@@ -14,13 +14,6 @@ spec:
         name: cert-manager
         namespace: cert-manager
       interval: 10m
-  values:
-    ingress:
-      enabled: true
-      host: longhorn.kennyandries.com
-      annotations:
-        # traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
-        external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
-
-    defaultBackupStore:
-      backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn
+  set:
+    - name: installCRDs
+      value: true
