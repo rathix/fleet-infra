@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: default
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: cert-manager/cert-manager
+      version: v1.19.1
+      sourceRef:
+        kind: OCIRepository
+        name: cert-manager
+        namespace: cert-manager
+      interval: 10m
+  values:
+    ingress:
+      enabled: true
+      host: longhorn.kennyandries.com
+      annotations:
+        # traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+        external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+    defaultBackupStore:
+      backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn
