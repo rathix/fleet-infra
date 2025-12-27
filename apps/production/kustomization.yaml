@@ -29,7 +29,3 @@ resources:
   - pocket-id/deployment.yaml
   - pocket-id/service.yaml
   - pocket-id/ingress.yaml
-  # External DNS
-  - external-dns/namespace.yaml
-  - external-dns/rbac.yaml
-  - external-dns/deployment.yaml
