@@ -9,8 +9,8 @@ resources:
   - cert-manager/sealedsecret.yaml
   # Longhorn
   - longhorn/namespace.yaml
-  - longhorn/repo.yaml
-  - longhorn/release.yaml
+  - longhorn/helmrepo.yaml
+  - longhorn/helmrelease.yaml
   # Traefik
   - traefik/sealedsecret.yaml
   - traefik/middleware.yaml
