@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servarr-sabnzbd
+  namespace: servarr
+  labels:
+    app.kubernetes.io/name: sabnzbd
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sabnzbd
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sabnzbd
+    spec:
+      enableServiceLinks: true
+      containers:
+        - name: sabnzbd
+          image: "lscr.io/linuxserver/sabnzbd:4.5.5"
+          env:
+            - name: PGID
+              value: "1000"
+            - name: PUID
+              value: "1000"
+            - name: UMASK
+              value: "002"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: servarr-sabnzbd
+            - mountPath: /media
+              name: servarr-jellyfin-media
+          resources:
+            limits:
+              memory: 8Gi
+              cpu: "4"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: servarr-sabnzbd
+          persistentVolumeClaim:
+            claimName: servarr-sabnzbd
+        - name: servarr-jellyfin-media
+          persistentVolumeClaim:
+            claimName: servarr-jellyfin-media
