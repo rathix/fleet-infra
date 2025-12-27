@@ -5,6 +5,8 @@ resources:
   - kube-vip/rbac.yaml
   - kube-vip/daemonset.yaml
   # Cert-manager
+  - cert-manager/helmrepo.yaml
+  - cert-manager/helmrelease.yaml
   - cert-manager/clusterissuer.yaml
   - cert-manager/sealedsecret.yaml
   # Longhorn
