@@ -13,6 +13,9 @@ resources:
   - longhorn/namespace.yaml
   - longhorn/helmrepo.yaml
   - longhorn/helmrelease.yaml
+  # Sealed Secrets
+  - sealed-secrets/helmrepo.yaml
+  - sealed-secrets/helmrelease.yaml
   # Traefik
   - traefik/sealedsecret.yaml
   - traefik/middleware.yaml
