@@ -10,7 +10,7 @@ spec:
       chart: longhorn/longhorn
       version: v1.10.1
       sourceRef:
-        kind: HelmRepository
+        kind: HelmChart
         name: longhorn
         namespace: longhorn-system
       interval: 10m
