@@ -17,6 +17,8 @@ resources:
   - sealed-secrets/helmrepo.yaml
   - sealed-secrets/helmrelease.yaml
   # Traefik
+  - traefik/helmrepo.yaml
+  - traefik/helmrelease.yaml
   - traefik/sealedsecret.yaml
   - traefik/middleware.yaml
   - traefik/certificate.yaml
