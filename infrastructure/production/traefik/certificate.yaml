@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: traefik-cert
-  namespace: traefik
+  namespace: traefik-system
 spec:
   commonName: "*.kennyandries.com"
   dnsNames:

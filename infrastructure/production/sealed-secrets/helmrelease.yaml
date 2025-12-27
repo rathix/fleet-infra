@@ -13,8 +13,9 @@ spec:
       version: v2.17.9
   interval: 1h0m0s
   releaseName: sealed-secrets-controller
-  targetNamespace: flux-system
+  targetNamespace: sealed-secrets
   install:
+    createNamespace: true
     crds: Create
   upgrade:
     crds: CreateReplace

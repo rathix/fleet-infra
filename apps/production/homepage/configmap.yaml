@@ -211,7 +211,7 @@ data:
           icon: traefik.png
           href: https://traefik.kennyandries.com/
           description: Ingress controller
-          namespace: traefik
+          namespace: traefik-system
           app: traefik
           siteMonitor: https://traefik.kennyandries.com
       - Longhorn:
