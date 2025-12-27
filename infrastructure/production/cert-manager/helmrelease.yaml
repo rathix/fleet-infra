@@ -11,7 +11,7 @@ spec:
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: cert-manager
+        name: cert-manager-repo
         namespace: flux-system
       version: v1.19.1
   install:
