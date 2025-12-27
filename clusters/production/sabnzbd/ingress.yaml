@@ -4,7 +4,7 @@ metadata:
   name: servarr-sabnzbd
   namespace: servarr
   labels:
-    app.kubernetes.io/name: sabnzbd
+    app: sabnzbd
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
