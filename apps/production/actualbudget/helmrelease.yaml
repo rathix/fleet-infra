@@ -30,4 +30,4 @@ spec:
 
     persistence:
       enabled: true
-      existingClaim: actualbudget-volume
+      # existingClaim: actualbudget-volume
