@@ -5,6 +5,8 @@ resources:
   - servarr/namespace.yaml
   - servarr/persistentvolume.yaml
   - servarr/persistentvolumeclaim.yaml
+  - servarr/helmrepo.yaml
+  - servarr/helmrelease.yaml
   # Homepage Dashboard
   - homepage/namespace.yaml
   - homepage/rbac.yaml
@@ -29,3 +31,9 @@ resources:
   - pocket-id/deployment.yaml
   - pocket-id/service.yaml
   - pocket-id/ingress.yaml
+  # Metrics Server
+  - metrics-server/helmrepo.yaml
+  - metrics-server/helmrelease.yaml
+  # Actual Budget
+  - actualbudget/helmrepo.yaml
+  - actualbudget/helmrelease.yaml

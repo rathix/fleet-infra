@@ -1,0 +1,244 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: servarr-release
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: servarr
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: servarr-repo
+      version: v1.2.2
+  interval: 1m0s
+  install:
+    createNamespace: true
+  targetNamespace: servarr
+  values:
+    jellyfin:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts: ["jellyfin.kennyandries.com"]
+        annotations:
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+      persistence:
+        config:
+          enabled: true
+          existingClaim: servarr-jellyfin-config
+        media:
+          enabled: true
+          existingClaim: servarr-jellyfin-media
+
+      resources:
+        limits:
+          memory: 8Gi
+          cpu: "4"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    sonarr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: sonarr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-sonarr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    qbittorrent:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: qbittorrent.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-qbittorrent
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    prowlarr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: prowlarr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-prowlarr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    flaresolverr:
+      enabled: false
+
+    jellyseerr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: jellyseerr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-jellyseerr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    bazarr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: bazarr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-bazarr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    radarr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: radarr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-radarr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    lidarr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: lidarr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-lidarr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+    cleanuparr:
+      enabled: true
+      ingress:
+        enabled: true
+        hosts:
+          - host: cleanuparr.kennyandries.com
+            paths:
+              - path: /
+                pathType: ImplementationSpecific
+        annotations:
+          traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+          external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+
+      persistence:
+        enabled: true
+        existingClaim: servarr-cleanuparr
+
+      resources:
+        limits:
+          memory: 2Gi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
