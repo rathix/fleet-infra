@@ -16,7 +16,7 @@ spec:
   interval: 1m0s
   install:
     createNamespace: true
-  targetnamespace: traefik-system
+  targetNamespace: traefik-system
   values:
     replicas: 2
 
