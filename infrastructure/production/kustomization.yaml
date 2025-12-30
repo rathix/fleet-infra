@@ -8,7 +8,7 @@ resources:
   - cert-manager/helmrepo.yaml
   - cert-manager/helmrelease.yaml
   - cert-manager/clusterissuer.yaml
-  - cert-manager/sealedsecret.yaml
+  # - cert-manager/sealedsecret.yaml
   # Longhorn
   - longhorn/namespace.yaml
   - longhorn/helmrepo.yaml
@@ -19,6 +19,6 @@ resources:
   # Traefik
   - traefik/helmrepo.yaml
   - traefik/helmrelease.yaml
-  - traefik/sealedsecret.yaml
+  # - traefik/sealedsecret.yaml
   - traefik/middleware.yaml
   - traefik/certificate.yaml
