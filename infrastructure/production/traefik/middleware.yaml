@@ -6,6 +6,7 @@ metadata:
 spec:
   plugin:
     traefik-oidc-auth:
+      Secret: "urn:k8s:secret:oidc-secret:pluginSecret"
       Provider:
         Url: "https://auth.kennyandries.com/"
         Scopes: ["openid", "profile", "email"]
