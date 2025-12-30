@@ -12,7 +12,7 @@ metadata:
     gethomepage.dev/icon: homepage.png
     gethomepage.dev/name: Homepage
     gethomepage.dev/siteMonitor: http://homepage.homepage.svc.cluster.local:3000
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-oidc@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
   rules:
