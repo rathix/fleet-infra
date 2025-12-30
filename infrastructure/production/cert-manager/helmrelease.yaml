@@ -36,10 +36,9 @@ spec:
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: cert-manager-webhook-hetzner
+        name: cert-manager-webhook-hetzner-repo
         namespace: flux-system
       version: v1.4.0
   interval: 1m0s
   releaseName: cert-manager-webhook-hetzner
-  storageNamespace: cert-manager
   targetNamespace: cert-manager
