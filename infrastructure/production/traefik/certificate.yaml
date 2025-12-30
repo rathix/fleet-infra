@@ -12,5 +12,3 @@ spec:
     name: letsencrypt
     kind: ClusterIssuer
   secretName: traefik-cert
-  dependsOn:
-    name: cert-manager
