@@ -219,7 +219,7 @@ spec:
           cpu: "0.2"
 
     cleanuparr:
-      enabled: true
+      enabled: false
       ingress:
         enabled: true
         hosts:
