@@ -199,7 +199,7 @@ data:
           description: Personal finance
           namespace: actualbudget
           app: actualbudget
-          siteMonitor: http://actualbudget.actualbudget.svc.cluster.local:5006
+          siteMonitor: http://actualbudget-actualbudget-release.actualbudget.svc.cluster.local:5006
       - Pocket ID:
           icon: pocket-id.png
           href: https://auth.kennyandries.com/
