@@ -4,17 +4,17 @@ metadata:
   name: pocket-id
   namespace: pocket-id
   labels:
-    app: pocket-id
+    app.kubernetes.io/name: pocket-id
 spec:
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      app: pocket-id
+      app.kubernetes.io/name: pocket-id
   template:
     metadata:
       labels:
-        app: pocket-id
+        app.kubernetes.io/name: pocket-id
     spec:
       enableServiceLinks: true
       containers:
