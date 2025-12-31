@@ -80,10 +80,10 @@ data:
           description: Media streaming
           namespace: servarr
           app: jellyfin
-          siteMonitor: http://servarr-jellyfin.servarr.svc.cluster.local:8096
+          siteMonitor: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
           widget:
             type: jellyfin
-            url: http://servarr-jellyfin.servarr.svc.cluster.local:8096
+            url: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
             key: {{HOMEPAGE_VAR_JELLYFIN}}
             enableBlocks: true # optional, defaults to false
             enableNowPlaying: true # optional, defaults to true
@@ -97,10 +97,10 @@ data:
           description: Movie requesting
           namespace: servarr
           app: radarr
-          siteMonitor: http://servarr-radarr.servarr.svc.cluster.local:7878
+          siteMonitor: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
           widget:
             type: radarr
-            url: http://servarr-radarr.servarr.svc.cluster.local:7878
+            url: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
             key: {{HOMEPAGE_VAR_RADARR}}
             enableQueue: true # optional, defaults to false
       - Sonarr:
@@ -109,10 +109,10 @@ data:
           description: Series requesting
           namespace: servarr
           app: sonarr
-          siteMonitor: http://servarr-sonarr.servarr.svc.cluster.local:80
+          siteMonitor: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
           widget:
             type: sonarr
-            url: http://servarr-sonarr.servarr.svc.cluster.local:80
+            url: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
             key: {{HOMEPAGE_VAR_SONARR}}
             enableQueue: true # optional, defaults to false
       - Lidarr:
@@ -121,10 +121,10 @@ data:
           description: Music requesting
           namespace: servarr
           app: lidarr
-          siteMonitor: http://servarr-lidarr.servarr.svc.cluster.local:8686
+          siteMonitor: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
           widget:
             type: lidarr
-            url: http://servarr-lidarr.servarr.svc.cluster.local:8686
+            url: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
             key: {{HOMEPAGE_VAR_LIDARR}}
             enableQueue: true # optional, defaults to false
       - Prowlarr:
@@ -133,10 +133,10 @@ data:
           description: Indexer management
           namespace: servarr
           app: prowlarr
-          siteMonitor: http://servarr-prowlarr.servarr.svc.cluster.local:9696
+          siteMonitor: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
           widget:
             type: prowlarr
-            url: http://servarr-prowlarr.servarr.svc.cluster.local:9696
+            url: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
             key: {{HOMEPAGE_VAR_PROWLARR}}
             enableQueue: true # optional, defaults to false
       - Jellyseerr:
@@ -145,10 +145,10 @@ data:
           description: Media requesting
           namespace: servarr
           app: jellyseerr
-          siteMonitor: http://servarr-jellyseerr.servarr.svc.cluster.local:5055
+          siteMonitor: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
           widget:
             type: jellyseerr
-            url: http://servarr-jellyseerr.servarr.svc.cluster.local:5055
+            url: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
             key: {{HOMEPAGE_VAR_JELLYSEERR}}          
       - Bazarr:
           icon: bazarr.png
@@ -156,10 +156,10 @@ data:
           description: Subtitle management
           namespace: servarr
           app: bazarr
-          siteMonitor: http://servarr-bazarr.servarr.svc.cluster.local:6767
+          siteMonitor: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
           widget:
             type: bazarr
-            url: http://servarr-bazarr.servarr.svc.cluster.local:6767
+            url: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
             key: {{HOMEPAGE_VAR_BAZARR}}          
       - Cleanuparr:
           icon: cleanuperr.png
@@ -167,17 +167,17 @@ data:
           description: Media cleanup
           namespace: servarr
           app: cleanuparr
-          siteMonitor: http://servarr-cleanuparr.servarr.svc.cluster.local:11011
+          siteMonitor: http://servarr-servarr-release-cleanuparr.servarr.svc.cluster.local:11011
       - qBittorrent:
           icon: qbittorrent.png
           href: https://qbittorrent.kennyandries.com/
           description: Torrent client
           namespace: servarr
           app: qbittorrent
-          siteMonitor: http://servarr-qbittorrent-web.servarr.svc.cluster.local:8080
+          siteMonitor: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
           widget:
             type: qbittorrent
-            url: http://servarr-qbittorrent-web.servarr.svc.cluster.local:8080
+            url: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
             enableLeechProgress: true # optional, defaults to false
             enableLeechSize: true # optional, defaults to false
       - SABnzbd:
@@ -186,10 +186,10 @@ data:
           description: Usenet client
           namespace: servarr
           app: sabnzbd
-          siteMonitor: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
+          siteMonitor: http://servarr-servarr-release-sabnzbd.servarr.svc.cluster.local:8080
           widget:
             type: sabnzbd
-            url: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
+            url: http://servarr-servarr-release-sabnzbd.servarr.svc.cluster.local:8080
             key: {{HOMEPAGE_VAR_SABNZBD}}
 
     - Services:
