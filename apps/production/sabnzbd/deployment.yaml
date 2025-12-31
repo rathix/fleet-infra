@@ -4,7 +4,7 @@ metadata:
   name: servarr-sabnzbd
   namespace: servarr
   labels:
-    app: sabnzbd
+    app.kubernetes.io/name: sabnzbd
 spec:
   strategy:
     type: Recreate
