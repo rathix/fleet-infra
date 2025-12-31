@@ -4,7 +4,7 @@ metadata:
   name: homepage
   namespace: homepage
   labels:
-    app: homepage
+    app.kubernetes.io/name: homepage
 data:
   kubernetes.yaml: |
     mode: cluster

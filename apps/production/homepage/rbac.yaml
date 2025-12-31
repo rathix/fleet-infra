@@ -4,7 +4,7 @@ metadata:
   name: homepage
   namespace: homepage
   labels:
-    app: homepage
+    app.kubernetes.io/name: homepage
 secrets:
   - name: homepage
 ---
@@ -15,7 +15,7 @@ metadata:
   name: homepage
   namespace: homepage
   labels:
-    app: homepage
+    app.kubernetes.io/name: homepage
   annotations:
     kubernetes.io/service-account.name: homepage
 ---
@@ -24,7 +24,7 @@ kind: ClusterRole
 metadata:
   name: homepage
   labels:
-    app: homepage
+    app.kubernetes.io/name: homepage
 rules:
   - apiGroups:
       - ""
@@ -72,7 +72,7 @@ kind: ClusterRoleBinding
 metadata:
   name: homepage
   labels:
-    app: homepage
+    app.kubernetes.io/name: homepage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

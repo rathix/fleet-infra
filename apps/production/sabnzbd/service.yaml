@@ -4,7 +4,7 @@ metadata:
   name: servarr-sabnzbd
   namespace: servarr
   labels:
-    app: sabnzbd
+    app.kubernetes.io/name: sabnzbd
 spec:
   type: ClusterIP
   ports:
@@ -13,4 +13,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: sabnzbd
+    app.kubernetes.io/name: sabnzbd

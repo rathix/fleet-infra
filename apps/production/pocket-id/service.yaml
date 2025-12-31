@@ -4,7 +4,7 @@ metadata:
   name: pocket-id
   namespace: pocket-id
   labels:
-    app: pocket-id
+    app.kubernetes.io/name: pocket-id
 spec:
   type: ClusterIP
   ports:
@@ -13,4 +13,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: pocket-id
+    app.kubernetes.io/name: pocket-id

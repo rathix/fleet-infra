@@ -4,7 +4,7 @@ metadata:
   name: pocket-id
   namespace: pocket-id
   labels:
-    app: pocket-id
+    app.kubernetes.io/name: pocket-id
   annotations:
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
