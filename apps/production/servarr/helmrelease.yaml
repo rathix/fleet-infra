@@ -28,7 +28,7 @@ spec:
       persistence:
         config:
           enabled: true
-          existingClaim: servarr-jellyfin-config
+          # existingClaim: servarr-jellyfin-config
         media:
           enabled: true
           existingClaim: servarr-jellyfin-media
@@ -56,7 +56,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-sonarr
+        # existingClaim: servarr-sonarr
 
       resources:
         limits:
@@ -81,7 +81,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-qbittorrent
+        # existingClaim: servarr-qbittorrent
 
       resources:
         limits:
@@ -106,7 +106,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-prowlarr
+        # existingClaim: servarr-prowlarr
 
       resources:
         limits:
@@ -133,7 +133,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-jellyseerr
+        # existingClaim: servarr-jellyseerr
 
       resources:
         limits:
@@ -158,7 +158,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-bazarr
+        # existingClaim: servarr-bazarr
 
       resources:
         limits:
@@ -183,7 +183,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-radarr
+        # existingClaim: servarr-radarr
 
       resources:
         limits:
@@ -208,7 +208,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-lidarr
+        # existingClaim: servarr-lidarr
 
       resources:
         limits:
@@ -233,7 +233,7 @@ spec:
 
       persistence:
         enabled: true
-        existingClaim: servarr-cleanuparr
+        # existingClaim: servarr-cleanuparr
 
       resources:
         limits:
