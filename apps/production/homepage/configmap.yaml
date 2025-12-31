@@ -186,10 +186,10 @@ data:
           description: Usenet client
           namespace: servarr
           app: sabnzbd
-          siteMonitor: http://servarr-servarr-release-sabnzbd.servarr.svc.cluster.local:8080
+          siteMonitor: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
           widget:
             type: sabnzbd
-            url: http://servarr-servarr-release-sabnzbd.servarr.svc.cluster.local:8080
+            url: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
             key: {{HOMEPAGE_VAR_SABNZBD}}
 
     - Services:
