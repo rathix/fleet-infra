@@ -161,13 +161,13 @@ data:
             type: bazarr
             url: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
             key: {{HOMEPAGE_VAR_BAZARR}}          
-      - Cleanuparr:
-          icon: cleanuperr.png
-          href: https://cleanuparr.kennyandries.com/
-          description: Media cleanup
-          namespace: servarr
-          app: cleanuparr
-          siteMonitor: http://servarr-servarr-release-cleanuparr.servarr.svc.cluster.local:11011
+      # - Cleanuparr:
+      #     icon: cleanuperr.png
+      #     href: https://cleanuparr.kennyandries.com/
+      #     description: Media cleanup
+      #     namespace: servarr
+      #     app: cleanuparr
+      #     siteMonitor: http://servarr-servarr-release-cleanuparr.servarr.svc.cluster.local:11011
       - qBittorrent:
           icon: qbittorrent.png
           href: https://qbittorrent.kennyandries.com/
