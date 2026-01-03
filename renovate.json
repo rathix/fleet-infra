@@ -15,9 +15,9 @@
         ]
     },
     "kubernetes": {
-        "fileMatch": [
-            "apps/.+\\.yaml$",
-            "infrastructure/.+\\.yaml$"
+        "managerFilePatterns": [
+            "/apps/.+\\.yaml$/",
+            "/infrastructure/.+\\.yaml$/"
         ]
     },
     "helm-values": {
@@ -43,7 +43,7 @@
             ],
             "automerge": true,
             "platformAutomerge": true,
-            "requiredStatusChecks": null
+            "ignoreTests": true
         }
     ]
 }
