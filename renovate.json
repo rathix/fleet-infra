@@ -12,6 +12,12 @@
             "/apps/.+\\.yaml$/"
         ]
     },
+    "kubernetes": {
+        "fileMatch": [
+            "apps/.+\\.yaml$",
+            "infrastructure/.+\\.yaml$"
+        ]
+    },
     "helm-values": {
         "managerFilePatterns": [
             "/apps/.+/values.yaml$/",
