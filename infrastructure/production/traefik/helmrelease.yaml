@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: traefik-repo
-      version: v37.4.0
+      version: 38.0.1
   interval: 1m0s
   install:
     createNamespace: true
