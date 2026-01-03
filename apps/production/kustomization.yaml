@@ -27,6 +27,7 @@ resources:
   - sabnzbd/ingress.yaml
   # Pocket ID
   - pocket-id/namespace.yaml
+  - pocket-id/secret.yaml
   - pocket-id/pvc.yaml
   - pocket-id/deployment.yaml
   - pocket-id/service.yaml
