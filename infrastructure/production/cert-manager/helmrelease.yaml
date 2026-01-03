@@ -38,7 +38,7 @@ spec:
         kind: HelmRepository
         name: cert-manager-webhook-hetzner-repo
         namespace: flux-system
-      version: v1.4.0
+      version: 1.4.2
   interval: 1m0s
   releaseName: cert-manager-webhook-hetzner
   targetNamespace: cert-manager
