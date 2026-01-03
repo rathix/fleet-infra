@@ -42,7 +42,8 @@
                 "patch"
             ],
             "automerge": true,
-            "platformAutomerge": true
+            "platformAutomerge": true,
+            "requiredStatusChecks": null
         }
     ]
 }
