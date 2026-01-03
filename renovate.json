@@ -1,21 +1,21 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:base",
+        "config:recommended",
         ":dependencyDashboard"
     ],
     "pinDigests": false,
     "flux": {
-        "fileMatch": [
-            "clusters/.+\\.yaml$",
-            "infrastructure/.+\\.yaml$",
-            "apps/.+\\.yaml$"
+        "managerFilePatterns": [
+            "/clusters/.+\\.yaml$/",
+            "/infrastructure/.+\\.yaml$/",
+            "/apps/.+\\.yaml$/"
         ]
     },
     "helm-values": {
-        "fileMatch": [
-            "apps/.+/values.yaml$",
-            "infrastructure/.+/values.yaml$"
+        "managerFilePatterns": [
+            "/apps/.+/values.yaml$/",
+            "/infrastructure/.+/values.yaml$/"
         ]
     },
     "packageRules": [
