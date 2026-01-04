@@ -13,4 +13,6 @@ spec:
       version: v2.2.7
   interval: 1h0m0s
   releaseName: reloader
+  install:
+    createNamespace: true
   targetNamespace: reloader
