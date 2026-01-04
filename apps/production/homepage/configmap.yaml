@@ -215,7 +215,7 @@ data:
           app: uptime-kuma
           siteMonitor: https://uptime-kuma.kennyandries.com/
       - Home Assistant:
-          icon: homeassistant.png
+          icon: home-assistant.png
           href: http://homeassistant.local:8123/
           description: Home automation
           siteMonitor: http://homeassistant.local:8123/
