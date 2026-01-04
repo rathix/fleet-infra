@@ -102,7 +102,7 @@ spec:
 
       image:
         repository: lscr.io/linuxserver/qbittorrent
-        tag: 5.1.4
+        tag: 20.04.1
 
     prowlarr:
       enabled: true
@@ -220,7 +220,7 @@ spec:
 
       image:
         repository: lscr.io/linuxserver/radarr
-        tag: 5.14.0
+        tag: 6.0.4
 
     lidarr:
       enabled: true
@@ -249,7 +249,7 @@ spec:
 
       image:
         repository: lscr.io/linuxserver/lidarr
-        tag: 2.14.5
+        tag: 8.1.2135
 
     cleanuparr:
       enabled: false
