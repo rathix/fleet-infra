@@ -10,7 +10,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: stakater
-      version: 1.4.12
+      version: v2.2.7
   interval: 1h0m0s
   releaseName: reloader
   targetNamespace: reloader
