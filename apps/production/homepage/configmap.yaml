@@ -205,6 +205,11 @@ data:
           href: https://auth.kennyandries.com/
           description: Passkey IdP
           siteMonitor: https://auth.kennyandries.com/
+      - Uptime Kuma:
+          icon: uptime-kuma.png
+          href: https://uptime-kuma.kennyandries.com/
+          description: Application Monitoring
+          siteMonitor: https://uptime-kuma.kennyandries.com/
 
     - Cluster Management:
       - Traefik:

@@ -38,3 +38,6 @@ resources:
   # Actual Budget
   - actualbudget/helmrepo.yaml
   - actualbudget/helmrelease.yaml
+  # Uptime Kuma
+  - uptime-kuma/helmrepo.yaml
+  - uptime-kuma/helmrelease.yaml
