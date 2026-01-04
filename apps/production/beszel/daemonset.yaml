@@ -22,6 +22,8 @@ spec:
                 secretKeyRef:
                   name: beszel-secret
                   key: apiKey
+            - name: HUB_URL
+              value: https://beszel.kennyandries.com
           image: henrygd/beszel-agent:0.17.0
           name: beszel-agent
           ports:
