@@ -134,7 +134,11 @@ spec:
         tag: 2.3.0
 
     flaresolverr:
-      enabled: false
+      enabled: true
+
+      image:
+        repository: ghcr.io/flaresolverr/flaresolverr
+        tag: v3.3.21
 
     jellyseerr:
       enabled: true
