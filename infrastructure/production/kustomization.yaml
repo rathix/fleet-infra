@@ -22,3 +22,6 @@ resources:
   # - traefik/sealedsecret.yaml
   - traefik/middleware.yaml
   - traefik/certificate.yaml
+  # Reloader
+  - reloader/helmrepo.yaml
+  - reloader/helmrelease.yaml
