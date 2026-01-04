@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beszel
+  namespace: beszel
+  labels:
+    app.kubernetes.io/name: beszel
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: beszel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: beszel
+    spec:
+      containers:
+        - name: beszel
+          image: "henrygd/beszel:0.17.0"
+          ports:
+            - name: http
+              containerPort: 8090
+          volumeMounts:
+            - mountPath: /beszel_data
+              name: beszel
+          resources:
+            limits:
+              memory: 2Gi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: beszel
+          persistentVolumeClaim:
+            claimName: beszel

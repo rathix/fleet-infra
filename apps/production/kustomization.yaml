@@ -41,3 +41,9 @@ resources:
   # Uptime Kuma
   - uptime-kuma/helmrepo.yaml
   - uptime-kuma/helmrelease.yaml
+  # Beszel
+  - beszel/namespace.yaml
+  - beszel/pvc.yaml
+  - beszel/deployment.yaml
+  - beszel/service.yaml
+  - beszel/ingress.yaml
