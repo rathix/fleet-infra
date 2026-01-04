@@ -204,11 +204,15 @@ data:
           icon: pocket-id.png
           href: https://auth.kennyandries.com/
           description: Passkey IdP
+          namespace: pocket-id
+          app: pocket-id
           siteMonitor: https://auth.kennyandries.com/
       - Uptime Kuma:
           icon: uptime-kuma.png
           href: https://uptime-kuma.kennyandries.com/
           description: Application Monitoring
+          namespace: uptime-kuma
+          app: uptime-kuma
           siteMonitor: https://uptime-kuma.kennyandries.com/
 
     - Cluster Management:
