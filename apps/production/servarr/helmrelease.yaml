@@ -29,6 +29,7 @@ spec:
         config:
           enabled: true
           # existingClaim: servarr-jellyfin-config
+          size: 4Gi
         media:
           enabled: true
           existingClaim: servarr-jellyfin-media
