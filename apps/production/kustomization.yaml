@@ -43,7 +43,9 @@ resources:
   - uptime-kuma/helmrelease.yaml
   # Beszel
   - beszel/namespace.yaml
+  - beszel/sealedsecret.yaml
   - beszel/pvc.yaml
   - beszel/deployment.yaml
   - beszel/service.yaml
   - beszel/ingress.yaml
+  - beszel/daemonset.yaml
