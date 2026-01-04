@@ -15,6 +15,7 @@ data:
 
     useEqualHeights: true
     statusStyle: "dot"
+    headerStyle: boxedWidgets
 
     layout:
       Media:
