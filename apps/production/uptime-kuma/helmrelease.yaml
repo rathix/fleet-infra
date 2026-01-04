@@ -32,3 +32,7 @@ spec:
     volume:
       enabled: true
       # existingClaim: uptime-kuma-volume
+
+    image:
+      repository: louislam/uptime-kuma
+      tag: 2.0.2
