@@ -248,7 +248,7 @@ spec:
 
       image:
         repository: lscr.io/linuxserver/lidarr
-        tag: 2.7.1
+        tag: 2.14.5
 
     cleanuparr:
       enabled: false
