@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: actualbudget-repo
-      version: 1.8.5
+      version: 1.8.6
   interval: 1m0s
   install:
     createNamespace: true
