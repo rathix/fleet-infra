@@ -282,4 +282,4 @@ spec:
 
       image:
         repository: ghcr.io/cleanuparr/cleanuparr
-        tag: v2.4.7
+        tag: 2.5.0
