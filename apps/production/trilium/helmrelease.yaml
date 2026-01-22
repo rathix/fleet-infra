@@ -1,0 +1,43 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: trilium
+  namespace: flux-system # Change to your target namespace
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: trilium
+      version: "1.3.0" # Pin to major version for stability
+      sourceRef:
+        kind: HelmRepository
+        name: triliumnext
+        namespace: flux-system
+      interval: 12h
+      install:
+        createNamespace: true
+      targetNamespace: trilium
+  values:
+    controllers:
+      main:
+        containers:
+          trilium:
+            image:
+              repository: triliumnext/notes
+              tag: v0.92.4
+              pullPolicy: IfNotPresent
+            env:
+              TRILIUM_NO_AUTHENTICATION: true
+
+      ingress:
+        main:
+          enabled: true
+          hosts:
+            - host: trilium.kennyandries.com
+              paths:
+                - path: "/api/v1"
+
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim

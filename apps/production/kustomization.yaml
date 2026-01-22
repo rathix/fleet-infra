@@ -49,3 +49,6 @@ resources:
   - beszel/service.yaml
   - beszel/ingress.yaml
   - beszel/daemonset.yaml
+  # Trilium
+  - trilium/helmrepo.yaml
+  - trilium/helmrelease.yaml
