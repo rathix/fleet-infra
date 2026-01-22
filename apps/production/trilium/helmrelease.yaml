@@ -27,30 +27,30 @@ spec:
               tag: v0.92.4
               pullPolicy: IfNotPresent
 
-      configini:
-        general:
-          instanceName: ""
-          noAuthentication: true
-          noBackup: false
-        network:
-          host: "0.0.0.0"
-          port: 8080
-          https: false
-          certPath: ""
-          keyPath: ""
-          trustedReverseProxy: true
+    configini:
+      general:
+        instanceName: ""
+        noAuthentication: true
+        noBackup: false
+      network:
+        host: "0.0.0.0"
+        port: 8080
+        https: false
+        certPath: ""
+        keyPath: ""
+        trustedReverseProxy: true
 
-      ingress:
-        main:
-          enabled: true
-          className: nginx
-          hosts:
-            - host: trilium.kennyandries.com
-              paths:
-                - path: /
-                  service:
-                    identifier: main
-                    port: http
+    ingress:
+      main:
+        enabled: true
+        className: nginx
+        hosts:
+          - host: trilium.kennyandries.com
+            paths:
+              - path: /
+                service:
+                  identifier: main
+                  port: http
 
     persistence:
       data:
