@@ -14,9 +14,9 @@ spec:
         name: triliumnext
         namespace: flux-system
       interval: 12h
-      install:
-        createNamespace: true
-      targetNamespace: trilium
+  install:
+    createNamespace: true
+  targetNamespace: trilium
   values:
     controllers:
       main:
