@@ -24,7 +24,7 @@ spec:
           trilium:
             image:
               repository: triliumnext/notes
-              tag: v0.92.4
+              tag: v0.95.0
               pullPolicy: IfNotPresent
             env:
               TRILIUM_NO_AUTHENTICATION: true
