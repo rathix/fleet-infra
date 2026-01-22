@@ -50,6 +50,7 @@ resources:
   - beszel/ingress.yaml
   - beszel/daemonset.yaml
   # Trilium
+  - trilium/namespace.yaml
   - trilium/helmrepo.yaml
   - trilium/helmrelease.yaml
   - trilium/pvc.yaml
