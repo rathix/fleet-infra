@@ -29,14 +29,16 @@ spec:
             env:
               TRILIUM_NO_AUTHENTICATION: true
 
-      # ingress:
-      #   main:
-      #     enabled: true
-      #     hosts:
-      #       - host: trilium.kennyandries.com
-      #         paths:
-      #           - path: "/api/v1"
+      ingress:
+        main:
+          enabled: true
+          hosts:
+            - host: trilium.kennyandries.com
+              paths:
+                - path: "/api/v1"
 
     persistence:
       data:
         enabled: true
+        type: persistentVolumeClaim
+        existingClaim: trilium-pvc

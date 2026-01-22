@@ -52,3 +52,4 @@ resources:
   # Trilium
   - trilium/helmrepo.yaml
   - trilium/helmrelease.yaml
+  - trilium/pvc.yaml
