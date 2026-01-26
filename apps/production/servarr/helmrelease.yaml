@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: servarr-repo
-      version: v1.2.2
+      version: 1.2.3
   interval: 1m0s
   install:
     createNamespace: true
