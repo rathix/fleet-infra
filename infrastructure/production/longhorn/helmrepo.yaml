@@ -4,6 +4,8 @@ kind: HelmRepository
 metadata:
   name: longhorn-repo
   namespace: flux-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   interval: 1m0s
   url: https://charts.longhorn.io
