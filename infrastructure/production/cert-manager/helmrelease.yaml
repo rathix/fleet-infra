@@ -12,11 +12,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: cert-manager-repo
-        namespace: flux-system
       version: v1.19.2
   install:
     createNamespace: true
-  interval: 1m0s
+  interval: 1m
   releaseName: cert-manager
   storageNamespace: cert-manager
   targetNamespace: cert-manager
@@ -37,8 +36,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: cert-manager-webhook-hetzner-repo
-        namespace: flux-system
       version: 1.4.2
-  interval: 1m0s
+  interval: 1m
   releaseName: cert-manager-webhook-hetzner
   targetNamespace: cert-manager

@@ -5,7 +5,7 @@ metadata:
   name: cert-manager-repo
   namespace: flux-system
 spec:
-  interval: 1m0s
+  interval: 1m
   type: oci
   url: oci://quay.io/jetstack/charts
 ---
@@ -15,5 +15,5 @@ metadata:
   name: cert-manager-webhook-hetzner-repo
   namespace: flux-system
 spec:
-  interval: 1m0s
+  interval: 1m
   url: https://vadimkim.github.io/cert-manager-webhook-hetzner

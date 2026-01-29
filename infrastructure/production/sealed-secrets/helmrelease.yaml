@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: sealed-secrets-repo
       version: 2.18.0
-  interval: 1h0m0s
+  interval: 1h
   releaseName: sealed-secrets-controller
   targetNamespace: sealed-secrets
   install:

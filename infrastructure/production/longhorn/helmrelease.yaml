@@ -15,7 +15,7 @@ spec:
         kind: HelmRepository
         name: longhorn-repo
       version: 1.10.2
-  interval: 1m0s
+  interval: 1m
   install:
     createNamespace: true
   targetNamespace: longhorn-system

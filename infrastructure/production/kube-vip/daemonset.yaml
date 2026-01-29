@@ -69,7 +69,13 @@ spec:
           image: ghcr.io/kube-vip/kube-vip:v1.0.3
           imagePullPolicy: IfNotPresent
           name: kube-vip
-          resources: {}
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: 100m
+            requests:
+              memory: 32Mi
+              cpu: 10m
           securityContext:
             capabilities:
               add:
@@ -84,4 +90,5 @@ spec:
           operator: Exists
         - effect: NoExecute
           operator: Exists
-  updateStrategy: {}
+  updateStrategy:
+    type: RollingUpdate
