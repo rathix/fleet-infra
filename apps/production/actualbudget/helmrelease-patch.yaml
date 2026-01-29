@@ -4,6 +4,7 @@ metadata:
   name: actualbudget
   namespace: flux-system
 spec:
+  interval: 30m
   values:
     ingress:
       enabled: true

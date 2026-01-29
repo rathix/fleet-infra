@@ -4,6 +4,7 @@ metadata:
   name: servarr
   namespace: flux-system
 spec:
+  interval: 30m
   values:
     jellyfin:
       enabled: true
