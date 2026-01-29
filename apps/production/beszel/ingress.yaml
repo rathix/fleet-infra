@@ -9,10 +9,10 @@ metadata:
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
   rules:
-    - host: "beszel.kennyandries.com"
+    - host: beszel.kennyandries.com
       http:
         paths:
-          - path: "/"
+          - path: /
             pathType: Prefix
             backend:
               service:

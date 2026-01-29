@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/name: beszel
 spec:
   type: ClusterIP
-  ports:
-    - port: 8090
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
     app.kubernetes.io/name: beszel
+  ports:
+    - name: http
+      port: 8090
+      targetPort: http
+      protocol: TCP

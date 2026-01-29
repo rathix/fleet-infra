@@ -6,6 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: beszel
 spec:
+  replicas: 1
+  revisionHistoryLimit: 3
   strategy:
     type: Recreate
   selector:
@@ -18,13 +20,26 @@ spec:
     spec:
       containers:
         - name: beszel
-          image: "henrygd/beszel:0.18.2"
+          image: henrygd/beszel:0.18.2
           ports:
             - name: http
               containerPort: 8090
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           volumeMounts:
-            - mountPath: /beszel_data
-              name: beszel
+            - name: beszel
+              mountPath: /beszel_data
           resources:
             limits:
               memory: 2Gi

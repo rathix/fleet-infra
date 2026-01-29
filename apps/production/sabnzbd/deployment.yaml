@@ -6,6 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: sabnzbd
 spec:
+  replicas: 1
+  revisionHistoryLimit: 3
   strategy:
     type: Recreate
   selector:
@@ -19,7 +21,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: sabnzbd
-          image: "lscr.io/linuxserver/sabnzbd:4.5.5"
+          image: lscr.io/linuxserver/sabnzbd:4.5.5
           env:
             - name: PGID
               value: "1000"
@@ -31,11 +33,23 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
           volumeMounts:
-            - mountPath: /config
-              name: servarr-sabnzbd
-            - mountPath: /media
-              name: servarr-jellyfin-media
+            - name: servarr-sabnzbd
+              mountPath: /config
+            - name: servarr-jellyfin-media
+              mountPath: /media
           resources:
             limits:
               memory: 8Gi

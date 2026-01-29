@@ -3,12 +3,14 @@ kind: Middleware
 metadata:
   name: oidc
   namespace: traefik-system
+  labels:
+    app.kubernetes.io/name: traefik
 spec:
   plugin:
     traefik-oidc-auth:
-      Secret: "urn:k8s:secret:oidc-secret:pluginSecret"
+      Secret: urn:k8s:secret:oidc-secret:pluginSecret
       Provider:
-        Url: "https://auth.kennyandries.com/"
+        Url: https://auth.kennyandries.com/
         Scopes: ["openid", "profile", "email"]
-        ClientId: "urn:k8s:secret:oidc-secret:providerClientId"
-        ClientSecret: "urn:k8s:secret:oidc-secret:providerClientSecret"
+        ClientId: urn:k8s:secret:oidc-secret:providerClientId
+        ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret

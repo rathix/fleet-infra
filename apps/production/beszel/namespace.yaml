@@ -3,7 +3,7 @@ kind: Namespace
 metadata:
   name: beszel
   labels:
-    # Allows hostNetwork, hostPort, and other host-level access
+    app.kubernetes.io/name: beszel
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged

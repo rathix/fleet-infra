@@ -3,11 +3,13 @@ kind: PersistentVolumeClaim
 metadata:
   name: servarr-jellyfin-media
   namespace: servarr
+  labels:
+    app.kubernetes.io/name: servarr
 spec:
   accessModes:
     - ReadWriteMany
+  storageClassName: ""
+  volumeName: servarr-jellyfin-media-nfs
   resources:
     requests:
       storage: 2000Gi
-  storageClassName: ""
-  volumeName: servarr-jellyfin-media-nfs

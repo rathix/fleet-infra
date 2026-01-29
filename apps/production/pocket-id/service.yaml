@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/name: pocket-id
 spec:
   type: ClusterIP
-  ports:
-    - port: 1411
-      targetPort: http
-      protocol: TCP
-      name: http
   selector:
     app.kubernetes.io/name: pocket-id
+  ports:
+    - name: http
+      port: 1411
+      targetPort: http
+      protocol: TCP

@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: pocket-id
   namespace: pocket-id
+  labels:
+    app.kubernetes.io/name: pocket-id
 spec:
   accessModes:
     - ReadWriteOnce

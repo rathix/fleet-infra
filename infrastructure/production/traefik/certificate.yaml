@@ -3,10 +3,12 @@ kind: Certificate
 metadata:
   name: traefik-cert
   namespace: traefik-system
+  labels:
+    app.kubernetes.io/name: traefik
 spec:
   commonName: "*.kennyandries.com"
   dnsNames:
-    - "kennyandries.com"
+    - kennyandries.com
     - "*.kennyandries.com"
   issuerRef:
     name: letsencrypt

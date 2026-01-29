@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: media-app-data
   namespace: servarr
+  labels:
+    app.kubernetes.io/name: configarr
 spec:
   accessModes:
     - ReadWriteOnce

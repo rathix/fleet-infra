@@ -3,6 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: trilium-pvc
   namespace: trilium
+  labels:
+    app.kubernetes.io/name: trilium
 spec:
   accessModes:
     - ReadWriteOnce

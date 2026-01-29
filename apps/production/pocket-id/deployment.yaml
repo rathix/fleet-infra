@@ -6,6 +6,8 @@ metadata:
   labels:
     app.kubernetes.io/name: pocket-id
 spec:
+  replicas: 1
+  revisionHistoryLimit: 3
   strategy:
     type: Recreate
   selector:
@@ -19,7 +21,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: pocket-id
-          image: "ghcr.io/pocket-id/pocket-id:v2.2.0"
+          image: ghcr.io/pocket-id/pocket-id:v2.2.0
           env:
             - name: PGID
               value: "1000"
@@ -28,7 +30,7 @@ spec:
             - name: TRUST_PROXY
               value: "true"
             - name: APP_URL
-              value: "https://auth.kennyandries.com"
+              value: https://auth.kennyandries.com
             - name: ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:
@@ -38,9 +40,21 @@ spec:
             - name: http
               containerPort: 1411
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
           volumeMounts:
-            - mountPath: /app/data
-              name: pocket-id
+            - name: pocket-id
+              mountPath: /app/data
           resources:
             limits:
               memory: 2Gi
