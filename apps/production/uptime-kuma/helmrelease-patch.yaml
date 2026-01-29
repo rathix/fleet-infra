@@ -17,6 +17,7 @@ spec:
               pathType: ImplementationSpecific
     volume:
       enabled: true
+      existingClaim: uptime-kuma-uptime-kuma-pvc
     image:
       repository: louislam/uptime-kuma
       tag: 2.0.2
