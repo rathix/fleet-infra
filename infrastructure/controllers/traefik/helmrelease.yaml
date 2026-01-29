@@ -27,6 +27,8 @@ spec:
     mode: enabled
   values:
     replicas: 2
+    ingressClass:
+      isDefaultClass: true
     ports:
       web:
         redirections:
