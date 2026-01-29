@@ -1,0 +1,18 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: actualbudget
+  namespace: flux-system
+spec:
+  values:
+    ingress:
+      enabled: true
+      annotations:
+        external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+      hosts:
+        - host: actualbudget.kennyandries.com
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+    persistence:
+      enabled: true

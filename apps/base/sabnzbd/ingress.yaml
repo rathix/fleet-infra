@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: servarr-sabnzbd
+  namespace: servarr
+  labels:
+    app.kubernetes.io/name: sabnzbd
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: servarr-sabnzbd
+                port:
+                  number: 8080

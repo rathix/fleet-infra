@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-config
+  namespace: flux-system
+data:
+  cluster_name: production
+  domain: kennyandries.com
+  ingress_class: traefik
+  storage_class: longhorn
+  external_dns_target: traefik.kennyandries.com
