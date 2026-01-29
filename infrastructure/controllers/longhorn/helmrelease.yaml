@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: flux-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  chart:
+    spec:
+      chart: longhorn
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+      version: 1.11.0
+  interval: 30m
+  timeout: 15m
+  targetNamespace: longhorn-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    ingress:
+      enabled: true
+      host: longhorn.kennyandries.com
+      annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
+        external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+    defaultBackupStore:
+      backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn

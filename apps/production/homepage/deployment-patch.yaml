@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: homepage
+spec:
+  template:
+    spec:
+      containers:
+        - name: homepage
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: homepage.kennyandries.com
+            - name: HOMEPAGE_VAR_SONARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: sonarrKey
+            - name: HOMEPAGE_VAR_RADARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: radarrKey
+            - name: HOMEPAGE_VAR_LIDARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: lidarrKey
+            - name: HOMEPAGE_VAR_PROWLARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: prowlarrKey
+            - name: HOMEPAGE_VAR_JELLYFIN
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: jellyfinKey
+            - name: HOMEPAGE_VAR_SABNZBD
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: sabnzbdKey
+            - name: HOMEPAGE_VAR_JELLYSEERR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: jellyseerrKey
+            - name: HOMEPAGE_VAR_BAZARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: bazarrKey

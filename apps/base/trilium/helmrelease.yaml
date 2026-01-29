@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: trilium
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: trilium
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: triliumnext
+      version: 1.3.0
+  interval: 30m
+  timeout: 5m
+  targetNamespace: trilium
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
