@@ -12,9 +12,18 @@ spec:
         kind: HelmRepository
         name: uptime-kuma
       version: 2.24.0
-  interval: 1m
+  interval: 30m
+  timeout: 5m
   install:
     createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
   targetNamespace: uptime-kuma
   values:
     ingress:

@@ -12,9 +12,18 @@ spec:
         kind: HelmRepository
         name: servarr-repo
       version: 1.2.3
-  interval: 1m
+  interval: 30m
+  timeout: 15m
   install:
     createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
   targetNamespace: servarr
   values:
     jellyfin:

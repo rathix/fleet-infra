@@ -13,9 +13,18 @@ spec:
         kind: HelmRepository
         name: cert-manager-repo
       version: v1.19.2
+  interval: 30m
+  timeout: 10m
   install:
     createNamespace: true
-  interval: 1m
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
   releaseName: cert-manager
   storageNamespace: cert-manager
   targetNamespace: cert-manager
@@ -29,6 +38,8 @@ metadata:
   name: cert-manager-webhook-hetzner-release
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: cert-manager-release
   chart:
     spec:
       chart: cert-manager-webhook-hetzner
@@ -37,6 +48,14 @@ spec:
         kind: HelmRepository
         name: cert-manager-webhook-hetzner-repo
       version: 1.4.2
-  interval: 1m
+  interval: 30m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
   releaseName: cert-manager-webhook-hetzner
   targetNamespace: cert-manager

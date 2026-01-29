@@ -13,8 +13,17 @@ spec:
         kind: HelmRepository
         name: triliumnext
       interval: 12h
+  timeout: 5m
   install:
     createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
   targetNamespace: trilium
   values:
     controllers:

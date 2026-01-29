@@ -12,7 +12,16 @@ spec:
         name: stakater
       version: v2.2.7
   interval: 1h
+  timeout: 5m
   releaseName: reloader
   install:
     createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
   targetNamespace: reloader

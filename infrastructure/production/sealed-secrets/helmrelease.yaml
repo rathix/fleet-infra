@@ -12,10 +12,18 @@ spec:
         name: sealed-secrets-repo
       version: 2.18.0
   interval: 1h
+  timeout: 10m
   releaseName: sealed-secrets-controller
   targetNamespace: sealed-secrets
   install:
     createNamespace: true
     crds: Create
+    remediation:
+      retries: 3
   upgrade:
     crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled

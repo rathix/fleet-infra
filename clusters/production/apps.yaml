@@ -6,12 +6,21 @@ metadata:
 spec:
   dependsOn:
     - name: infrastructure
-  interval: 1m
+  interval: 10m
   retryInterval: 2m
-  timeout: 5m
+  timeout: 10m
   sourceRef:
     kind: ExternalArtifact
     name: apps
   path: ./production
   prune: true
   wait: true
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: servarr-release
+      namespace: flux-system
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: uptime-kuma
+      namespace: flux-system
