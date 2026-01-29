@@ -14,6 +14,7 @@ spec:
       version: 2.24.0
   interval: 30m
   timeout: 5m
+  targetNamespace: uptime-kuma
   install:
     createNamespace: true
     remediation:
@@ -24,7 +25,6 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
-  targetNamespace: uptime-kuma
   values:
     ingress:
       enabled: true
@@ -36,11 +36,8 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
-
     volume:
       enabled: true
-      # existingClaim: uptime-kuma-volume
-
     image:
       repository: louislam/uptime-kuma
       tag: 2.0.2

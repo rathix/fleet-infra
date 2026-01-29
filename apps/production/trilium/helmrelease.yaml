@@ -4,16 +4,17 @@ metadata:
   name: trilium
   namespace: flux-system
 spec:
-  interval: 30m
   chart:
     spec:
       chart: trilium
-      version: 1.3.0
+      reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: triliumnext
-      interval: 12h
+      version: 1.3.0
+  interval: 30m
   timeout: 5m
+  targetNamespace: trilium
   install:
     createNamespace: true
     remediation:
@@ -24,7 +25,6 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
-  targetNamespace: trilium
   values:
     controllers:
       main:
@@ -34,7 +34,6 @@ spec:
               repository: triliumnext/notes
               tag: v0.95.0
               pullPolicy: IfNotPresent
-
     configini:
       general:
         instanceName: ""
@@ -47,7 +46,6 @@ spec:
         certPath: ""
         keyPath: ""
         trustedReverseProxy: true
-
     ingress:
       main:
         enabled: true
@@ -58,7 +56,6 @@ spec:
                 service:
                   identifier: main
                   port: http
-
     persistence:
       data:
         enabled: true

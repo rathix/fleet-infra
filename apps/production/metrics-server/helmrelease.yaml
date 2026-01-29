@@ -14,6 +14,7 @@ spec:
       version: v3.13.0
   interval: 30m
   timeout: 5m
+  targetNamespace: metrics-server
   install:
     createNamespace: true
     remediation:
@@ -24,7 +25,6 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
-  targetNamespace: metrics-server
   values:
     apiService:
       insecureSkipTLSVerify: false

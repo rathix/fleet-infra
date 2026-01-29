@@ -14,6 +14,7 @@ spec:
       version: 1.8.6
   interval: 30m
   timeout: 5m
+  targetNamespace: actualbudget
   install:
     createNamespace: true
     remediation:
@@ -24,7 +25,6 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
-  targetNamespace: actualbudget
   values:
     ingress:
       enabled: true
@@ -35,7 +35,5 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
-
     persistence:
       enabled: true
-      # existingClaim: actualbudget-volume

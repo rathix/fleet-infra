@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -17,6 +16,7 @@ spec:
       version: 1.10.2
   interval: 30m
   timeout: 15m
+  targetNamespace: longhorn-system
   install:
     createNamespace: true
     remediation:
@@ -27,7 +27,6 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
-  targetNamespace: longhorn-system
   values:
     ingress:
       enabled: true
@@ -35,6 +34,5 @@ spec:
       annotations:
         traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
         external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
-
     defaultBackupStore:
       backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn
