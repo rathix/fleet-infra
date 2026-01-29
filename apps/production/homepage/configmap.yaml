@@ -12,10 +12,8 @@ data:
     providers:
       longhorn:
         url: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
-
     useEqualHeights: true
-    statusStyle: "dot"
-
+    statusStyle: dot
     layout:
       Media:
         style: row
@@ -35,239 +33,223 @@ data:
       Monitoring:
         style: row
         columns: 4
-
   bookmarks.yaml: |
     - Development:
-      - Github:
-        - abbr: GH
-          href: https://github.com/
+        - Github:
+            - abbr: GH
+              href: https://github.com/
     - Hetzner:
-      - konsoleH:
-        - abbr: KH
-          href: https://konsoleh.hetzner.com/
-      - DNS Console:
-        - abbr: DC
-          href: http://dns.hetzner.com/
-      - KH Webmail:
-        - abbr: KW
-          href: https://webmail.your-server.de/
-      - Cloud Console:
-        - abbr: CC
-          href: https://console.hetzner.com/
+        - konsoleH:
+            - abbr: KH
+              href: https://konsoleh.hetzner.com/
+        - DNS Console:
+            - abbr: DC
+              href: https://dns.hetzner.com/
+        - KH Webmail:
+            - abbr: KW
+              href: https://webmail.your-server.de/
+        - Cloud Console:
+            - abbr: CC
+              href: https://console.hetzner.com/
     - Personal:
-      - Personal Website:
-        - abbr: KA
-          href: https://kennyandries.com/
-      - ProtonMail:
-        - abbr: PM
-          href: https://mail.proton.me/u/4/inbox
+        - Personal Website:
+            - abbr: KA
+              href: https://kennyandries.com/
+        - ProtonMail:
+            - abbr: PM
+              href: https://mail.proton.me/u/4/inbox
     - Work:
-      - Company Website: 
-        - abbr: RC
-          href: https://rathix.be/
-      - Liantis:
-        - abbr: LI
-          href: https://app.liantis.be/myliantis/
+        - Company Website:
+            - abbr: RC
+              href: https://rathix.be/
+        - Liantis:
+            - abbr: LI
+              href: https://app.liantis.be/myliantis/
     - Shopping:
-      - Albert Heijn:
-        - abbr: AH
-          href: https://ah.be/
-      - Collect&Go:
-        - abbr: CG
-          href: https://collectandgo.be/colruyt/nl/home
-
+        - Albert Heijn:
+            - abbr: AH
+              href: https://ah.be/
+        - Collect&Go:
+            - abbr: CG
+              href: https://collectandgo.be/colruyt/nl/home
   services.yaml: |
     - Media:
-      - Jellyfin:
-          icon: jellyfin.png
-          href: https://jellyfin.kennyandries.com/
-          description: Media streaming
-          namespace: servarr
-          app: jellyfin
-          siteMonitor: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
-          widget:
-            type: jellyfin
-            url: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
-            key: {{HOMEPAGE_VAR_JELLYFIN}}
-            enableBlocks: true # optional, defaults to false
-            enableNowPlaying: true # optional, defaults to true
-            enableUser: true # optional, defaults to false
-            enableMediaControl: false # optional, defaults to true
-            showEpisodeNumber: true # optional, defaults to false
-            expandOneStreamToTwoRows: false # optional, defaults to true          
-      - Radarr:
-          icon: radarr.png
-          href: https://radarr.kennyandries.com/
-          description: Movie requesting
-          namespace: servarr
-          app: radarr
-          siteMonitor: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
-          widget:
-            type: radarr
-            url: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
-            key: {{HOMEPAGE_VAR_RADARR}}
-            enableQueue: true # optional, defaults to false
-      - Sonarr:
-          icon: sonarr.png
-          href: https://sonarr.kennyandries.com/
-          description: Series requesting
-          namespace: servarr
-          app: sonarr
-          siteMonitor: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
-          widget:
-            type: sonarr
-            url: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
-            key: {{HOMEPAGE_VAR_SONARR}}
-            enableQueue: true # optional, defaults to false
-      - Lidarr:
-          icon: lidarr.png
-          href: https://lidarr.kennyandries.com/
-          description: Music requesting
-          namespace: servarr
-          app: lidarr
-          siteMonitor: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
-          widget:
-            type: lidarr
-            url: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
-            key: {{HOMEPAGE_VAR_LIDARR}}
-            enableQueue: true # optional, defaults to false
-      - Prowlarr:
-          icon: prowlarr.png
-          href: https://prowlarr.kennyandries.com/
-          description: Indexer management
-          namespace: servarr
-          app: prowlarr
-          siteMonitor: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
-          widget:
-            type: prowlarr
-            url: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
-            key: {{HOMEPAGE_VAR_PROWLARR}}
-            enableQueue: true # optional, defaults to false
-      - Jellyseerr:
-          icon: jellyseerr.png
-          href: https://jellyseerr.kennyandries.com/
-          description: Media requesting
-          namespace: servarr
-          app: jellyseerr
-          siteMonitor: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
-          widget:
-            type: jellyseerr
-            url: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
-            key: {{HOMEPAGE_VAR_JELLYSEERR}}          
-      - Bazarr:
-          icon: bazarr.png
-          href: https://bazarr.kennyandries.com/
-          description: Subtitle management
-          namespace: servarr
-          app: bazarr
-          siteMonitor: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
-          widget:
-            type: bazarr
-            url: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
-            key: {{HOMEPAGE_VAR_BAZARR}}          
-      # - Cleanuparr:
-      #     icon: cleanuperr.png
-      #     href: https://cleanuparr.kennyandries.com/
-      #     description: Media cleanup
-      #     namespace: servarr
-      #     app: cleanuparr
-      #     siteMonitor: http://servarr-servarr-release-cleanuparr.servarr.svc.cluster.local:11011
-      - qBittorrent:
-          icon: qbittorrent.png
-          href: https://qbittorrent.kennyandries.com/
-          description: Torrent client
-          namespace: servarr
-          app: qbittorrent
-          siteMonitor: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
-          widget:
-            type: qbittorrent
-            url: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
-            enableLeechProgress: true # optional, defaults to false
-            enableLeechSize: true # optional, defaults to false
-      - SABnzbd:
-          icon: sabnzbd.png
-          href: https://sabnzbd.kennyandries.com/
-          description: Usenet client
-          namespace: servarr
-          app: sabnzbd
-          siteMonitor: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
-          widget:
-            type: sabnzbd
-            url: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
-            key: {{HOMEPAGE_VAR_SABNZBD}}
-
+        - Jellyfin:
+            icon: jellyfin.png
+            href: https://jellyfin.kennyandries.com/
+            description: Media server
+            namespace: servarr
+            app: jellyfin
+            siteMonitor: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
+            widget:
+              type: jellyfin
+              url: http://servarr-servarr-release-jellyfin.servarr.svc.cluster.local:8096
+              key: {{HOMEPAGE_VAR_JELLYFIN}}
+              enableBlocks: true
+              enableNowPlaying: true
+              enableUser: true
+              enableMediaControl: false
+              showEpisodeNumber: true
+              expandOneStreamToTwoRows: false
+        - Radarr:
+            icon: radarr.png
+            href: https://radarr.kennyandries.com/
+            description: Movie manager
+            namespace: servarr
+            app: radarr
+            siteMonitor: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
+            widget:
+              type: radarr
+              url: http://servarr-servarr-release-radarr.servarr.svc.cluster.local:7878
+              key: {{HOMEPAGE_VAR_RADARR}}
+              enableQueue: true
+        - Sonarr:
+            icon: sonarr.png
+            href: https://sonarr.kennyandries.com/
+            description: Series manager
+            namespace: servarr
+            app: sonarr
+            siteMonitor: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
+            widget:
+              type: sonarr
+              url: http://servarr-servarr-release-sonarr.servarr.svc.cluster.local:80
+              key: {{HOMEPAGE_VAR_SONARR}}
+              enableQueue: true
+        - Lidarr:
+            icon: lidarr.png
+            href: https://lidarr.kennyandries.com/
+            description: Music manager
+            namespace: servarr
+            app: lidarr
+            siteMonitor: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
+            widget:
+              type: lidarr
+              url: http://servarr-servarr-release-lidarr.servarr.svc.cluster.local:8686
+              key: {{HOMEPAGE_VAR_LIDARR}}
+              enableQueue: true
+        - Prowlarr:
+            icon: prowlarr.png
+            href: https://prowlarr.kennyandries.com/
+            description: Indexer manager
+            namespace: servarr
+            app: prowlarr
+            siteMonitor: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
+            widget:
+              type: prowlarr
+              url: http://servarr-servarr-release-prowlarr.servarr.svc.cluster.local:9696
+              key: {{HOMEPAGE_VAR_PROWLARR}}
+        - Jellyseerr:
+            icon: jellyseerr.png
+            href: https://jellyseerr.kennyandries.com/
+            description: Request manager
+            namespace: servarr
+            app: jellyseerr
+            siteMonitor: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
+            widget:
+              type: jellyseerr
+              url: http://servarr-servarr-release-jellyseerr.servarr.svc.cluster.local:5055
+              key: {{HOMEPAGE_VAR_JELLYSEERR}}
+        - Bazarr:
+            icon: bazarr.png
+            href: https://bazarr.kennyandries.com/
+            description: Subtitle manager
+            namespace: servarr
+            app: bazarr
+            siteMonitor: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
+            widget:
+              type: bazarr
+              url: http://servarr-servarr-release-bazarr.servarr.svc.cluster.local:6767
+              key: {{HOMEPAGE_VAR_BAZARR}}
+        - qBittorrent:
+            icon: qbittorrent.png
+            href: https://qbittorrent.kennyandries.com/
+            description: Download client
+            namespace: servarr
+            app: qbittorrent
+            siteMonitor: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
+            widget:
+              type: qbittorrent
+              url: http://servarr-servarr-release-qbittorrent-web.servarr.svc.cluster.local:8080
+              enableLeechProgress: true
+              enableLeechSize: true
+        - SABnzbd:
+            icon: sabnzbd.png
+            href: https://sabnzbd.kennyandries.com/
+            description: Download client
+            namespace: servarr
+            app: sabnzbd
+            siteMonitor: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
+            widget:
+              type: sabnzbd
+              url: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
+              key: {{HOMEPAGE_VAR_SABNZBD}}
     - Services:
-      - Actual Budget:
-          icon: actual-budget.png
-          href: https://actualbudget.kennyandries.com/
-          description: Personal finance
-          namespace: actualbudget
-          app: actualbudget
-          siteMonitor: http://actualbudget-actualbudget-release.actualbudget.svc.cluster.local:5006
-      - Pocket ID:
-          icon: pocket-id.png
-          href: https://auth.kennyandries.com/
-          description: Passkey IdP
-          namespace: pocket-id
-          app: pocket-id
-          siteMonitor: https://auth.kennyandries.com/
-      - Home Assistant:
-          icon: home-assistant.png
-          href: http://homeassistant.local:8123/
-          description: Home automation
-          siteMonitor: http://192.168.1.151:8123/
-
+        - Actual Budget:
+            icon: actual-budget.png
+            href: https://actualbudget.kennyandries.com/
+            description: Budget manager
+            namespace: actualbudget
+            app: actualbudget
+            siteMonitor: http://actualbudget-actualbudget-release.actualbudget.svc.cluster.local:5006
+        - Pocket ID:
+            icon: pocket-id.png
+            href: https://auth.kennyandries.com/
+            description: Identity provider
+            namespace: pocket-id
+            app: pocket-id
+            siteMonitor: https://auth.kennyandries.com/
+        - Home Assistant:
+            icon: home-assistant.png
+            href: http://homeassistant.local:8123/
+            description: Smart home controller
+            siteMonitor: http://192.168.1.151:8123/
     - Cluster Management:
-      - Traefik:
-          icon: traefik.png
-          href: https://traefik.kennyandries.com/
-          description: Ingress controller
-          namespace: traefik-system
-          app: traefik
-          siteMonitor: https://traefik.kennyandries.com
-      - Longhorn:
-          icon: longhorn.png
-          href: https://longhorn.kennyandries.com/
-          description: Distributed block storage
-          namespace: longhorn-system
-          app: longhorn
-          siteMonitor: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
-
+        - Traefik:
+            icon: traefik.png
+            href: https://traefik.kennyandries.com/
+            description: Reverse proxy
+            namespace: traefik-system
+            app: traefik
+            siteMonitor: https://traefik.kennyandries.com
+        - Longhorn:
+            icon: longhorn.png
+            href: https://longhorn.kennyandries.com/
+            description: Block storage
+            namespace: longhorn-system
+            app: longhorn
+            siteMonitor: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
     - TrueNAS:
-      - pkb-nas-tns-1:
-          icon: truenas.png
-          href: https://pkb-nas-tns-1/
-          description: Network attached storage
-          siteMonitor: https://pkb-nas-tns-1
-      - plb-nas-tns-1:
-          icon: truenas.png
-          href: https://192.168.2.2/
-          description: Network attached storage
-          siteMonitor: https://192.168.2.2
-
+        - pkb-nas-tns-1:
+            icon: truenas.png
+            href: https://pkb-nas-tns-1/
+            description: File server
+            siteMonitor: https://pkb-nas-tns-1
+        - plb-nas-tns-1:
+            icon: truenas.png
+            href: https://192.168.2.2/
+            description: File server
+            siteMonitor: https://192.168.2.2
     - Networking:
-      - UniFi Express 7:
-          icon: unifi.png
-          href: https://192.168.1.1/
-          description: Router
-          siteMonitor: https://192.168.1.1
-
+        - UniFi Express 7:
+            icon: unifi.png
+            href: https://192.168.1.1/
+            description: Network gateway
+            siteMonitor: https://192.168.1.1
     - Monitoring:
-      - Uptime Kuma:
-          icon: uptime-kuma.png
-          href: https://uptime-kuma.kennyandries.com/
-          description: Application Monitoring
-          namespace: uptime-kuma
-          app: uptime-kuma
-          siteMonitor: https://uptime-kuma.kennyandries.com/
-      - Beszel:
-          icon: beszel.png
-          href: https://beszel.kennyandries.com/
-          description: System Monitoring
-          namespace: beszel
-          app: beszel
-          siteMonitor: https://beszel.kennyandries.com/
-
+        - Uptime Kuma:
+            icon: uptime-kuma.png
+            href: https://uptime-kuma.kennyandries.com/
+            description: Uptime monitor
+            namespace: uptime-kuma
+            app: uptime-kuma
+            siteMonitor: https://uptime-kuma.kennyandries.com/
+        - Beszel:
+            icon: beszel.png
+            href: https://beszel.kennyandries.com/
+            description: System monitor
+            namespace: beszel
+            app: beszel
+            siteMonitor: https://beszel.kennyandries.com/
   widgets.yaml: |
     - kubernetes:
         cluster:
@@ -275,7 +257,7 @@ data:
           cpu: true
           memory: true
           showLabel: true
-          label: "cluster"
+          label: cluster
         nodes:
           show: true
           cpu: true
@@ -285,12 +267,8 @@ data:
         provider: duckduckgo
         target: _blank
     - longhorn:
-        # Show the expanded view
         expanded: true
-        # Shows a node representing the aggregate values
         total: true
-        # Shows the node names as labels
         labels: true
-        # Show the nodes
         nodes: true
   docker.yaml: ""
