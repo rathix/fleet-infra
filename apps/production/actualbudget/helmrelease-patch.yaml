@@ -16,3 +16,4 @@ spec:
               pathType: ImplementationSpecific
     persistence:
       enabled: true
+      existingClaim: actualbudget-actualbudget-release-data
