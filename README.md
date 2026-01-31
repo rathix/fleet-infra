@@ -1,5 +1,7 @@
 # Fleet Infrastructure
 
+[![Validate](https://github.com/rathix/fleet-infra/actions/workflows/validate.yaml/badge.svg)](https://github.com/rathix/fleet-infra/actions/workflows/validate.yaml)
+
 GitOps repository for managing Kubernetes cluster infrastructure and applications using Flux CD.
 
 **Cluster:** Production
