@@ -1,0 +1,268 @@
+# Applications Guide
+
+This document details the applications deployed in the cluster.
+
+## Overview
+
+| Application | Type | Description | URL |
+|-------------|------|-------------|-----|
+| Homepage | Helm | Dashboard/landing page | `kennyandries.com` |
+| Servarr | Helm | Media management suite | Various |
+| Uptime Kuma | Helm | Status monitoring | `status.kennyandries.com` |
+| Pocket-ID | Helm | OIDC identity provider | `auth.kennyandries.com` |
+| Trilium | Helm | Note-taking app | `notes.kennyandries.com` |
+| Actualbudget | Helm | Personal finance | `budget.kennyandries.com` |
+| Beszel | Manifest | System monitoring | `beszel.kennyandries.com` |
+| SABnzbd | Manifest | Usenet downloader | `sabnzbd.kennyandries.com` |
+| ConfigArr | CronJob | Servarr configuration sync | N/A |
+| Metrics Server | Helm | Kubernetes metrics | N/A |
+
+---
+
+## Homepage
+
+**Description**: Customizable dashboard displaying service links, bookmarks, and cluster status.
+
+**Chart**: `jameswynn/homepage`
+**Version**: 1.9.x
+
+**Features**:
+- Service autodiscovery via Kubernetes API
+- Custom bookmarks and widgets
+- Real-time cluster resource monitoring
+
+**Configuration Files**:
+```
+apps/production/homepage/
+├── kustomization.yaml
+├── configmap.yaml          # bookmarks, services, widgets, settings
+└── helmrelease-patch.yaml
+```
+
+**Key ConfigMap Sections**:
+- `bookmarks.yaml` - External links organized by category
+- `services.yaml` - Service definitions with icons
+- `widgets.yaml` - Dashboard widgets (clock, search, etc.)
+- `kubernetes.yaml` - Cluster integration settings
+
+---
+
+## Servarr Stack
+
+**Description**: Media automation suite for managing TV shows, movies, and downloads.
+
+**Chart**: `kubito/servarr`
+**Version**: 1.2.x
+
+**Included Applications**:
+- **Sonarr** - TV show management
+- **Radarr** - Movie management
+- **Prowlarr** - Indexer management
+- **Bazarr** - Subtitle management
+
+**Storage**:
+- Config volumes per application
+- Shared media volume (NFS or Longhorn)
+
+---
+
+## Uptime Kuma
+
+**Description**: Self-hosted monitoring tool for tracking service availability.
+
+**Chart**: `dirsigler/uptime-kuma`
+**Version**: 2.24.x
+
+**Features**:
+- HTTP/HTTPS monitoring
+- TCP/Ping checks
+- Status pages
+- Notifications (Discord, Telegram, etc.)
+
+---
+
+## Pocket-ID
+
+**Description**: Lightweight OIDC identity provider for single sign-on.
+
+**Chart**: `pocket-id`
+**Version**: 2.2.x
+
+**Usage**:
+- Provides authentication for Traefik-protected services
+- Configured as OIDC provider at `auth.kennyandries.com`
+
+**Protected Services**:
+- Traefik Dashboard
+- Longhorn UI
+- Other internal tools
+
+---
+
+## Trilium
+
+**Description**: Hierarchical note-taking application with rich features.
+
+**Chart**: `triliumnext/trilium`
+**Version**: 1.3.x
+
+**Features**:
+- Tree-structured notes
+- Rich text editing
+- Code blocks with syntax highlighting
+- Note encryption
+
+---
+
+## Actualbudget
+
+**Description**: Privacy-focused personal finance and budgeting tool.
+
+**Chart**: `actualbudget`
+**Version**: 1.8.x
+
+**Features**:
+- Envelope budgeting
+- Bank sync (optional)
+- Reports and analytics
+- Multi-device sync
+
+---
+
+## Beszel
+
+**Description**: Lightweight system monitoring with a DaemonSet agent.
+
+**Type**: Raw Kubernetes manifests (Deployment + DaemonSet)
+**Version**: 0.18.x
+
+**Components**:
+- **Hub** (Deployment) - Central dashboard
+- **Agent** (DaemonSet) - Runs on each node
+
+**Metrics Collected**:
+- CPU, memory, disk usage
+- Network I/O
+- Process information
+
+---
+
+## SABnzbd
+
+**Description**: Usenet binary newsreader for automated downloads.
+
+**Type**: Raw Kubernetes manifests
+**Version**: Latest
+
+**Storage**:
+- Config volume (Longhorn)
+- Downloads volume (NFS recommended)
+
+---
+
+## ConfigArr
+
+**Description**: Automated configuration management for Servarr applications.
+
+**Type**: CronJob
+**Schedule**: Hourly (`0 * * * *`)
+
+**Purpose**:
+- Syncs configuration across Servarr apps
+- Applies predefined quality profiles
+- Manages indexer settings
+
+---
+
+## Application Structure
+
+Each application follows this pattern:
+
+```
+apps/
+├── base/
+│   └── <app-name>/
+│       ├── kustomization.yaml    # References all resources
+│       ├── namespace.yaml        # App namespace
+│       ├── helmrelease.yaml      # Helm chart definition
+│       └── ingress.yaml          # Ingress route (if applicable)
+└── production/
+    └── <app-name>/
+        ├── kustomization.yaml    # Patches base resources
+        ├── helmrelease-patch.yaml # Version and value overrides
+        ├── ingress-patch.yaml    # Domain/TLS configuration
+        └── sealedsecret.yaml     # Encrypted secrets
+```
+
+## Common Patterns
+
+### Ingress with TLS
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-app
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-redirect-https@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - myapp.kennyandries.com
+      secretName: myapp-tls
+  rules:
+    - host: myapp.kennyandries.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-app
+                port:
+                  number: 80
+```
+
+### Persistent Volume Claim
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-app-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+### HelmRelease with Values
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: my-app
+  namespace: flux-system
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: my-app
+      version: "1.x.x"
+      sourceRef:
+        kind: HelmRepository
+        name: my-repo
+  values:
+    replicaCount: 1
+    image:
+      tag: latest
+    persistence:
+      enabled: true
+      storageClass: longhorn
+```
