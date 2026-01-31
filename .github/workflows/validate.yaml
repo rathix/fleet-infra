@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Run yamllint
         uses: ibiqlik/action-yamllint@v3
@@ -60,7 +60,7 @@ jobs:
           - apps/production
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Kustomize
         uses: fluxcd/pkg/actions/kustomize@main
@@ -86,7 +86,7 @@ jobs:
           - apps/production
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Kustomize
         uses: fluxcd/pkg/actions/kustomize@main
@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flux CLI
         uses: fluxcd/flux2/action@main
@@ -151,12 +151,12 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout PR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: pr
 
       - name: Checkout main
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
           path: main
