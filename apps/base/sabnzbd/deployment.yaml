@@ -33,6 +33,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+              add:
+                - SETGID
+                - SETUID
           env:
             - name: PGID
               value: "1000"
