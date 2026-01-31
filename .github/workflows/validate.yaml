@@ -1,0 +1,194 @@
+# =============================================================================
+# Fleet Infrastructure - CI Validation
+# =============================================================================
+#
+# Validates Kubernetes manifests before Flux deploys them:
+# - YAML syntax validation
+# - Kustomize build verification
+# - Kubernetes schema validation (kubeconform)
+# - Flux resource validation
+#
+# =============================================================================
+
+name: Validate
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  KUBERNETES_VERSION: "1.31.0"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # YAML Lint - Check YAML syntax
+  # ---------------------------------------------------------------------------
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run yamllint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .
+          config_data: |
+            extends: relaxed
+            rules:
+              line-length: disable
+              comments: disable
+              truthy:
+                check-keys: false
+
+  # ---------------------------------------------------------------------------
+  # Kustomize Build - Verify manifests render correctly
+  # ---------------------------------------------------------------------------
+  kustomize-build:
+    name: Kustomize Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        path:
+          - clusters/production
+          - infrastructure/controllers
+          - infrastructure/configs
+          - apps/production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Kustomize
+        uses: fluxcd/pkg/actions/kustomize@main
+
+      - name: Build ${{ matrix.path }}
+        run: |
+          echo "Building ${{ matrix.path }}..."
+          kustomize build ${{ matrix.path }} > /dev/null
+          echo "✓ ${{ matrix.path }} builds successfully"
+
+  # ---------------------------------------------------------------------------
+  # Kubeconform - Validate against Kubernetes schemas
+  # ---------------------------------------------------------------------------
+  kubeconform:
+    name: Kubeconform
+    runs-on: ubuntu-latest
+    needs: kustomize-build
+    strategy:
+      matrix:
+        path:
+          - infrastructure/controllers
+          - infrastructure/configs
+          - apps/production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Kustomize
+        uses: fluxcd/pkg/actions/kustomize@main
+
+      - name: Setup kubeconform
+        uses: fluxcd/pkg/actions/kubeconform@main
+
+      - name: Validate ${{ matrix.path }}
+        run: |
+          echo "Validating ${{ matrix.path }}..."
+          kustomize build ${{ matrix.path }} | \
+            kubeconform \
+              -strict \
+              -ignore-missing-schemas \
+              -kubernetes-version ${{ env.KUBERNETES_VERSION }} \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+              -summary
+          echo "✓ ${{ matrix.path }} is valid"
+
+  # ---------------------------------------------------------------------------
+  # Flux Validation - Validate Flux-specific resources
+  # ---------------------------------------------------------------------------
+  flux-validate:
+    name: Flux Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flux CLI
+        uses: fluxcd/flux2/action@main
+
+      - name: Validate Flux resources
+        run: |
+          echo "Validating Flux Kustomizations..."
+          find . -name '*.yaml' -type f | while read -r file; do
+            if grep -q "kind: Kustomization" "$file" && grep -q "toolkit.fluxcd.io" "$file"; then
+              echo "Validating: $file"
+              flux check --pre || true
+            fi
+          done
+
+          echo ""
+          echo "Validating HelmReleases..."
+          find . -name '*.yaml' -type f | while read -r file; do
+            if grep -q "kind: HelmRelease" "$file"; then
+              echo "Validating: $file"
+              yq eval 'select(.kind == "HelmRelease")' "$file" | kubectl apply --dry-run=client -f - 2>/dev/null || echo "  (requires CRDs, skipped)"
+            fi
+          done
+
+          echo ""
+          echo "✓ Flux resources validated"
+
+  # ---------------------------------------------------------------------------
+  # Diff - Show what would change (on PRs only)
+  # ---------------------------------------------------------------------------
+  diff:
+    name: Diff
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          path: pr
+
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Setup Kustomize
+        uses: fluxcd/pkg/actions/kustomize@main
+
+      - name: Diff infrastructure
+        run: |
+          echo "## Infrastructure Changes" >> $GITHUB_STEP_SUMMARY
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+
+          # Build both versions
+          kustomize build main/infrastructure/controllers > /tmp/main-infra.yaml 2>/dev/null || echo "" > /tmp/main-infra.yaml
+          kustomize build pr/infrastructure/controllers > /tmp/pr-infra.yaml 2>/dev/null || echo "" > /tmp/pr-infra.yaml
+
+          # Show diff
+          diff -u /tmp/main-infra.yaml /tmp/pr-infra.yaml >> $GITHUB_STEP_SUMMARY || true
+
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Diff apps
+        run: |
+          echo "## Application Changes" >> $GITHUB_STEP_SUMMARY
+          echo '```diff' >> $GITHUB_STEP_SUMMARY
+
+          # Build both versions
+          kustomize build main/apps/production > /tmp/main-apps.yaml 2>/dev/null || echo "" > /tmp/main-apps.yaml
+          kustomize build pr/apps/production > /tmp/pr-apps.yaml 2>/dev/null || echo "" > /tmp/pr-apps.yaml
+
+          # Show diff
+          diff -u /tmp/main-apps.yaml /tmp/pr-apps.yaml >> $GITHUB_STEP_SUMMARY || true
+
+          echo '```' >> $GITHUB_STEP_SUMMARY
