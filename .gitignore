@@ -1,0 +1,41 @@
+# Environment files
+*.env
+*.env.local
+.env.*
+
+# Unsealed Kubernetes secrets (CRITICAL - never commit these)
+secret.yaml
+*-secret.yaml
+!*sealed*secret.yaml
+
+# Sealed Secrets backup files
+sealed-secrets-key-backup.yaml
+sealed-secrets-cert.pem
+master.key
+
+# Temporary files
+/tmp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kubeconfig files
+kubeconfig
+*.kubeconfig
+config.yaml
+
+# Private keys
+*.pem
+*.key
+id_rsa*
+
+# Backup files
+*.bak
+*.backup

@@ -19,9 +19,23 @@ spec:
         app.kubernetes.io/name: sabnzbd
     spec:
       enableServiceLinks: true
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: sabnzbd
           image: lscr.io/linuxserver/sabnzbd:4.5.5
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: PGID
               value: "1000"

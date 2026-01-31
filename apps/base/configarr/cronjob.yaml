@@ -17,10 +17,23 @@ spec:
             app.kubernetes.io/name: configarr
         spec:
           restartPolicy: Never
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: configarr
-              image: ghcr.io/raydak-labs/configarr:latest
-              imagePullPolicy: Always
+              image: ghcr.io/raydak-labs/configarr:v1.20.0
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                runAsNonRoot: true
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: false
+                capabilities:
+                  drop:
+                    - ALL
               tty: true
               volumeMounts:
                 - name: app-data

@@ -31,11 +31,21 @@ spec:
       containers:
         - name: beszel-agent
           image: henrygd/beszel-agent:0.18.2
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: LISTEN
               value: "45876"
             - name: KEY
-              value: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFtkHpdRf++PWFRnVJFmH793bv8aSP8xbxY0ROhkEAxC
+              valueFrom:
+                secretKeyRef:
+                  name: beszel-secret
+                  key: sshKey
           ports:
             - containerPort: 45876
               hostPort: 45876
