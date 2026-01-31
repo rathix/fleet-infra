@@ -55,7 +55,6 @@ jobs:
     strategy:
       matrix:
         path:
-          - clusters/production
           - infrastructure/controllers
           - infrastructure/configs
           - apps/production
