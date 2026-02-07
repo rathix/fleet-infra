@@ -32,7 +32,7 @@ spec:
       enabled: true
       host: longhorn.kennyandries.com
       annotations:
-        traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd,traefik-system-security-headers@kubernetescrd,traefik-system-rate-limit@kubernetescrd
         external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
     defaultBackupStore:
       backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn

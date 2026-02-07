@@ -6,3 +6,5 @@ resources:
   - networkpolicy-pocket-id.yaml
   - networkpolicy-beszel.yaml
   - networkpolicy-trilium.yaml
+  - networkpolicy-actualbudget.yaml
+  - networkpolicy-uptime-kuma.yaml

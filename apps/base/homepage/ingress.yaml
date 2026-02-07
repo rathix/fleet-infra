@@ -6,6 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: homepage
 spec:
+  ingressClassName: traefik
   rules:
     - http:
         paths:
