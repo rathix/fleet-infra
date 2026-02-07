@@ -9,6 +9,7 @@ spec:
     ingress:
       enabled: true
       annotations:
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-system-security-headers@kubernetescrd,traefik-system-rate-limit@kubernetescrd
         external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
       hosts:
         - host: actualbudget.kennyandries.com
