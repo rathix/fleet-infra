@@ -42,8 +42,17 @@
                 "patch"
             ],
             "automerge": true,
-            "platformAutomerge": true,
-            "ignoreTests": true
+            "platformAutomerge": true
+        },
+        {
+            "description": "Group infrastructure controller updates",
+            "matchFileNames": ["infrastructure/**"],
+            "groupName": "infrastructure"
+        },
+        {
+            "description": "Group application updates",
+            "matchFileNames": ["apps/**"],
+            "groupName": "applications"
         }
     ]
 }
