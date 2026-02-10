@@ -13,13 +13,13 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: traefik-system
+              kubernetes.io/metadata.name: traefik-system
   egress:
     # Allow DNS
     - to:
         - namespaceSelector:
             matchLabels:
-              name: kube-system
+              kubernetes.io/metadata.name: kube-system
       ports:
         - protocol: UDP
           port: 53
@@ -31,4 +31,24 @@ spec:
           port: 443
     # Allow access to other namespaces for widget data
     - to:
-        - namespaceSelector: {}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: servarr
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: actualbudget
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: pocket-id
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: longhorn-system
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: uptime-kuma
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: beszel

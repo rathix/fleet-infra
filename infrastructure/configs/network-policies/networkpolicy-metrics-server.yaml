@@ -1,21 +1,14 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-traefik-ingress
-  namespace: uptime-kuma
+  name: allow-metrics-server-egress
+  namespace: metrics-server
 spec:
   podSelector: {}
   policyTypes:
-    - Ingress
     - Egress
-  ingress:
-    # Allow traffic from Traefik
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: traefik-system
   egress:
-    # Allow DNS
+    # Allow DNS resolution.
     - to:
         - namespaceSelector:
             matchLabels:
@@ -23,11 +16,12 @@ spec:
       ports:
         - protocol: UDP
           port: 53
-    # Allow HTTPS egress for uptime monitoring
+    # Allow kubelet scraping and API-server communication.
     - to:
-        - namespaceSelector: {}
+        - ipBlock:
+            cidr: 0.0.0.0/0
       ports:
         - protocol: TCP
-          port: 443
+          port: 10250
         - protocol: TCP
-          port: 80
+          port: 443
