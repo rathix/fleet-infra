@@ -12,7 +12,4 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: traefik-system
-    # Allow traffic from all namespaces (OIDC authentication)
-    - from:
-        - namespaceSelector: {}
+              kubernetes.io/metadata.name: traefik-system

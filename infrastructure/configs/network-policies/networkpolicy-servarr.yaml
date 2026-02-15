@@ -12,12 +12,4 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: traefik-system
-    # Allow DNS
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              name: kube-system
-      ports:
-        - protocol: UDP
-          port: 53
+              kubernetes.io/metadata.name: traefik-system

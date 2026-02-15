@@ -36,7 +36,6 @@ fleet-infra/
 │       ├── infrastructure-configs.yaml
 │       └── apps.yaml
 ├── infrastructure/
-│   ├── base/                 # Base infrastructure definitions
 │   ├── controllers/          # Infrastructure controllers (Helm releases)
 │   └── configs/              # Infrastructure configurations
 ├── apps/
