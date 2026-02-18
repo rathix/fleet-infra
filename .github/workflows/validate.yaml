@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
 
       - name: Install yamllint
         run: |
@@ -62,7 +62,7 @@ jobs:
           - apps/production
     steps:
       - name: Checkout
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
 
       - name: Install kustomize
         run: |
@@ -92,7 +92,7 @@ jobs:
           - apps/production
     steps:
       - name: Checkout
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
 
       - name: Install kustomize
         run: |
@@ -128,7 +128,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
 
       - name: Install Flux CLI
         run: |
@@ -140,18 +140,31 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Running Flux pre-flight checks..."
-          flux check --pre
-
-          echo ""
           echo "Building cluster Flux Kustomizations from local manifests..."
-          for ks in repositories infrastructure-controllers infrastructure-configs apps; do
-            echo "Building: $ks"
-            flux build kustomization "$ks" \
-              --path ./clusters/production \
-              --kustomization-file "./clusters/production/${ks}.yaml" \
-              --dry-run > /dev/null
-          done
+
+          echo "Building: repositories"
+          flux build kustomization repositories \
+            --path ./repositories \
+            --kustomization-file ./clusters/production/repositories.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: infrastructure-controllers"
+          flux build kustomization infrastructure-controllers \
+            --path ./infrastructure/controllers \
+            --kustomization-file ./clusters/production/infrastructure-controllers.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: infrastructure-configs"
+          flux build kustomization infrastructure-configs \
+            --path ./infrastructure/configs \
+            --kustomization-file ./clusters/production/infrastructure-configs.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: apps"
+          flux build kustomization apps \
+            --path ./apps/production \
+            --kustomization-file ./clusters/production/apps.yaml \
+            --dry-run > /dev/null
 
           echo ""
           echo "✓ Flux resources validated"
@@ -165,12 +178,12 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout PR
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
         with:
           path: pr
 
       - name: Checkout main
-        uses: actions/checkout@f21396f60a265edbc1f1f8aae5ab501df808f919 # v6.0.0
+        uses: actions/checkout@v6
         with:
           ref: main
           path: main
