@@ -86,8 +86,10 @@ spec:
 Applies configurations that depend on controllers:
 
 - **ClusterIssuers** - Let's Encrypt certificate issuers
-- **Middlewares** - Traefik authentication, redirects
-- **Default certificates** - Wildcard TLS certificates
+- **Middlewares** - OIDC authentication (depends on Sealed Secrets for client credentials)
+- **Wildcard certificate** - `*.kennyandries.com` via cert-manager
+- **Network policies** - Per-namespace ingress policies
+- **Notifications** - Flux GitHub status reporting
 
 ```yaml
 # clusters/production/infrastructure-configs.yaml

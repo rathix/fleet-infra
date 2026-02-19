@@ -85,14 +85,14 @@ spec:
 
 **Ingress** (`apps/base/my-app/ingress.yaml`):
 
+TLS is handled by a wildcard certificate (`*.kennyandries.com`), so no per-ingress cert-manager annotations are needed.
+
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: my-app
   namespace: my-app
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: traefik
   rules:
@@ -160,10 +160,6 @@ metadata:
   name: my-app
   namespace: my-app
 spec:
-  tls:
-    - hosts:
-        - my-app.kennyandries.com
-      secretName: my-app-tls
   rules:
     - host: my-app.kennyandries.com
 ```
@@ -280,8 +276,8 @@ kubectl create secret generic my-app-secret \
 
 ```bash
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
   > apps/production/my-app/sealedsecret.yaml
 ```

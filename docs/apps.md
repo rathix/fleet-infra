@@ -6,12 +6,12 @@ This document details the applications deployed in the cluster.
 
 | Application | Type | Description | URL |
 |-------------|------|-------------|-----|
-| Homepage | Helm | Dashboard/landing page | `kennyandries.com` |
+| Homepage | Manifest | Dashboard/landing page | `homepage.kennyandries.com` |
 | Servarr | Helm | Media management suite | Various |
-| Uptime Kuma | Helm | Status monitoring | `status.kennyandries.com` |
-| Pocket-ID | Helm | OIDC identity provider | `auth.kennyandries.com` |
-| Trilium | Helm | Note-taking app | `notes.kennyandries.com` |
-| Actualbudget | Helm | Personal finance | `budget.kennyandries.com` |
+| Uptime Kuma | Helm | Status monitoring | `uptime-kuma.kennyandries.com` |
+| Pocket-ID | Manifest | OIDC identity provider | `auth.kennyandries.com` |
+| Trilium | Helm | Note-taking app | `trilium.kennyandries.com` |
+| Actualbudget | Helm | Personal finance | `actualbudget.kennyandries.com` |
 | Beszel | Manifest | System monitoring | `beszel.kennyandries.com` |
 | SABnzbd | Manifest | Usenet downloader | `sabnzbd.kennyandries.com` |
 | ConfigArr | CronJob | Servarr configuration sync | N/A |
@@ -23,8 +23,7 @@ This document details the applications deployed in the cluster.
 
 **Description**: Customizable dashboard displaying service links, bookmarks, and cluster status.
 
-**Chart**: `jameswynn/homepage`
-**Version**: 1.9.x
+**Type**: Raw Kubernetes manifests (Deployment, Service, Ingress, RBAC)
 
 **Features**:
 - Service autodiscovery via Kubernetes API
@@ -33,10 +32,18 @@ This document details the applications deployed in the cluster.
 
 **Configuration Files**:
 ```
+apps/base/homepage/
+├── kustomization.yaml
+├── namespace.yaml
+├── deployment.yaml
+├── service.yaml
+├── ingress.yaml
+└── rbac.yaml
+
 apps/production/homepage/
 ├── kustomization.yaml
 ├── configmap.yaml          # bookmarks, services, widgets, settings
-└── helmrelease-patch.yaml
+└── ingress-patch.yaml
 ```
 
 **Key ConfigMap Sections**:
@@ -55,10 +62,15 @@ apps/production/homepage/
 **Version**: 1.2.x
 
 **Included Applications**:
-- **Sonarr** - TV show management
-- **Radarr** - Movie management
-- **Prowlarr** - Indexer management
-- **Bazarr** - Subtitle management
+- **Jellyfin** - Media server (`jellyfin.kennyandries.com`)
+- **Jellyseerr** - Media request management (`jellyseerr.kennyandries.com`)
+- **Sonarr** - TV show management (`sonarr.kennyandries.com`)
+- **Radarr** - Movie management (`radarr.kennyandries.com`)
+- **Lidarr** - Music management (`lidarr.kennyandries.com`)
+- **Prowlarr** - Indexer management (`prowlarr.kennyandries.com`)
+- **Bazarr** - Subtitle management (`bazarr.kennyandries.com`)
+- **qBittorrent** - Torrent client (`qbittorrent.kennyandries.com`)
+- **Flaresolverr** - CAPTCHA solver (no ingress)
 
 **Storage**:
 - Config volumes per application
@@ -85,8 +97,7 @@ apps/production/homepage/
 
 **Description**: Lightweight OIDC identity provider for single sign-on.
 
-**Chart**: `pocket-id`
-**Version**: 2.2.x
+**Type**: Raw Kubernetes manifests (Deployment, Service, Ingress, PVC)
 
 **Usage**:
 - Provides authentication for Traefik-protected services
@@ -95,7 +106,8 @@ apps/production/homepage/
 **Protected Services**:
 - Traefik Dashboard
 - Longhorn UI
-- Other internal tools
+- Sonarr, Radarr, Lidarr, Prowlarr, Bazarr, qBittorrent
+- Homepage
 
 ---
 
@@ -196,22 +208,17 @@ apps/
 
 ## Common Patterns
 
-### Ingress with TLS
+### Ingress
+
+TLS is handled by a wildcard certificate (`*.kennyandries.com`) managed at `infrastructure/configs/traefik/certificate.yaml`. Individual ingresses do not need TLS blocks or cert-manager annotations.
 
 ```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: my-app
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-redirect-https@kubernetescrd
 spec:
   ingressClassName: traefik
-  tls:
-    - hosts:
-        - myapp.kennyandries.com
-      secretName: myapp-tls
   rules:
     - host: myapp.kennyandries.com
       http:
@@ -223,6 +230,14 @@ spec:
                 name: my-app
                 port:
                   number: 80
+```
+
+Production overlays can add middleware annotations as needed:
+
+```yaml
+metadata:
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-security-headers@kubernetescrd,traefik-system-rate-limit@kubernetescrd
 ```
 
 ### Persistent Volume Claim
