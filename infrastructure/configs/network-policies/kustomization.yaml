@@ -8,3 +8,4 @@ resources:
   - networkpolicy-trilium.yaml
   - networkpolicy-actualbudget.yaml
   - networkpolicy-uptime-kuma.yaml
+  - networkpolicy-metrics-server.yaml

@@ -12,7 +12,7 @@ spec:
     - from:
         - namespaceSelector:
             matchLabels:
-              name: traefik-system
+              kubernetes.io/metadata.name: traefik-system
     # Allow agent connections from nodes
     - ports:
         - protocol: TCP

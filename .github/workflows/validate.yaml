@@ -20,8 +20,14 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 env:
   KUBERNETES_VERSION: "1.31.0"
+  KUSTOMIZE_VERSION: "5.6.0"
+  KUBECONFORM_VERSION: "0.6.7"
+  FLUX_VERSION: "2.6.1"
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -34,17 +40,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Install yamllint
+        run: |
+          python3 -m pip install --user yamllint==1.37.1
+
       - name: Run yamllint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          file_or_dir: .
-          config_data: |
-            extends: relaxed
-            rules:
-              line-length: disable
-              comments: disable
-              truthy:
-                check-keys: false
+        run: |
+          ~/.local/bin/yamllint -d '{extends: relaxed, rules: {line-length: disable, comments: disable, truthy: {check-keys: false}}}' .
 
   # ---------------------------------------------------------------------------
   # Kustomize Build - Verify manifests render correctly
@@ -62,11 +64,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Kustomize
-        uses: fluxcd/pkg/actions/kustomize@main
+      - name: Install kustomize
+        run: |
+          curl -sSLo /tmp/kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${{ env.KUSTOMIZE_VERSION }}/kustomize_v${{ env.KUSTOMIZE_VERSION }}_linux_amd64.tar.gz"
+          tar -xzf /tmp/kustomize.tar.gz -C /tmp
+          sudo mv /tmp/kustomize /usr/local/bin/kustomize
 
       - name: Build ${{ matrix.path }}
         run: |
+          set -euo pipefail
           echo "Building ${{ matrix.path }}..."
           kustomize build ${{ matrix.path }} > /dev/null
           echo "✓ ${{ matrix.path }} builds successfully"
@@ -88,14 +94,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Kustomize
-        uses: fluxcd/pkg/actions/kustomize@main
+      - name: Install kustomize
+        run: |
+          curl -sSLo /tmp/kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${{ env.KUSTOMIZE_VERSION }}/kustomize_v${{ env.KUSTOMIZE_VERSION }}_linux_amd64.tar.gz"
+          tar -xzf /tmp/kustomize.tar.gz -C /tmp
+          sudo mv /tmp/kustomize /usr/local/bin/kustomize
 
-      - name: Setup kubeconform
-        uses: fluxcd/pkg/actions/kubeconform@main
+      - name: Install kubeconform
+        run: |
+          curl -sSLo /tmp/kubeconform.tar.gz "https://github.com/yannh/kubeconform/releases/download/v${{ env.KUBECONFORM_VERSION }}/kubeconform-linux-amd64.tar.gz"
+          tar -xzf /tmp/kubeconform.tar.gz -C /tmp kubeconform
+          sudo mv /tmp/kubeconform /usr/local/bin/kubeconform
 
       - name: Validate ${{ matrix.path }}
         run: |
+          set -euo pipefail
           echo "Validating ${{ matrix.path }}..."
           kustomize build ${{ matrix.path }} | \
             kubeconform \
@@ -117,27 +130,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Flux CLI
-        uses: fluxcd/flux2/action@main
+      - name: Install Flux CLI
+        run: |
+          curl -sSLo /tmp/flux.tar.gz "https://github.com/fluxcd/flux2/releases/download/v${{ env.FLUX_VERSION }}/flux_${{ env.FLUX_VERSION }}_linux_amd64.tar.gz"
+          tar -xzf /tmp/flux.tar.gz -C /tmp
+          sudo mv /tmp/flux /usr/local/bin/flux
 
       - name: Validate Flux resources
         run: |
-          echo "Validating Flux Kustomizations..."
-          find . -name '*.yaml' -type f | while read -r file; do
-            if grep -q "kind: Kustomization" "$file" && grep -q "toolkit.fluxcd.io" "$file"; then
-              echo "Validating: $file"
-              flux check --pre || true
-            fi
-          done
+          set -euo pipefail
 
-          echo ""
-          echo "Validating HelmReleases..."
-          find . -name '*.yaml' -type f | while read -r file; do
-            if grep -q "kind: HelmRelease" "$file"; then
-              echo "Validating: $file"
-              yq eval 'select(.kind == "HelmRelease")' "$file" | kubectl apply --dry-run=client -f - 2>/dev/null || echo "  (requires CRDs, skipped)"
-            fi
-          done
+          echo "Building cluster Flux Kustomizations from local manifests..."
+
+          echo "Building: repositories"
+          flux build kustomization repositories \
+            --path ./repositories \
+            --kustomization-file ./clusters/production/repositories.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: infrastructure-controllers"
+          flux build kustomization infrastructure-controllers \
+            --path ./infrastructure/controllers \
+            --kustomization-file ./clusters/production/infrastructure-controllers.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: infrastructure-configs"
+          flux build kustomization infrastructure-configs \
+            --path ./infrastructure/configs \
+            --kustomization-file ./clusters/production/infrastructure-configs.yaml \
+            --dry-run > /dev/null
+
+          echo "Building: apps"
+          flux build kustomization apps \
+            --path ./apps/production \
+            --kustomization-file ./clusters/production/apps.yaml \
+            --dry-run > /dev/null
 
           echo ""
           echo "✓ Flux resources validated"
@@ -161,33 +188,56 @@ jobs:
           ref: main
           path: main
 
-      - name: Setup Kustomize
-        uses: fluxcd/pkg/actions/kustomize@main
-
-      - name: Diff infrastructure
+      - name: Install kustomize
         run: |
-          echo "## Infrastructure Changes" >> $GITHUB_STEP_SUMMARY
-          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          curl -sSLo /tmp/kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${{ env.KUSTOMIZE_VERSION }}/kustomize_v${{ env.KUSTOMIZE_VERSION }}_linux_amd64.tar.gz"
+          tar -xzf /tmp/kustomize.tar.gz -C /tmp
+          sudo mv /tmp/kustomize /usr/local/bin/kustomize
 
-          # Build both versions
-          kustomize build main/infrastructure/controllers > /tmp/main-infra.yaml 2>/dev/null || echo "" > /tmp/main-infra.yaml
-          kustomize build pr/infrastructure/controllers > /tmp/pr-infra.yaml 2>/dev/null || echo "" > /tmp/pr-infra.yaml
+      - name: Diff repositories
+        run: |
+          echo "## Repository Source Changes" >> "$GITHUB_STEP_SUMMARY"
+          echo '```diff' >> "$GITHUB_STEP_SUMMARY"
 
-          # Show diff
-          diff -u /tmp/main-infra.yaml /tmp/pr-infra.yaml >> $GITHUB_STEP_SUMMARY || true
+          kustomize build main/repositories > /tmp/main-repositories.yaml 2>/dev/null || echo "" > /tmp/main-repositories.yaml
+          kustomize build pr/repositories > /tmp/pr-repositories.yaml 2>/dev/null || echo "" > /tmp/pr-repositories.yaml
 
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          diff -u /tmp/main-repositories.yaml /tmp/pr-repositories.yaml >> "$GITHUB_STEP_SUMMARY" || true
+
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Diff infrastructure controllers
+        run: |
+          echo "## Infrastructure Controller Changes" >> "$GITHUB_STEP_SUMMARY"
+          echo '```diff' >> "$GITHUB_STEP_SUMMARY"
+
+          kustomize build main/infrastructure/controllers > /tmp/main-controllers.yaml 2>/dev/null || echo "" > /tmp/main-controllers.yaml
+          kustomize build pr/infrastructure/controllers > /tmp/pr-controllers.yaml 2>/dev/null || echo "" > /tmp/pr-controllers.yaml
+
+          diff -u /tmp/main-controllers.yaml /tmp/pr-controllers.yaml >> "$GITHUB_STEP_SUMMARY" || true
+
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Diff infrastructure configs
+        run: |
+          echo "## Infrastructure Config Changes" >> "$GITHUB_STEP_SUMMARY"
+          echo '```diff' >> "$GITHUB_STEP_SUMMARY"
+
+          kustomize build main/infrastructure/configs > /tmp/main-configs.yaml 2>/dev/null || echo "" > /tmp/main-configs.yaml
+          kustomize build pr/infrastructure/configs > /tmp/pr-configs.yaml 2>/dev/null || echo "" > /tmp/pr-configs.yaml
+
+          diff -u /tmp/main-configs.yaml /tmp/pr-configs.yaml >> "$GITHUB_STEP_SUMMARY" || true
+
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Diff apps
         run: |
-          echo "## Application Changes" >> $GITHUB_STEP_SUMMARY
-          echo '```diff' >> $GITHUB_STEP_SUMMARY
+          echo "## Application Changes" >> "$GITHUB_STEP_SUMMARY"
+          echo '```diff' >> "$GITHUB_STEP_SUMMARY"
 
-          # Build both versions
           kustomize build main/apps/production > /tmp/main-apps.yaml 2>/dev/null || echo "" > /tmp/main-apps.yaml
           kustomize build pr/apps/production > /tmp/pr-apps.yaml 2>/dev/null || echo "" > /tmp/pr-apps.yaml
 
-          # Show diff
-          diff -u /tmp/main-apps.yaml /tmp/pr-apps.yaml >> $GITHUB_STEP_SUMMARY || true
+          diff -u /tmp/main-apps.yaml /tmp/pr-apps.yaml >> "$GITHUB_STEP_SUMMARY" || true
 
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
