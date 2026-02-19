@@ -63,14 +63,17 @@ Each stage waits for the previous to be healthy before proceeding.
 
 | Application | Description | URL |
 |-------------|-------------|-----|
-| **Homepage** | Dashboard with service links | `kennyandries.com` |
+| **Homepage** | Dashboard with service links | `homepage.kennyandries.com` |
 | **Traefik** | Ingress dashboard | `traefik.kennyandries.com` |
 | **Longhorn** | Storage dashboard | `longhorn.kennyandries.com` |
-| **Uptime Kuma** | Status monitoring | `status.kennyandries.com` |
+| **Uptime Kuma** | Status monitoring | `uptime-kuma.kennyandries.com` |
 | **Pocket-ID** | Identity provider | `auth.kennyandries.com` |
 | **Servarr** | Media management suite | Various subdomains |
-| **Trilium** | Note-taking | `notes.kennyandries.com` |
-| **Actualbudget** | Personal finance | `budget.kennyandries.com` |
+| **Trilium** | Note-taking | `trilium.kennyandries.com` |
+| **Actualbudget** | Personal finance | `actualbudget.kennyandries.com` |
+| **Beszel** | System monitoring | `beszel.kennyandries.com` |
+| **SABnzbd** | Usenet downloader | `sabnzbd.kennyandries.com` |
+| **Metrics Server** | Kubernetes resource metrics | N/A |
 
 ## Quick Start
 

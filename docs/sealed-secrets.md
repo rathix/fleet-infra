@@ -54,7 +54,7 @@ sudo install kubeseal /usr/local/bin/
 ### Verify Controller
 
 ```bash
-kubectl get pods -n flux-system -l app.kubernetes.io/name=sealed-secrets
+kubectl get pods -n sealed-secrets -l app.kubernetes.io/name=sealed-secrets
 ```
 
 ## Creating Sealed Secrets
@@ -71,8 +71,8 @@ kubectl create secret generic my-secret \
 
 # Seal it
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
   > apps/production/my-app/sealedsecret.yaml
 
@@ -92,8 +92,8 @@ kubectl create secret generic my-tls \
 
 # Seal it
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
   > apps/production/my-app/tls-sealedsecret.yaml
 ```
@@ -109,8 +109,8 @@ kubectl create secret generic my-env \
 
 # Seal it
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
   > apps/production/my-app/env-sealedsecret.yaml
 ```
@@ -180,8 +180,8 @@ kubectl create secret generic my-secret \
   --from-literal=password=newpassword \
   --dry-run=client -o yaml | \
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   --merge-into apps/production/my-app/sealedsecret.yaml
 ```
 
@@ -193,7 +193,7 @@ The controller generates a sealing key pair. **If lost, all existing SealedSecre
 
 ```bash
 # Backup the private key
-kubectl get secret -n flux-system -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > sealed-secrets-key-backup.yaml
+kubectl get secret -n sealed-secrets -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > sealed-secrets-key-backup.yaml
 
 # Store this securely (NOT in Git!)
 ```
@@ -202,7 +202,7 @@ kubectl get secret -n flux-system -l sealedsecrets.bitnami.com/sealed-secrets-ke
 
 ```bash
 kubectl apply -f sealed-secrets-key-backup.yaml
-kubectl rollout restart deployment sealed-secrets -n flux-system
+kubectl rollout restart deployment sealed-secrets-controller -n sealed-secrets
 ```
 
 ## Fetching the Public Key
@@ -212,8 +212,8 @@ If you need to seal secrets without cluster access:
 ```bash
 # Fetch and save public key
 kubeseal --fetch-cert \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   > sealed-secrets-cert.pem
 
 # Use offline
@@ -225,7 +225,7 @@ kubeseal --cert sealed-secrets-cert.pem --format yaml < secret.yaml > sealedsecr
 ### Check Controller Logs
 
 ```bash
-kubectl logs -n flux-system deployment/sealed-secrets
+kubectl logs -n sealed-secrets deployment/sealed-secrets-controller
 ```
 
 ### Verify Decryption
@@ -267,8 +267,8 @@ kubectl create secret generic api-keys \
   --from-literal=SLACK_WEBHOOK=https://hooks.slack.com/xxx \
   --dry-run=client -o yaml | \
 kubeseal --format yaml \
-  --controller-name=sealed-secrets \
-  --controller-namespace=flux-system \
+  --controller-name=sealed-secrets-controller \
+  --controller-namespace=sealed-secrets \
   > apps/production/my-app/api-keys-sealedsecret.yaml
 
 # 2. Add to kustomization

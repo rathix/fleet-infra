@@ -8,7 +8,7 @@ This document details the infrastructure components deployed in the cluster.
 |-----------|---------|-----------|---------|
 | Traefik | 38.0.2 | traefik-system | Ingress controller |
 | cert-manager | 1.19.2 | cert-manager | Certificate management |
-| Sealed Secrets | 2.18.0 | flux-system | Secret encryption |
+| Sealed Secrets | 2.18.0 | sealed-secrets | Secret encryption |
 | Longhorn | 1.11.0 | longhorn-system | Distributed storage |
 | kube-vip | 1.0.3 | kube-system | Virtual IP |
 | Reloader | 2.2.7 | reloader | Config reload |
@@ -41,9 +41,14 @@ spec:
         enabled: true
 ```
 
-**Middlewares**:
-- `redirect-https` - Redirects HTTP to HTTPS
-- `traefik-oidc` - OIDC authentication for protected routes
+**Middlewares** (in `infrastructure/controllers/traefik/middleware.yaml`):
+- `security-headers` - HSTS, frame deny, content type nosniff, XSS filter, referrer policy
+- `rate-limit` - 100 avg / 200 burst per minute
+
+**Middlewares** (in `infrastructure/configs/traefik/middleware.yaml`):
+- `oidc` - OIDC authentication via `traefik-oidc-auth` plugin (depends on Pocket-ID)
+
+HTTP to HTTPS redirect is handled by Traefik's entrypoint configuration, not a middleware.
 
 ---
 
@@ -70,12 +75,9 @@ spec:
             solverName: hetzner
 ```
 
-**Usage in Ingress**:
+**Wildcard Certificate**:
 
-```yaml
-annotations:
-  cert-manager.io/cluster-issuer: letsencrypt
-```
+TLS is handled by a wildcard certificate (`*.kennyandries.com`) defined in `infrastructure/configs/traefik/certificate.yaml`. Individual ingresses do not need `cert-manager.io/cluster-issuer` annotations.
 
 ---
 
@@ -127,10 +129,9 @@ parameters:
   staleReplicaTimeout: "30"
 ```
 
-**Backup Configuration**:
+**Backup Configuration** (inline in `infrastructure/controllers/longhorn/helmrelease.yaml`):
 
 ```yaml
-# infrastructure/base/longhorn/values.yaml
 defaultSettings:
   backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn
 ```
@@ -204,22 +205,18 @@ kubectl top pods -A
 
 ```
 infrastructure/
-├── base/                    # Base definitions (namespace, common config)
-│   ├── cert-manager/
-│   ├── kube-vip/
-│   ├── longhorn/
-│   ├── sealed-secrets/
-│   └── traefik/
-├── controllers/             # HelmReleases for each component
+├── controllers/             # HelmReleases and DaemonSets for each component
 │   ├── cert-manager/
 │   ├── kube-vip/
 │   ├── longhorn/
 │   ├── reloader/
 │   ├── sealed-secrets/
-│   └── traefik/
+│   └── traefik/             # Includes security-headers and rate-limit middlewares
 └── configs/                 # Post-install configurations
     ├── cert-manager/        # ClusterIssuers
-    └── traefik/             # Middlewares, default certs
+    ├── network-policies/    # Per-namespace ingress network policies
+    ├── notifications/       # Flux GitHub status notifications
+    └── traefik/             # OIDC middleware, wildcard certificate
 ```
 
 ## Health Checks
