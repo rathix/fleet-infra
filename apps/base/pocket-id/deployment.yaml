@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: pocket-id
-          image: ghcr.io/pocket-id/pocket-id:v2.2.0
+          image: ghcr.io/pocket-id/pocket-id:v2.3.0
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsNonRoot: true
