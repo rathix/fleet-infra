@@ -64,6 +64,7 @@ Deploys core infrastructure components:
 - **Longhorn** - Distributed storage
 - **kube-vip** - Virtual IP management
 - **Reloader** - Config/secret change detection
+- **metrics-server** - Kubernetes resource metrics
 
 ```yaml
 # clusters/production/infrastructure-controllers.yaml
@@ -88,7 +89,6 @@ Applies configurations that depend on controllers:
 - **ClusterIssuers** - Let's Encrypt certificate issuers
 - **Middlewares** - OIDC authentication (depends on Sealed Secrets for client credentials)
 - **Wildcard certificate** - `*.kennyandries.com` via cert-manager
-- **Network policies** - Per-namespace ingress policies
 - **Notifications** - Flux GitHub status reporting
 
 ```yaml

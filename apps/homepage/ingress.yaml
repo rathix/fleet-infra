@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homepage
+  namespace: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd,traefik-system-security-headers@kubernetescrd,traefik-system-rate-limit@kubernetescrd
+    external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+spec:
+  ingressClassName: traefik-system-traefik
+  rules:
+    - host: homepage.kennyandries.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homepage
+                port:
+                  number: 3000

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: beszel-agent
+  namespace: beszel
+  labels:
+    app.kubernetes.io/name: beszel-agent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: beszel-agent
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: beszel-agent
+    spec:
+      hostNetwork: true
+      restartPolicy: Always
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+          effect: NoSchedule
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: beszel-agent
+          image: henrygd/beszel-agent:0.18.4
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: LISTEN
+              value: "45876"
+            - name: KEY
+              valueFrom:
+                secretKeyRef:
+                  name: beszel-secret
+                  key: sshKey
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: beszel-secret
+                  key: apiKey
+            - name: HUB_URL
+              value: https://beszel.kennyandries.com
+          ports:
+            - containerPort: 45876
+              hostPort: 45876
+              protocol: TCP
+          resources:
+            limits:
+              memory: 128Mi
+              cpu: "0.5"
+            requests:
+              memory: 32Mi
+              cpu: "0.1"

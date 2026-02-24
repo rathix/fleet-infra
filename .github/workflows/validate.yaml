@@ -59,7 +59,7 @@ jobs:
         path:
           - infrastructure/controllers
           - infrastructure/configs
-          - apps/production
+          - apps
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -89,7 +89,7 @@ jobs:
         path:
           - infrastructure/controllers
           - infrastructure/configs
-          - apps/production
+          - apps
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -162,7 +162,7 @@ jobs:
 
           echo "Building: apps"
           flux build kustomization apps \
-            --path ./apps/production \
+            --path ./apps \
             --kustomization-file ./clusters/production/apps.yaml \
             --dry-run > /dev/null
 
@@ -235,8 +235,8 @@ jobs:
           echo "## Application Changes" >> "$GITHUB_STEP_SUMMARY"
           echo '```diff' >> "$GITHUB_STEP_SUMMARY"
 
-          kustomize build main/apps/production > /tmp/main-apps.yaml 2>/dev/null || echo "" > /tmp/main-apps.yaml
-          kustomize build pr/apps/production > /tmp/pr-apps.yaml 2>/dev/null || echo "" > /tmp/pr-apps.yaml
+          kustomize build main/apps > /tmp/main-apps.yaml 2>/dev/null || echo "" > /tmp/main-apps.yaml
+          kustomize build pr/apps > /tmp/pr-apps.yaml 2>/dev/null || echo "" > /tmp/pr-apps.yaml
 
           diff -u /tmp/main-apps.yaml /tmp/pr-apps.yaml >> "$GITHUB_STEP_SUMMARY" || true
 
