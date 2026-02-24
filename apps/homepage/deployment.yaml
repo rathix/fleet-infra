@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: homepage
+  labels:
+    app.kubernetes.io/name: homepage
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: homepage
+    spec:
+      serviceAccountName: homepage
+      automountServiceAccountToken: true
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      containers:
+        - name: homepage
+          image: ghcr.io/gethomepage/homepage:v1.10
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            runAsNonRoot: false
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: homepage.kennyandries.com
+            - name: HOMEPAGE_VAR_SONARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: sonarrKey
+            - name: HOMEPAGE_VAR_RADARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: radarrKey
+            - name: HOMEPAGE_VAR_LIDARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: lidarrKey
+            - name: HOMEPAGE_VAR_PROWLARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: prowlarrKey
+            - name: HOMEPAGE_VAR_JELLYFIN
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: jellyfinKey
+            - name: HOMEPAGE_VAR_SABNZBD
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: sabnzbdKey
+            - name: HOMEPAGE_VAR_JELLYSEERR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: jellyseerrKey
+            - name: HOMEPAGE_VAR_BAZARR
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: bazarrKey
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: homepage-config
+              mountPath: /app/config/bookmarks.yaml
+              subPath: bookmarks.yaml
+            - name: homepage-config
+              mountPath: /app/config/docker.yaml
+              subPath: docker.yaml
+            - name: homepage-config
+              mountPath: /app/config/kubernetes.yaml
+              subPath: kubernetes.yaml
+            - name: homepage-config
+              mountPath: /app/config/services.yaml
+              subPath: services.yaml
+            - name: homepage-config
+              mountPath: /app/config/settings.yaml
+              subPath: settings.yaml
+            - name: homepage-config
+              mountPath: /app/config/widgets.yaml
+              subPath: widgets.yaml
+            - name: logs
+              mountPath: /app/config/logs
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: homepage-config
+          configMap:
+            name: homepage
+        - name: logs
+          emptyDir: {}
