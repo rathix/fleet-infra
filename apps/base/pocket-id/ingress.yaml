@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: pocket-id
 spec:
-  ingressClassName: traefik
+  ingressClassName: traefik-system-traefik-system-traefik
   rules:
     - http:
         paths:

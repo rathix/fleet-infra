@@ -79,7 +79,7 @@ Applications follow base/overlay pattern:
 
 - HelmReleases deployed to `flux-system` namespace with `targetNamespace` pointing to app namespace
 - TLS uses a wildcard certificate (`*.kennyandries.com`) managed by cert-manager at `infrastructure/configs/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
-- Ingress uses `ingressClassName: traefik`
+- Ingress uses `ingressClassName: traefik-system-traefik`
 - Storage uses `storageClassName: longhorn`
 
 ## CI Validation

@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: sabnzbd
 spec:
-  ingressClassName: traefik
+  ingressClassName: traefik-system-traefik
   rules:
     - http:
         paths:

@@ -218,7 +218,7 @@ kind: Ingress
 metadata:
   name: my-app
 spec:
-  ingressClassName: traefik
+  ingressClassName: traefik-system-traefik
   rules:
     - host: myapp.kennyandries.com
       http:

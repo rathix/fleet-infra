@@ -94,7 +94,7 @@ metadata:
   name: my-app
   namespace: my-app
 spec:
-  ingressClassName: traefik
+  ingressClassName: traefik-system-traefik
   rules:
     - host: my-app.example.com
       http:
