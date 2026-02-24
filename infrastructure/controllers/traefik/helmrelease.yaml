@@ -27,9 +27,6 @@ spec:
     mode: enabled
   values:
     replicas: 2
-    logs:
-      access:
-        enabled: true
     ingressClass:
       isDefaultClass: true
     ports:
