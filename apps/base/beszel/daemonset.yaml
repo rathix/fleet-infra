@@ -30,7 +30,7 @@ spec:
           effect: NoSchedule
       containers:
         - name: beszel-agent
-          image: henrygd/beszel-agent:0.18.3
+          image: henrygd/beszel-agent:0.18.4
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
