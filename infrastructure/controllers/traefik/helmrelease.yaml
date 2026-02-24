@@ -30,9 +30,6 @@ spec:
     logs:
       access:
         enabled: true
-        filters:
-          statusCodes:
-            - "400-599"
     ingressClass:
       isDefaultClass: true
     ports:
