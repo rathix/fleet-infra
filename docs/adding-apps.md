@@ -36,15 +36,13 @@ resources:
   - my-repo.yaml  # Add new repo
 ```
 
-### Step 2: Create Base Application
-
-Create the base directory structure:
+### Step 2: Create Application Directory
 
 ```bash
-mkdir -p apps/base/my-app
+mkdir -p apps/my-app
 ```
 
-**Namespace** (`apps/base/my-app/namespace.yaml`):
+**Namespace** (`apps/my-app/namespace.yaml`):
 
 ```yaml
 apiVersion: v1
@@ -53,7 +51,9 @@ metadata:
   name: my-app
 ```
 
-**HelmRelease** (`apps/base/my-app/helmrelease.yaml`):
+**HelmRelease** (`apps/my-app/helmrelease.yaml`):
+
+All values are defined inline -- no separate patch files.
 
 ```yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -68,7 +68,7 @@ spec:
   chart:
     spec:
       chart: my-app
-      version: "1.x.x"
+      version: "1.2.3"
       sourceRef:
         kind: HelmRepository
         name: my-repo
@@ -80,10 +80,17 @@ spec:
     remediation:
       retries: 3
   values:
-    # Default values here
+    # All values inline
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
 ```
 
-**Ingress** (`apps/base/my-app/ingress.yaml`):
+**Ingress** (`apps/my-app/ingress.yaml`):
 
 TLS is handled by a wildcard certificate (`*.kennyandries.com`), so no per-ingress cert-manager annotations are needed.
 
@@ -96,7 +103,7 @@ metadata:
 spec:
   ingressClassName: traefik-system-traefik
   rules:
-    - host: my-app.example.com
+    - host: my-app.kennyandries.com
       http:
         paths:
           - path: /
@@ -108,78 +115,40 @@ spec:
                   number: 80
 ```
 
-**Kustomization** (`apps/base/my-app/kustomization.yaml`):
+**Network Policy** (`apps/my-app/networkpolicy.yaml`) (optional):
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress
+  namespace: my-app
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
+```
+
+**Kustomization** (`apps/my-app/kustomization.yaml`):
 
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: my-app
 resources:
   - namespace.yaml
   - helmrelease.yaml
   - ingress.yaml
+  - networkpolicy.yaml
 ```
 
-### Step 3: Create Production Overlay
+### Step 3: Add to Apps Kustomization
 
-Create the production directory:
-
-```bash
-mkdir -p apps/production/my-app
-```
-
-**HelmRelease Patch** (`apps/production/my-app/helmrelease-patch.yaml`):
-
-```yaml
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: my-app
-  namespace: flux-system
-spec:
-  chart:
-    spec:
-      version: "1.2.3"  # Pin specific version
-  values:
-    # Production-specific values
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 500m
-```
-
-**Ingress Patch** (`apps/production/my-app/ingress-patch.yaml`):
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: my-app
-  namespace: my-app
-spec:
-  rules:
-    - host: my-app.kennyandries.com
-```
-
-**Kustomization** (`apps/production/my-app/kustomization.yaml`):
-
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: my-app
-resources:
-  - ../../base/my-app
-patches:
-  - path: helmrelease-patch.yaml
-  - path: ingress-patch.yaml
-```
-
-### Step 4: Add to Production Apps
-
-Update `apps/production/kustomization.yaml`:
+Update `apps/kustomization.yaml`:
 
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -189,9 +158,13 @@ resources:
   - ./my-app  # Add new app
 ```
 
-### Step 5: Commit and Push
+### Step 4: Test and Deploy
 
 ```bash
+# Validate locally
+kustomize build apps/my-app
+
+# Commit and push
 git add apps/
 git commit -m "Add my-app application"
 git push
@@ -205,19 +178,20 @@ Flux will automatically detect the changes and deploy the application.
 
 For applications without Helm charts:
 
-### Step 1: Create Base Manifests
+### Step 1: Create Application Directory
 
 ```bash
-mkdir -p apps/base/my-app
+mkdir -p apps/my-app
 ```
 
-**Deployment** (`apps/base/my-app/deployment.yaml`):
+**Deployment** (`apps/my-app/deployment.yaml`):
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-app
+  namespace: my-app
 spec:
   replicas: 1
   selector:
@@ -242,13 +216,14 @@ spec:
               cpu: 200m
 ```
 
-**Service** (`apps/base/my-app/service.yaml`):
+**Service** (`apps/my-app/service.yaml`):
 
 ```yaml
 apiVersion: v1
 kind: Service
 metadata:
   name: my-app
+  namespace: my-app
 spec:
   selector:
     app: my-app
@@ -257,7 +232,7 @@ spec:
       targetPort: 8080
 ```
 
-Follow the same kustomization pattern as above.
+Create namespace, ingress, network policy, and kustomization files following the same pattern as above.
 
 ---
 
@@ -279,15 +254,17 @@ kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
-  > apps/production/my-app/sealedsecret.yaml
+  > apps/my-app/sealedsecret.yaml
 ```
 
 ### Step 3: Reference in Kustomization
 
 ```yaml
-# apps/production/my-app/kustomization.yaml
+# apps/my-app/kustomization.yaml
 resources:
-  - ../../base/my-app
+  - namespace.yaml
+  - helmrelease.yaml
+  - ingress.yaml
   - sealedsecret.yaml
 ```
 
@@ -373,9 +350,9 @@ curl -I https://my-app.kennyandries.com
 ## Checklist
 
 - [ ] Helm repository added (if needed)
-- [ ] Base manifests created
-- [ ] Production overlay created
-- [ ] Added to `apps/production/kustomization.yaml`
+- [ ] Application directory created in `apps/<app>/`
+- [ ] All manifests co-located (namespace, helmrelease/deployment, service, ingress, networkpolicy, sealedsecret)
+- [ ] Added to `apps/kustomization.yaml`
 - [ ] Secrets sealed and committed
 - [ ] DNS record created (if applicable)
 - [ ] Tested locally with `kustomize build`

@@ -74,7 +74,7 @@ kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
-  > apps/production/my-app/sealedsecret.yaml
+  > apps/my-app/sealedsecret.yaml
 
 # Clean up plain secret
 rm /tmp/secret.yaml
@@ -95,7 +95,7 @@ kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
-  > apps/production/my-app/tls-sealedsecret.yaml
+  > apps/my-app/tls-sealedsecret.yaml
 ```
 
 ### Method 3: From .env File
@@ -112,7 +112,7 @@ kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
   < /tmp/secret.yaml \
-  > apps/production/my-app/env-sealedsecret.yaml
+  > apps/my-app/env-sealedsecret.yaml
 ```
 
 ## Sealed Secret Structure
@@ -182,7 +182,7 @@ kubectl create secret generic my-secret \
 kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
-  --merge-into apps/production/my-app/sealedsecret.yaml
+  --merge-into apps/my-app/sealedsecret.yaml
 ```
 
 ## Backup & Recovery
@@ -269,13 +269,13 @@ kubectl create secret generic api-keys \
 kubeseal --format yaml \
   --controller-name=sealed-secrets-controller \
   --controller-namespace=sealed-secrets \
-  > apps/production/my-app/api-keys-sealedsecret.yaml
+  > apps/my-app/api-keys-sealedsecret.yaml
 
 # 2. Add to kustomization
-echo "  - api-keys-sealedsecret.yaml" >> apps/production/my-app/kustomization.yaml
+echo "  - api-keys-sealedsecret.yaml" >> apps/my-app/kustomization.yaml
 
 # 3. Commit and push
-git add apps/production/my-app/
+git add apps/
 git commit -m "Add API keys secret for my-app"
 git push
 

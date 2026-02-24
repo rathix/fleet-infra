@@ -32,7 +32,7 @@ This folder contains detailed documentation for the fleet-infra repository.
 
 When making changes:
 
-1. Test manifests locally: `kustomize build apps/production/my-app`
+1. Test manifests locally: `kustomize build apps/my-app`
 2. Validate YAML syntax
 3. Commit with descriptive messages
 4. Push and monitor Flux reconciliation

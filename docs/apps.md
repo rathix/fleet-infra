@@ -15,7 +15,8 @@ This document details the applications deployed in the cluster.
 | Beszel | Manifest | System monitoring | `beszel.kennyandries.com` |
 | SABnzbd | Manifest | Usenet downloader | `sabnzbd.kennyandries.com` |
 | ConfigArr | CronJob | Servarr configuration sync | N/A |
-| Metrics Server | Helm | Kubernetes metrics | N/A |
+
+
 
 ---
 
@@ -32,18 +33,15 @@ This document details the applications deployed in the cluster.
 
 **Configuration Files**:
 ```
-apps/base/homepage/
+apps/homepage/
 ├── kustomization.yaml
 ├── namespace.yaml
 ├── deployment.yaml
 ├── service.yaml
 ├── ingress.yaml
-└── rbac.yaml
-
-apps/production/homepage/
-├── kustomization.yaml
+├── rbac.yaml
 ├── configmap.yaml          # bookmarks, services, widgets, settings
-└── ingress-patch.yaml
+└── networkpolicy.yaml
 ```
 
 **Key ConfigMap Sections**:
@@ -188,22 +186,17 @@ apps/production/homepage/
 
 ## Application Structure
 
-Each application follows this pattern:
+Each application uses a flat directory structure with all manifests co-located:
 
 ```
 apps/
-├── base/
-│   └── <app-name>/
-│       ├── kustomization.yaml    # References all resources
-│       ├── namespace.yaml        # App namespace
-│       ├── helmrelease.yaml      # Helm chart definition
-│       └── ingress.yaml          # Ingress route (if applicable)
-└── production/
-    └── <app-name>/
-        ├── kustomization.yaml    # Patches base resources
-        ├── helmrelease-patch.yaml # Version and value overrides
-        ├── ingress-patch.yaml    # Domain/TLS configuration
-        └── sealedsecret.yaml     # Encrypted secrets
+└── <app-name>/
+    ├── kustomization.yaml    # Lists all resources
+    ├── namespace.yaml        # App namespace
+    ├── helmrelease.yaml      # Helm chart with values inline (or deployment.yaml + service.yaml)
+    ├── ingress.yaml          # Ingress route (if applicable)
+    ├── networkpolicy.yaml    # Network policy (if applicable)
+    └── sealedsecret.yaml     # Encrypted secrets (if applicable)
 ```
 
 ## Common Patterns
@@ -232,7 +225,7 @@ spec:
                   number: 80
 ```
 
-Production overlays can add middleware annotations as needed:
+Middleware annotations can be added directly to the ingress:
 
 ```yaml
 metadata:

@@ -211,10 +211,10 @@ infrastructure/
 │   ├── longhorn/
 │   ├── reloader/
 │   ├── sealed-secrets/
+│   ├── metrics-server/
 │   └── traefik/             # Includes security-headers and rate-limit middlewares
 └── configs/                 # Post-install configurations
     ├── cert-manager/        # ClusterIssuers
-    ├── network-policies/    # Per-namespace ingress network policies
     ├── notifications/       # Flux GitHub status notifications
     └── traefik/             # OIDC middleware, wildcard certificate
 ```
