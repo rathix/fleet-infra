@@ -5,3 +5,4 @@ resources:
   - helmrelease.yaml
   - persistentvolume.yaml
   - persistentvolumeclaim.yaml
+  - networkpolicy.yaml

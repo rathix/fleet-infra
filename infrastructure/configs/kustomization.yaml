@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - cert-manager
   - traefik
-  - network-policies
   - notifications

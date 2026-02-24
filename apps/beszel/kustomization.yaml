@@ -8,3 +8,4 @@ resources:
   - daemonset.yaml
   - ingress.yaml
   - sealedsecret.yaml
+  - networkpolicy.yaml
