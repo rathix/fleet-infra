@@ -14,7 +14,7 @@ This repository contains the Infrastructure as Code (IaC) for a production Kuber
 ## Tech Stack
 
 | Component | Technology | Purpose |
-|-----------|------------|---------|
+|-|-|-|
 | **GitOps** | Flux CD v2 | Continuous delivery and cluster synchronization |
 | **Ingress** | Traefik | Load balancing, TLS termination, routing |
 | **Certificates** | cert-manager | Automatic TLS certificate management |
@@ -32,18 +32,24 @@ fleet-infra/
 │       ├── flux-system/      # Flux components
 │       ├── cluster-config.yaml
 │       ├── repositories.yaml
-│       ├── infrastructure-controllers.yaml
-│       ├── infrastructure-configs.yaml
+│       ├── infrastructure.yaml
 │       └── apps.yaml
-├── infrastructure/
-│   ├── controllers/          # Infrastructure controllers (Helm releases)
-│   └── configs/              # Infrastructure configurations
-├── apps/
-│   ├── base/                 # Base application definitions
-│   └── production/           # Production-specific overrides
+├── infrastructure/           # Infrastructure services
+│   ├── cert-manager/
+│   ├── traefik/
+│   ├── longhorn/
+│   ├── sealed-secrets/
+│   ├── kube-vip/
+│   ├── reloader/
+│   ├── metrics-server/
+│   └── notifications/
+├── apps/                     # Application definitions
+│   ├── homepage/
+│   ├── servarr/
+│   ├── uptime-kuma/
+│   └── ...
 ├── repositories/             # Helm repository definitions
-├── docs/                     # Additional documentation
-└── renovate.json            # Automated dependency updates
+└── docs/                     # Additional documentation
 ```
 
 ## Deployment Flow
@@ -51,10 +57,7 @@ fleet-infra/
 Flux deploys resources in a specific order based on dependencies:
 
 ```
-┌─────────────┐     ┌─────────────────────────┐     ┌─────────────────────────┐     ┌──────┐
-│ Repositories│ ──▶ │ Infrastructure Controllers│ ──▶ │ Infrastructure Configs  │ ──▶ │ Apps │
-└─────────────┘     └─────────────────────────┘     └─────────────────────────┘     └──────┘
-     10m                      10m                            10m                       10m
+Repositories → Infrastructure → Apps
 ```
 
 Each stage waits for the previous to be healthy before proceeding.
@@ -62,7 +65,7 @@ Each stage waits for the previous to be healthy before proceeding.
 ## Applications
 
 | Application | Description | URL |
-|-------------|-------------|-----|
+|-|-|-|
 | **Homepage** | Dashboard with service links | `homepage.kennyandries.com` |
 | **Traefik** | Ingress dashboard | `traefik.kennyandries.com` |
 | **Longhorn** | Storage dashboard | `longhorn.kennyandries.com` |
@@ -113,9 +116,6 @@ flux logs
 
 ## Documentation
 
-- [Architecture Overview](docs/architecture.md)
-- [Infrastructure Components](docs/infrastructure.md)
-- [Applications Guide](docs/apps.md)
 - [Adding New Applications](docs/adding-apps.md)
 - [Sealed Secrets Guide](docs/sealed-secrets.md)
 
@@ -126,33 +126,6 @@ This repository uses [Renovate](https://github.com/renovatebot/renovate) for aut
 - Helm chart versions are automatically updated
 - Minor and patch updates are auto-merged
 - Major updates create PRs for review
-
-## Directory Conventions
-
-### Base vs Production
-
-- `base/` - Generic, environment-agnostic definitions
-- `production/` - Environment-specific patches, secrets, and overrides
-
-### Kustomization Pattern
-
-Each application follows this structure:
-
-```
-apps/
-├── base/
-│   └── my-app/
-│       ├── kustomization.yaml
-│       ├── namespace.yaml
-│       ├── helmrelease.yaml
-│       └── ingress.yaml
-└── production/
-    └── my-app/
-        ├── kustomization.yaml
-        ├── helmrelease-patch.yaml    # Version/config overrides
-        ├── ingress-patch.yaml        # Domain/TLS settings
-        └── sealedsecret.yaml         # Encrypted secrets
-```
 
 ## Troubleshooting
 

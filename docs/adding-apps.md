@@ -12,10 +12,11 @@ This guide walks through the process of adding a new application to the cluster.
 
 ### Step 1: Add Helm Repository (if needed)
 
-If the chart comes from a new repository, add it to `repositories/`:
+If the chart comes from a new repository, add a new document to `repositories/repositories.yaml`:
 
 ```yaml
-# repositories/my-repo.yaml
+# Append to repositories/repositories.yaml
+---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -24,16 +25,6 @@ metadata:
 spec:
   interval: 1h
   url: https://charts.example.com
-```
-
-Update `repositories/kustomization.yaml`:
-
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - existing-repo.yaml
-  - my-repo.yaml  # Add new repo
 ```
 
 ### Step 2: Create Application Directory

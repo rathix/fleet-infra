@@ -15,8 +15,7 @@ GitOps repository for managing a production Kubernetes cluster using Flux CD v2.
 
 ```bash
 # Build and verify Kustomization renders correctly
-kustomize build infrastructure/controllers
-kustomize build infrastructure/configs
+kustomize build infrastructure
 kustomize build apps
 
 # Validate against Kubernetes schemas (v1.31.0)
@@ -54,7 +53,7 @@ kubeseal --format yaml \
 ### Deployment Order (Flux Dependencies)
 
 ```
-Repositories → Infrastructure Controllers → Infrastructure Configs → Apps
+Repositories → Infrastructure → Apps
 ```
 
 Each stage uses `dependsOn` and health checks to wait for the previous stage.
@@ -62,31 +61,31 @@ Each stage uses `dependsOn` and health checks to wait for the previous stage.
 ### Directory Structure
 
 - `clusters/production/` - Flux bootstrap and sync configuration
-- `infrastructure/controllers/` - Core services: Traefik, cert-manager, Longhorn, Sealed Secrets, kube-vip, Reloader, metrics-server
-- `infrastructure/configs/` - Post-install configs: ClusterIssuers, middlewares, certificates, notifications
+- `infrastructure/` - Core services, each in `infrastructure/<service>/` with all manifests co-located (HelmRelease, middlewares, certificates, ClusterIssuers, etc.)
 - `apps/` - Application definitions, each in a flat `apps/<app>/` directory with all manifests and network policies co-located
-- `repositories/` - Helm repository definitions
+- `repositories/` - Helm repository definitions (single multi-doc YAML file)
 - `docs/` - Additional documentation
 
 ### Kustomization Pattern
 
-Applications use a flat structure:
+Both infrastructure and apps use a flat structure:
+- `infrastructure/<service>/` contains all manifests for that service
 - `apps/<app>/` contains all manifests directly (namespace, HelmRelease or Deployment/Service, Ingress, NetworkPolicy, SealedSecrets)
 - No base/overlay split; values and configuration are defined inline
 
 ### Key Configuration
 
 - HelmReleases deployed to `flux-system` namespace with `targetNamespace` pointing to app namespace
-- TLS uses a wildcard certificate (`*.kennyandries.com`) managed by cert-manager at `infrastructure/configs/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
+- TLS uses a wildcard certificate (`*.kennyandries.com`) managed by cert-manager at `infrastructure/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
 - Ingress uses `ingressClassName: traefik-system-traefik`
 - Storage uses `storageClassName: longhorn`
-- metrics-server is deployed as an infrastructure controller in `infrastructure/controllers/metrics-server/`
+- metrics-server is in `infrastructure/metrics-server/`
 
 ## CI Validation
 
 GitHub Actions runs on all PRs and pushes to main:
 1. YAML lint (relaxed rules, no line-length limit)
-2. Kustomize build for infrastructure/controllers, infrastructure/configs, apps
+2. Kustomize build for infrastructure, apps
 3. Kubeconform schema validation against Kubernetes 1.31.0 (with CRD schema support)
 4. Flux resource validation
 5. Kustomize diff summary (PRs only)
@@ -94,7 +93,7 @@ GitHub Actions runs on all PRs and pushes to main:
 ## Adding New Applications
 
 ### Helm-based
-1. Add Helm repository to `repositories/` if needed
+1. Add Helm repository to `repositories/repositories.yaml` if needed
 2. Create `apps/<app>/` with kustomization.yaml, namespace.yaml, helmrelease.yaml (with values inline), ingress.yaml
 3. Add network policy if needed (`networkpolicy.yaml`)
 4. Add sealed secrets if needed
