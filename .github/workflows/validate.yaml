@@ -57,8 +57,7 @@ jobs:
     strategy:
       matrix:
         path:
-          - infrastructure/controllers
-          - infrastructure/configs
+          - infrastructure
           - apps
     steps:
       - name: Checkout
@@ -87,8 +86,7 @@ jobs:
     strategy:
       matrix:
         path:
-          - infrastructure/controllers
-          - infrastructure/configs
+          - infrastructure
           - apps
     steps:
       - name: Checkout
@@ -148,16 +146,10 @@ jobs:
             --kustomization-file ./clusters/production/repositories.yaml \
             --dry-run > /dev/null
 
-          echo "Building: infrastructure-controllers"
-          flux build kustomization infrastructure-controllers \
-            --path ./infrastructure/controllers \
-            --kustomization-file ./clusters/production/infrastructure-controllers.yaml \
-            --dry-run > /dev/null
-
-          echo "Building: infrastructure-configs"
-          flux build kustomization infrastructure-configs \
-            --path ./infrastructure/configs \
-            --kustomization-file ./clusters/production/infrastructure-configs.yaml \
+          echo "Building: infrastructure"
+          flux build kustomization infrastructure \
+            --path ./infrastructure \
+            --kustomization-file ./clusters/production/infrastructure.yaml \
             --dry-run > /dev/null
 
           echo "Building: apps"
@@ -206,27 +198,15 @@ jobs:
 
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Diff infrastructure controllers
+      - name: Diff infrastructure
         run: |
-          echo "## Infrastructure Controller Changes" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Infrastructure Changes" >> "$GITHUB_STEP_SUMMARY"
           echo '```diff' >> "$GITHUB_STEP_SUMMARY"
 
-          kustomize build main/infrastructure/controllers > /tmp/main-controllers.yaml 2>/dev/null || echo "" > /tmp/main-controllers.yaml
-          kustomize build pr/infrastructure/controllers > /tmp/pr-controllers.yaml 2>/dev/null || echo "" > /tmp/pr-controllers.yaml
+          kustomize build main/infrastructure > /tmp/main-infra.yaml 2>/dev/null || echo "" > /tmp/main-infra.yaml
+          kustomize build pr/infrastructure > /tmp/pr-infra.yaml 2>/dev/null || echo "" > /tmp/pr-infra.yaml
 
-          diff -u /tmp/main-controllers.yaml /tmp/pr-controllers.yaml >> "$GITHUB_STEP_SUMMARY" || true
-
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Diff infrastructure configs
-        run: |
-          echo "## Infrastructure Config Changes" >> "$GITHUB_STEP_SUMMARY"
-          echo '```diff' >> "$GITHUB_STEP_SUMMARY"
-
-          kustomize build main/infrastructure/configs > /tmp/main-configs.yaml 2>/dev/null || echo "" > /tmp/main-configs.yaml
-          kustomize build pr/infrastructure/configs > /tmp/pr-configs.yaml 2>/dev/null || echo "" > /tmp/pr-configs.yaml
-
-          diff -u /tmp/main-configs.yaml /tmp/pr-configs.yaml >> "$GITHUB_STEP_SUMMARY" || true
+          diff -u /tmp/main-infra.yaml /tmp/pr-infra.yaml >> "$GITHUB_STEP_SUMMARY" || true
 
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
