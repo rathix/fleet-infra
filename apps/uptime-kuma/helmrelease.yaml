@@ -39,6 +39,8 @@ spec:
     volume:
       enabled: true
       existingClaim: uptime-kuma-uptime-kuma-pvc
+    strategy:
+      type: Recreate
     image:
       repository: louislam/uptime-kuma
       tag: 2.2.0
