@@ -4,5 +4,6 @@ metadata:
   name: crowdsec
   labels:
     app.kubernetes.io/name: crowdsec
+    pod-security.kubernetes.io/enforce: privileged
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
