@@ -53,7 +53,7 @@ spec:
       access:
         enabled: true
         filters:
-          statusCodes: "400-599"
+          statuscodes: "400-599"
     ingressRoute:
       dashboard:
         enabled: true
