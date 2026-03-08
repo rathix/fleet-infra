@@ -27,7 +27,7 @@ spec:
       initContainers:
         - name: copy-config
           image: busybox:1.37
-          command: ["sh", "-c", "cp /configmap/* /config/"]
+          command: ["sh", "-c", "cp /configmap/* /config/ && chown -R 1000:1000 /config"]
           volumeMounts:
             - name: homepage-config
               mountPath: /configmap
