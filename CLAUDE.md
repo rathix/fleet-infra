@@ -107,3 +107,87 @@ GitHub Actions runs on all PRs and pushes to main:
 4. Test with `kustomize build apps/<app>`
 
 See [docs/adding-apps.md](docs/adding-apps.md) for detailed examples.
+
+## Talos Cluster Management
+
+Talos node configurations are managed with [talhelper](https://github.com/budimanjojo/talhelper) in the `talos/` directory. Secrets are encrypted with SOPS + age.
+
+### Prerequisites
+
+```bash
+brew install talhelper sops age
+export SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt  # also in ~/.zshrc
+```
+
+The age private key at `~/.config/sops/age/keys.txt` is required to decrypt secrets. Back this up securely.
+
+### Directory Structure
+
+- `talos/talconfig.yaml` - Talhelper config defining all nodes and patches
+- `talos/talsecret.sops.yaml` - Encrypted cluster secrets (PKI, tokens, etcd CA)
+- `talos/clusterconfig/` - Generated output (gitignored, never commit)
+- `.sops.yaml` - SOPS encryption rules (age public key)
+
+### Generate Configs
+
+```bash
+cd talos
+talhelper genconfig
+```
+
+This reads `talconfig.yaml` + `talsecret.sops.yaml` and outputs per-node configs into `clusterconfig/`.
+
+### Validate
+
+```bash
+talhelper validate talconfig                          # Check talconfig.yaml syntax
+talhelper validate nodeconfig clusterconfig/*.yaml     # Check generated node configs
+```
+
+### Apply Config to a Node
+
+```bash
+# Generate talosctl apply-config commands for all nodes
+talhelper gencommand apply
+
+# Or apply to a specific node
+talosctl apply-config -n 192.168.1.11 -f clusterconfig/production-pkb-k3s-tal-1.yaml
+```
+
+### Upgrade Talos Version
+
+1. Update `talosVersion` in `talconfig.yaml`
+2. Regenerate configs: `talhelper genconfig`
+3. Generate upgrade commands: `talhelper gencommand upgrade`
+4. Upgrade nodes one at a time, waiting for each to rejoin before proceeding
+
+### Upgrade Kubernetes Version
+
+1. Update `kubernetesVersion` in `talconfig.yaml`
+2. Regenerate and apply configs
+3. Run: `talosctl upgrade-k8s --to <version> -n 192.168.1.11`
+
+### Rotate Secrets
+
+```bash
+talhelper gensecret > talsecret.sops.yaml
+sops -e -i talsecret.sops.yaml
+talhelper genconfig
+# Apply to all nodes
+```
+
+### etcd Backup
+
+```bash
+talosctl etcd snapshot etcd-$(date +%Y%m%d).snapshot -n 192.168.1.11
+```
+
+### Cluster Nodes
+
+| Hostname | IP | Type | Notes |
+|-|-|-|-|
+| pkb-k3s-tal-1 | 192.168.1.11 | Bare-metal CP | TPM disk encryption |
+| pkb-k3s-tal-2 | 192.168.1.12 | Bare-metal CP | TPM disk encryption |
+| pkv-k3s-tal-3 | 192.168.1.13 | VM CP | No FDE (host has FDE) |
+
+VIP: `192.168.1.3` (kube.kennyandries.com)

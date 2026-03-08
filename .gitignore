@@ -39,3 +39,7 @@ id_rsa*
 # Backup files
 *.bak
 *.backup
+
+# Talhelper generated configs
+talos/clusterconfig/
+talos/talosconfig

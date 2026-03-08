@@ -1,0 +1,157 @@
+# -- Cluster identity --
+clusterName: production
+talosVersion: v1.11.5
+kubernetesVersion: v1.34.1
+endpoint: https://kube.kennyandries.com:6443 # DNS record pointing to the VIP
+
+# All 3 nodes are control plane; no dedicated workers
+allowSchedulingOnControlPlanes: true
+
+# -- Nodes --
+# pkb-k3s-tal-1 and pkb-k3s-tal-2 are bare-metal (TPM disk encryption)
+# pkv-k3s-tal-3 is a VM (host already has FDE, so no TPM encryption needed)
+nodes:
+  - hostname: pkb-k3s-tal-1
+    ipAddress: 192.168.1.11
+    controlPlane: true
+    installDiskSelector:
+      type: nvme
+    patches:
+      - |-
+        machine:
+          systemDiskEncryption:
+            ephemeral:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+            state:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+
+  - hostname: pkb-k3s-tal-2
+    ipAddress: 192.168.1.12
+    controlPlane: true
+    installDiskSelector:
+      type: nvme
+    patches:
+      - |-
+        machine:
+          systemDiskEncryption:
+            ephemeral:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+            state:
+              provider: luks2
+              keys:
+                - slot: 0
+                  tpm: {}
+
+  - hostname: pkv-k3s-tal-3
+    ipAddress: 192.168.1.13
+    controlPlane: true
+    installDiskSelector:
+      type: nvme
+
+# -- Shared control plane configuration --
+controlPlane:
+  # Auto-select physical NIC, get IP via DHCP, float VIP across CP nodes
+  networkInterfaces:
+    - deviceSelector:
+        physical: true
+      dhcp: true
+      vip:
+        ip: 192.168.1.3
+
+  # Factory image schematic — defines the installer image extensions and kernel args
+  schematic:
+    customization:
+      extraKernelArgs:
+        - iommu.passthrough=1 # Skip IOMMU address translation for better I/O performance
+      systemExtensions:
+        officialExtensions:
+          - siderolabs/i915        # Intel GPU driver (transcoding)
+          - siderolabs/intel-ucode # Intel CPU microcode updates
+          - siderolabs/iscsi-tools # Required by Longhorn for replicated storage
+          - siderolabs/util-linux-tools # Utilities needed by iscsi-tools
+
+  # Machine and cluster patches applied to all control plane nodes
+  patches:
+    - |-
+      machine:
+        # Kubelet hardening
+        kubelet:
+          defaultRuntimeSeccompProfileEnabled: true # Block dangerous syscalls by default
+          disableManifestsDirectory: true # Only API server schedules pods, no static pod dir
+
+        # Kernel modules required by storage (Longhorn/iSCSI) and GPU
+        kernel:
+          modules:
+            - name: nbd        # Network Block Device
+            - name: iscsi_tcp  # iSCSI initiator for Longhorn
+            - name: i915       # Intel GPU
+            - name: configfs   # Required by iSCSI target mode
+
+        # Route CoreDNS upstream queries through host DNS resolver
+        features:
+          hostDNS:
+            forwardKubeDNSToHost: true
+
+        # Allow CP nodes to receive external traffic (since they run workloads)
+        nodeLabels:
+          node.kubernetes.io/exclude-from-external-load-balancers:
+            $$patch: delete
+
+        # Explicit NTP servers for reliable clock sync
+        time:
+          servers:
+            - time.cloudflare.com
+            - time.google.com
+
+      cluster:
+        apiServer:
+          # Allow kubectl access via this hostname
+          certSANs:
+            - kube.kennyandries.com
+
+          # Pod Security Standards — enforce restricted profile cluster-wide
+          # Exempted namespaces run privileged workloads (storage drivers, ingress, etc.)
+          admissionControl:
+            - name: PodSecurity
+              configuration:
+                apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+                kind: PodSecurityConfiguration
+                defaults:
+                  audit: restricted
+                  audit-version: latest
+                  enforce: restricted
+                  enforce-version: latest
+                  warn: restricted
+                  warn-version: latest
+                exemptions:
+                  namespaces:
+                    - kube-system
+                    - longhorn-system
+                    - traefik-system
+                    - flux-system
+                  runtimeClasses: []
+                  usernames: []
+
+          # Audit logging — log request metadata (who/what/when) without bodies
+          auditPolicy:
+            apiVersion: audit.k8s.io/v1
+            kind: Policy
+            rules:
+              - level: Metadata
+
+        # Use Talos discovery service instead of Kubernetes API for node discovery
+        discovery:
+          enabled: true
+          registries:
+            kubernetes:
+              disabled: true
+            service: {}
