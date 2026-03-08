@@ -5,3 +5,4 @@ resources:
   - middleware.yaml
   - certificate.yaml
   - poddisruptionbudget.yaml
+  - sealedsecret-crowdsec.yaml
