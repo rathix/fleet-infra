@@ -28,6 +28,10 @@ spec:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:v1.10
           imagePullPolicy: IfNotPresent
+          # Entrypoint starts as root to chown /app/config and /app/.next,
+          # then uses su-exec to drop to PUID/PGID. This requires SETUID/SETGID
+          # capabilities and allowPrivilegeEscalation. The Node process itself
+          # runs as non-root (UID 1000).
           securityContext:
             allowPrivilegeEscalation: true
             capabilities:
