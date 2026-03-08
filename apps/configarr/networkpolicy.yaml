@@ -1,0 +1,45 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: configarr-netpol
+  namespace: servarr
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: configarr
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow egress to *arr services in servarr namespace
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 7878
+        - protocol: TCP
+          port: 8686
+        - protocol: TCP
+          port: 8989
+        - protocol: TCP
+          port: 9696
+    # Allow HTTPS egress for TRaSH Guides/templates from GitHub
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443

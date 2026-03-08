@@ -12,6 +12,13 @@ spec:
   secretRef:
     name: flux-system
   url: ssh://git@github.com/rathix/fleet-infra
+  # Git commit signature verification
+  # To enable, configure a secret with GPG/Cosign public keys and uncomment:
+  # verify:
+  #   mode: HEAD
+  #   provider: cosign
+  #   secretRef:
+  #     name: cosign-pub
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

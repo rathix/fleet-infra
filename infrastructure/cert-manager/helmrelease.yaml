@@ -31,6 +31,9 @@ spec:
   values:
     crds:
       enabled: true
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
