@@ -176,12 +176,6 @@ talhelper genconfig
 # Apply to all nodes
 ```
 
-### etcd Backup
-
-```bash
-talosctl etcd snapshot etcd-$(date +%Y%m%d).snapshot -n 192.168.1.11
-```
-
 ### Cluster Nodes
 
 | Hostname | IP | Type | Notes |
@@ -191,3 +185,7 @@ talosctl etcd snapshot etcd-$(date +%Y%m%d).snapshot -n 192.168.1.11
 | pkv-k3s-tal-3 | 192.168.1.13 | VM CP | No FDE (host has FDE) |
 
 VIP: `192.168.1.3` (kube.kennyandries.com)
+
+## Backup & Disaster Recovery
+
+The cluster is fully IaC — rebuildable from Git + two offline keys (age private key, Sealed Secrets controller key). No etcd backups needed. See [docs/backup-and-disaster-recovery.md](docs/backup-and-disaster-recovery.md) for full procedures.
