@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: sabnzbd-netpol
+  name: sabnzbd-allow-traefik-ingress
   namespace: servarr
 spec:
   podSelector:

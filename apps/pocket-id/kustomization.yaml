@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - pvc.yaml
+  - sealedsecret.yaml
   - service.yaml
   - deployment.yaml
   - ingress.yaml
-  - sealedsecret.yaml
   - networkpolicy.yaml
