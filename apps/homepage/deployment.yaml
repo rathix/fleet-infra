@@ -29,9 +29,10 @@ spec:
           image: ghcr.io/gethomepage/homepage:v1.10
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
+            allowPrivilegeEscalation: true
             capabilities:
               drop: ["ALL"]
+              add: ["SETUID", "SETGID"]
             runAsNonRoot: false
             seccompProfile:
               type: RuntimeDefault
