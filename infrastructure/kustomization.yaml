@@ -9,3 +9,4 @@ resources:
   - kube-vip
   - metrics-server
   - notifications
+  - crowdsec

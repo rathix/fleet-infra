@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crowdsec
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: crowdsec
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: crowdsec
+      version: 0.17.0
+  interval: 30m
+  timeout: 10m
+  targetNamespace: crowdsec
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    container_runtime: containerd
+    lapi:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+      env:
+        - name: ENROLL_KEY
+          value: ""
+        - name: ENROLL_INSTANCE_NAME
+          value: "fleet-infra-k8s"
+      persistentVolume:
+        config:
+          enabled: true
+          size: 1Gi
+          storageClassName: longhorn
+        data:
+          enabled: true
+          size: 2Gi
+          storageClassName: longhorn
+    agent:
+      acquisition:
+        - namespace: traefik-system
+          podName: traefik-*
+          program: traefik
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
