@@ -122,6 +122,9 @@ spec:
             - name: homepage-config
               mountPath: /app/config/widgets.yaml
               subPath: widgets.yaml
+            - name: homepage-config
+              mountPath: /app/config/proxmox.yaml
+              subPath: proxmox.yaml
             - name: logs
               mountPath: /app/config/logs
           resources:

@@ -272,3 +272,4 @@ data:
         labels: true
         nodes: true
   docker.yaml: ""
+  proxmox.yaml: ""
