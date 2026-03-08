@@ -49,6 +49,10 @@ spec:
       websecure:
         http3:
           enabled: true
+        middlewares:
+          - traefik-system-crowdsec@kubernetescrd
+          - traefik-system-security-headers@kubernetescrd
+          - traefik-system-rate-limit@kubernetescrd
     logs:
       access:
         enabled: true
@@ -62,8 +66,6 @@ spec:
           - websecure
         middlewares:
           - name: oidc
-          - name: security-headers
-          - name: rate-limit
           - name: lan-only
     service:
       externalIPs: ["192.168.1.3"]

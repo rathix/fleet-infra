@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/name: homepage
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd,traefik-system-security-headers@kubernetescrd,traefik-system-rate-limit@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
   ingressClassName: traefik-system-traefik
