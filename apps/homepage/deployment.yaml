@@ -24,6 +24,15 @@ spec:
       automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
+      initContainers:
+        - name: copy-config
+          image: busybox:1.37
+          command: ["sh", "-c", "cp /configmap/* /config/"]
+          volumeMounts:
+            - name: homepage-config
+              mountPath: /configmap
+            - name: config
+              mountPath: /config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:v1.10
@@ -104,27 +113,8 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 5
           volumeMounts:
-            - name: homepage-config
-              mountPath: /app/config/bookmarks.yaml
-              subPath: bookmarks.yaml
-            - name: homepage-config
-              mountPath: /app/config/docker.yaml
-              subPath: docker.yaml
-            - name: homepage-config
-              mountPath: /app/config/kubernetes.yaml
-              subPath: kubernetes.yaml
-            - name: homepage-config
-              mountPath: /app/config/services.yaml
-              subPath: services.yaml
-            - name: homepage-config
-              mountPath: /app/config/settings.yaml
-              subPath: settings.yaml
-            - name: homepage-config
-              mountPath: /app/config/widgets.yaml
-              subPath: widgets.yaml
-            - name: homepage-config
-              mountPath: /app/config/proxmox.yaml
-              subPath: proxmox.yaml
+            - name: config
+              mountPath: /app/config
             - name: logs
               mountPath: /app/config/logs
           resources:
@@ -138,5 +128,7 @@ spec:
         - name: homepage-config
           configMap:
             name: homepage
+        - name: config
+          emptyDir: {}
         - name: logs
           emptyDir: {}
