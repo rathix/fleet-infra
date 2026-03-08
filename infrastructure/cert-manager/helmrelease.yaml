@@ -4,6 +4,8 @@ kind: HelmRelease
 metadata:
   name: cert-manager
   namespace: flux-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   chart:
     spec:
@@ -40,6 +42,8 @@ kind: HelmRelease
 metadata:
   name: cert-manager-webhook-hetzner
   namespace: flux-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   dependsOn:
     - name: cert-manager

@@ -3,6 +3,8 @@ kind: HelmRelease
 metadata:
   name: sealed-secrets
   namespace: flux-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   chart:
     spec:
