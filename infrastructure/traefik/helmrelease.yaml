@@ -81,10 +81,6 @@ spec:
       default:
         defaultCertificate:
           secretName: traefik-cert
-    volumes:
-      - name: crowdsec-bouncer-key
-        mountPath: /etc/traefik/crowdsec
-        type: secret
     experimental:
       plugins:
         traefik-oidc-auth:

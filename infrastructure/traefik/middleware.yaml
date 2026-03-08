@@ -71,4 +71,4 @@ spec:
     crowdsec-bouncer-traefik-plugin:
       crowdsecLapiScheme: http
       crowdsecLapiHost: crowdsec-lapi.crowdsec.svc.cluster.local:8080
-      crowdsecLapiKeyFile: /etc/traefik/crowdsec/api-key
+      crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
