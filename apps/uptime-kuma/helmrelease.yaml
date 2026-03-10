@@ -43,4 +43,4 @@ spec:
       type: Recreate
     image:
       repository: louislam/uptime-kuma
-      tag: 2.2.0
+      tag: 2.2.1
