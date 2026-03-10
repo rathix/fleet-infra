@@ -28,7 +28,8 @@ spec:
   driftDetection:
     mode: enabled
   values:
-    replicas: 2
+    deployment:
+      kind: DaemonSet
     ingressClass:
       isDefaultClass: true
     podSecurityContext:
@@ -49,10 +50,6 @@ spec:
       websecure:
         http3:
           enabled: true
-        forwardedHeaders:
-          trustedIPs:
-            - 10.244.0.0/16
-            - 192.168.1.0/24
         middlewares:
           - traefik-system-crowdsec@kubernetescrd
           - traefik-system-security-headers@kubernetescrd
@@ -73,6 +70,8 @@ spec:
           - name: lan-only
     service:
       externalIPs: ["192.168.1.3"]
+      spec:
+        externalTrafficPolicy: Local
       annotations:
         external-dns.alpha.kubernetes.io/hostname: traefik.kennyandries.com
     tlsOptions:
