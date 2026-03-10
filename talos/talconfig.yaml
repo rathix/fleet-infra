@@ -74,9 +74,10 @@ controlPlane:
         - iommu.passthrough=1 # Skip IOMMU address translation for better I/O performance
       systemExtensions:
         officialExtensions:
-          - siderolabs/i915        # Intel GPU driver (transcoding)
+          - siderolabs/i915 # Intel GPU driver (transcoding)
           - siderolabs/intel-ucode # Intel CPU microcode updates
           - siderolabs/iscsi-tools # Required by Longhorn for replicated storage
+          - siderolabs/realtek-firmware
           - siderolabs/util-linux-tools # Utilities needed by iscsi-tools
 
   # Machine and cluster patches applied to all control plane nodes
