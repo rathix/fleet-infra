@@ -42,7 +42,8 @@ spec:
     traefik-oidc-auth:
       Secret: urn:k8s:secret:oidc-secret:pluginSecret
       Provider:
-        Url: https://auth.kennyandries.com/
+        Url: http://pocket-id.pocket-id.svc.cluster.local:1411
+        ValidIssuer: https://auth.kennyandries.com
         Scopes: ["openid", "profile", "email"]
         ClientId: urn:k8s:secret:oidc-secret:providerClientId
         ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
