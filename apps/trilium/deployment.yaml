@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trilium
+  namespace: trilium
+  labels:
+    app.kubernetes.io/name: trilium
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trilium
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: trilium
+    spec:
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: trilium
+          image: triliumnext/notes:v0.95.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          volumeMounts:
+            - name: data
+              mountPath: /home/node/trilium-data
+            - name: config
+              mountPath: /home/node/trilium-data/config.ini
+              subPath: config.ini
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: trilium-pvc
+        - name: config
+          configMap:
+            name: trilium-config
+        - name: tmp
+          emptyDir:
+            medium: Memory
