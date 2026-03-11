@@ -19,28 +19,20 @@ spec:
         app.kubernetes.io/name: jellyfin
     spec:
       securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: jellyfin
-          image: ghcr.io/hotio/jellyfin:release-88e2b7c
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
+          image: docker.io/jellyfin/jellyfin:10.11.6
           securityContext:
-            allowPrivilegeEscalation: true
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
             capabilities:
               drop:
                 - ALL
-              add:
-                - CHOWN
-                - DAC_OVERRIDE
-                - FOWNER
-                - SETUID
-                - SETGID
           ports:
             - name: http
               containerPort: 8096
@@ -61,7 +53,7 @@ spec:
             - name: config
               mountPath: /config
             - name: media
-              mountPath: /media
+              mountPath: /data/media
           resources:
             limits:
               memory: 8Gi
