@@ -125,6 +125,11 @@ controlPlane:
           certSANs:
             - kube.kennyandries.com
 
+          # Faster pod eviction from dead nodes (default 300s)
+          extraArgs:
+            default-not-ready-toleration-seconds: "60"
+            default-unreachable-toleration-seconds: "60"
+
           # Pod Security Standards — enforce restricted profile cluster-wide
           # Exempted namespaces run privileged workloads (storage drivers, ingress, etc.)
           admissionControl:

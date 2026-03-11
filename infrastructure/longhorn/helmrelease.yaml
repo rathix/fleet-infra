@@ -47,4 +47,6 @@ spec:
       replicaAutoBalance: best-effort
       autoSalvage: true
       nodeMonitorGracePeriod: 60
+      replicaReplenishmentWaitInterval: 60
+      defaultReplicaCount: 3
     deleting-confirmation-flag: "false"
