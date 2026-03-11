@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyseerr
+  namespace: servarr
+  labels:
+    app.kubernetes.io/name: jellyseerr
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jellyseerr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jellyseerr
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: jellyseerr
+          image: docker.io/fallenbagel/jellyseerr:2.7.3
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 5055
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /api/v1/status
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/v1/status
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "0.5"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: servarr-servarr-jellyseerr
