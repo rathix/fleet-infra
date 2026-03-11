@@ -46,3 +46,6 @@ docs/post-mortem-*.md
 # Talhelper generated configs
 talos/clusterconfig/
 talos/talosconfig
+
+# Git worktrees
+.worktrees/
