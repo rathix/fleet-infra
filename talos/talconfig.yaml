@@ -16,6 +16,9 @@ nodes:
     controlPlane: true
     installDiskSelector:
       type: nvme
+    machineSpec:
+      secureboot: true
+      useUKI: true
     patches:
       - |-
         machine:
@@ -36,6 +39,9 @@ nodes:
     controlPlane: true
     installDiskSelector:
       type: nvme
+    machineSpec:
+      secureboot: true
+      useUKI: true
     patches:
       - |-
         machine:
