@@ -40,6 +40,9 @@ id_rsa*
 *.bak
 *.backup
 
+# Post-mortem documents (contain internal IPs and hostnames)
+docs/post-mortem-*.md
+
 # Talhelper generated configs
 talos/clusterconfig/
 talos/talosconfig
