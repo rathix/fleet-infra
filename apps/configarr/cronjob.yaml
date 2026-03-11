@@ -30,7 +30,7 @@ spec:
               securityContext:
                 runAsNonRoot: true
                 allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: false
+                readOnlyRootFilesystem: true
                 capabilities:
                   drop:
                     - ALL
@@ -52,6 +52,8 @@ spec:
                 - name: secret-volume
                   mountPath: /app/config/secrets.yml
                   subPath: secrets.yml
+                - name: tmp
+                  mountPath: /tmp
               resources:
                 limits:
                   memory: 512Mi
@@ -69,3 +71,6 @@ spec:
             - name: secret-volume
               secret:
                 secretName: configarr
+            - name: tmp
+              emptyDir:
+                medium: Memory

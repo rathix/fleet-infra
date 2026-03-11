@@ -18,22 +18,25 @@ spec:
       labels:
         app.kubernetes.io/name: sabnzbd
     spec:
-      enableServiceLinks: true
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: sabnzbd
-          image: ghcr.io/hotio/sabnzbd:release-48d37cb
-          imagePullPolicy: IfNotPresent
-          env:
-            - name: PGID
-              value: "1000"
-            - name: PUID
-              value: "1000"
-            - name: UMASK
-              value: "002"
+          image: 11notes/sabnzbd:4.5.5
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: 8080
-              protocol: TCP
           livenessProbe:
             httpGet:
               path: /
@@ -47,10 +50,12 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
           volumeMounts:
-            - name: servarr-sabnzbd
-              mountPath: /config
-            - name: servarr-jellyfin-media
+            - name: config
+              mountPath: /sabnzbd/etc
+            - name: media
               mountPath: /media
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 8Gi
@@ -59,9 +64,12 @@ spec:
               memory: 256Mi
               cpu: "0.2"
       volumes:
-        - name: servarr-sabnzbd
+        - name: config
           persistentVolumeClaim:
             claimName: servarr-sabnzbd
-        - name: servarr-jellyfin-media
+        - name: media
           persistentVolumeClaim:
             claimName: servarr-jellyfin-media
+        - name: tmp
+          emptyDir:
+            medium: Memory

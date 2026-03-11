@@ -24,29 +24,24 @@ spec:
           type: RuntimeDefault
       containers:
         - name: qbittorrent
-          image: ghcr.io/hotio/qbittorrent:release-b54ef0b
+          image: 11notes/qbittorrent:5.1.4
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
               drop:
                 - ALL
-              add:
-                - CHOWN
-                - DAC_OVERRIDE
-                - FOWNER
-                - SETUID
-                - SETGID
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: UMASK
-              value: "002"
           ports:
             - name: http
               containerPort: 8080
-              protocol: TCP
+            - name: bittorrent-tcp
+              containerPort: 6881
+            - name: bittorrent-udp
+              containerPort: 6881
+              protocol: UDP
           livenessProbe:
             tcpSocket:
               port: http
@@ -59,9 +54,15 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - name: config
-              mountPath: /config
+              mountPath: /qbittorrent/etc
+              subPath: etc
+            - name: config
+              mountPath: /qbittorrent/var
+              subPath: var
             - name: media
               mountPath: /media
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 1Gi
@@ -76,3 +77,6 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: servarr-jellyfin-media
+        - name: tmp
+          emptyDir:
+            medium: Memory
