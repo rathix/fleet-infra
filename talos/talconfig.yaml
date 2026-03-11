@@ -135,7 +135,6 @@ controlPlane:
                   warn-version: latest
                 exemptions:
                   namespaces:
-                    - kube-system
                     - longhorn-system
                     - traefik-system
                     - flux-system

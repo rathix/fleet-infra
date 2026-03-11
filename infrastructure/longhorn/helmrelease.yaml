@@ -42,4 +42,9 @@ spec:
       reclaimPolicy: Retain
     defaultBackupStore:
       backupTarget: nfs://192.168.1.21:/mnt/hpool/backups/longhorn
+    defaultSettings:
+      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+      replicaAutoBalance: best-effort
+      autoSalvage: true
+      nodeMonitorGracePeriod: 60
     deleting-confirmation-flag: "false"
