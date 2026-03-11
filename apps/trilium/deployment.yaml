@@ -43,7 +43,7 @@ spec:
       containers:
         - name: trilium
           image: triliumnext/notes:v0.95.0
-          command: ["node", "/usr/src/app/src/main.js"]
+          command: ["node", "/usr/src/app/main.cjs"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
