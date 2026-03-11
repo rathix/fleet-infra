@@ -24,29 +24,19 @@ spec:
           type: RuntimeDefault
       containers:
         - name: prowlarr
-          image: ghcr.io/hotio/prowlarr:release-fa01a1c
+          image: 11notes/prowlarr:2.3.0
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
               drop:
                 - ALL
-              add:
-                - CHOWN
-                - DAC_OVERRIDE
-                - FOWNER
-                - SETUID
-                - SETGID
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: UMASK
-              value: "002"
           ports:
             - name: http
               containerPort: 9696
-              protocol: TCP
           livenessProbe:
             httpGet:
               path: /ping
@@ -61,7 +51,9 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - name: config
-              mountPath: /config
+              mountPath: /prowlarr/etc
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 512Mi
@@ -73,3 +65,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: servarr-servarr-prowlarr
+        - name: tmp
+          emptyDir:
+            medium: Memory

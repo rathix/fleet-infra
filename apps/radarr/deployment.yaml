@@ -24,29 +24,19 @@ spec:
           type: RuntimeDefault
       containers:
         - name: radarr
-          image: ghcr.io/hotio/radarr:release-211a269
+          image: 11notes/radarr:6.0.4
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
               drop:
                 - ALL
-              add:
-                - CHOWN
-                - DAC_OVERRIDE
-                - FOWNER
-                - SETUID
-                - SETGID
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: UMASK
-              value: "002"
           ports:
             - name: http
               containerPort: 7878
-              protocol: TCP
           livenessProbe:
             httpGet:
               path: /ping
@@ -61,9 +51,11 @@ spec:
             periodSeconds: 5
           volumeMounts:
             - name: config
-              mountPath: /config
+              mountPath: /radarr/etc
             - name: media
               mountPath: /media
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 1Gi
@@ -78,3 +70,6 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: servarr-jellyfin-media
+        - name: tmp
+          emptyDir:
+            medium: Memory
