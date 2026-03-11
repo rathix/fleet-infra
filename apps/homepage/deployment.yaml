@@ -51,7 +51,7 @@ spec:
           image: ghcr.io/gethomepage/homepage:v1.10
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             runAsNonRoot: true
             runAsUser: 1000
             runAsGroup: 1000
@@ -122,8 +122,6 @@ spec:
               mountPath: /app/config
             - name: logs
               mountPath: /app/config/logs
-            - name: next-cache
-              mountPath: /app/.next
             - name: tmp
               mountPath: /tmp
           resources:
@@ -140,8 +138,6 @@ spec:
         - name: config
           emptyDir: {}
         - name: logs
-          emptyDir: {}
-        - name: next-cache
           emptyDir: {}
         - name: tmp
           emptyDir:
