@@ -96,11 +96,6 @@ spec:
                 secretKeyRef:
                   name: homepage-secret
                   key: jellyseerrKey
-            - name: HOMEPAGE_VAR_BAZARR
-              valueFrom:
-                secretKeyRef:
-                  name: homepage-secret
-                  key: bazarrKey
           ports:
             - name: http
               containerPort: 3000

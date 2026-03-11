@@ -149,17 +149,6 @@ data:
               type: jellyseerr
               url: http://jellyseerr.servarr.svc.cluster.local:5055
               key: {{HOMEPAGE_VAR_JELLYSEERR}}
-        - Bazarr:
-            icon: bazarr.png
-            href: https://bazarr.kennyandries.com/
-            description: Subtitle manager
-            namespace: servarr
-            app: bazarr
-            siteMonitor: http://bazarr.servarr.svc.cluster.local:6767
-            widget:
-              type: bazarr
-              url: http://bazarr.servarr.svc.cluster.local:6767
-              key: {{HOMEPAGE_VAR_BAZARR}}
         - qBittorrent:
             icon: qbittorrent.png
             href: https://qbittorrent.kennyandries.com/
