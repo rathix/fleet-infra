@@ -5,8 +5,15 @@ resources:
   - beszel
   - configarr
   - homepage
+  - jellyfin
+  - jellyseerr
+  - lidarr
   - pocket-id
+  - prowlarr
+  - qbittorrent
+  - radarr
   - sabnzbd
-  - servarr
+  - servarr-common
+  - sonarr
   - trilium
   - uptime-kuma
