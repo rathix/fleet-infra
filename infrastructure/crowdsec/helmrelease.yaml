@@ -29,6 +29,12 @@ spec:
     container_runtime: containerd
     lapi:
       replicas: 1
+      extraConfig:
+        config.yaml.local: |
+          db_config:
+            flush:
+              agents_autodelete:
+                login_password: 60m
       resources:
         requests:
           cpu: 100m
