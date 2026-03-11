@@ -63,7 +63,7 @@ spec:
             - name: config
               mountPath: /config
             - name: media
-              mountPath: /data/media
+              mountPath: /media
           resources:
             limits:
               memory: 1Gi
