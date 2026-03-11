@@ -6,3 +6,4 @@ metadata:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     app.kubernetes.io/name: servarr
+    pod-security.kubernetes.io/enforce: baseline
