@@ -33,6 +33,8 @@ spec:
           type: RuntimeDefault
     controllers:
       main:
+        pod:
+          enableServiceLinks: false
         containers:
           trilium:
             image:
@@ -41,7 +43,7 @@ spec:
               pullPolicy: IfNotPresent
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: false
               runAsNonRoot: true
               runAsUser: 1000
               runAsGroup: 1000
@@ -79,6 +81,8 @@ spec:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: trilium-pvc
+        dataPermissionsInit:
+          enabled: false
       tmp:
         enabled: true
         type: emptyDir
