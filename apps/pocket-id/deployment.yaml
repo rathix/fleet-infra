@@ -32,15 +32,11 @@ spec:
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
           env:
-            - name: PGID
-              value: "1000"
-            - name: PUID
-              value: "1000"
             - name: TRUST_PROXY
               value: "true"
             - name: APP_URL
@@ -69,6 +65,8 @@ spec:
           volumeMounts:
             - name: pocket-id
               mountPath: /app/data
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 2Gi
@@ -80,3 +78,6 @@ spec:
         - name: pocket-id
           persistentVolumeClaim:
             claimName: pocket-id
+        - name: tmp
+          emptyDir:
+            medium: Memory

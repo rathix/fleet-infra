@@ -36,6 +36,19 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
+    podSecurityContext:
+      fsGroup: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      capabilities:
+        drop:
+          - ALL
     volume:
       enabled: true
       existingClaim: uptime-kuma-uptime-kuma-pvc
@@ -44,3 +57,10 @@ spec:
     image:
       repository: louislam/uptime-kuma
       tag: 2.2.1
+    extraVolumes:
+      - name: tmp
+        emptyDir:
+          medium: Memory
+    extraVolumeMounts:
+      - name: tmp
+        mountPath: /tmp

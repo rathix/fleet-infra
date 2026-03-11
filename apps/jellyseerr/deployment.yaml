@@ -30,6 +30,7 @@ spec:
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -52,6 +53,8 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/config
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 512Mi
@@ -63,3 +66,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: servarr-servarr-jellyseerr
+        - name: tmp
+          emptyDir:
+            medium: Memory

@@ -26,6 +26,11 @@ spec:
   driftDetection:
     mode: enabled
   values:
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
     controllers:
       main:
         containers:
@@ -34,6 +39,15 @@ spec:
               repository: triliumnext/notes
               tag: v0.95.0
               pullPolicy: IfNotPresent
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 1000
+              capabilities:
+                drop:
+                  - ALL
     configini:
       general:
         instanceName: ""
@@ -65,3 +79,9 @@ spec:
         enabled: true
         type: persistentVolumeClaim
         existingClaim: trilium-pvc
+      tmp:
+        enabled: true
+        type: emptyDir
+        medium: Memory
+        globalMounts:
+          - path: /tmp

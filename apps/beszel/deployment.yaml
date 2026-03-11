@@ -31,7 +31,7 @@ spec:
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -54,6 +54,8 @@ spec:
           volumeMounts:
             - name: beszel
               mountPath: /beszel_data
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 2Gi
@@ -65,3 +67,6 @@ spec:
         - name: beszel
           persistentVolumeClaim:
             claimName: beszel
+        - name: tmp
+          emptyDir:
+            medium: Memory

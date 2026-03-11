@@ -30,6 +30,7 @@ spec:
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -54,6 +55,10 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
+            - name: cache
+              mountPath: /cache
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 8Gi
@@ -68,3 +73,8 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: servarr-jellyfin-media
+        - name: cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir:
+            medium: Memory

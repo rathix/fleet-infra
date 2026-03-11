@@ -24,10 +24,23 @@ spec:
       automountServiceAccountToken: true
       dnsPolicy: ClusterFirst
       enableServiceLinks: true
+      securityContext:
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: copy-config
           image: busybox:1.37
-          command: ["sh", "-c", "cp /configmap/* /config/ && chown -R 1000:1000 /config"]
+          command: ["sh", "-c", "cp /configmap/* /config/"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - name: homepage-config
               mountPath: /configmap
@@ -36,24 +49,16 @@ spec:
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:v1.10
-          imagePullPolicy: IfNotPresent
-          # Entrypoint starts as root to chown /app/config and /app/.next,
-          # then uses su-exec to drop to PUID/PGID. This requires SETUID/SETGID
-          # capabilities and allowPrivilegeEscalation. The Node process itself
-          # runs as non-root (UID 1000).
           securityContext:
-            allowPrivilegeEscalation: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
             capabilities:
-              drop: ["ALL"]
-              add: ["SETUID", "SETGID"]
-            runAsNonRoot: false
-            seccompProfile:
-              type: RuntimeDefault
+              drop:
+                - ALL
           env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
             - name: HOMEPAGE_ALLOWED_HOSTS
               value: homepage.kennyandries.com
             - name: HOMEPAGE_VAR_SONARR
@@ -117,6 +122,10 @@ spec:
               mountPath: /app/config
             - name: logs
               mountPath: /app/config/logs
+            - name: next-cache
+              mountPath: /app/.next
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
               memory: 512Mi
@@ -132,3 +141,8 @@ spec:
           emptyDir: {}
         - name: logs
           emptyDir: {}
+        - name: next-cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir:
+            medium: Memory
