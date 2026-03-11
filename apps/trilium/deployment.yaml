@@ -22,9 +22,28 @@ spec:
         fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: copy-config
+          image: busybox:1.37
+          command: ["sh", "-c", "cp /configmap/config.ini /home/node/trilium-data/config.ini"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: configmap
+              mountPath: /configmap
+            - name: data
+              mountPath: /home/node/trilium-data
       containers:
         - name: trilium
           image: triliumnext/notes:v0.95.0
+          command: ["node", "/usr/src/app/src/main.js"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
@@ -52,9 +71,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /home/node/trilium-data
-            - name: config
-              mountPath: /home/node/trilium-data/config.ini
-              subPath: config.ini
             - name: tmp
               mountPath: /tmp
           resources:
@@ -68,7 +84,7 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: trilium-pvc
-        - name: config
+        - name: configmap
           configMap:
             name: trilium-config
         - name: tmp
