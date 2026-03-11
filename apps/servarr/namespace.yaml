@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: servarr
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-  labels:
-    app.kubernetes.io/name: servarr
-    pod-security.kubernetes.io/enforce: baseline
