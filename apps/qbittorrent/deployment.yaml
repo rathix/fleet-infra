@@ -30,6 +30,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+              add:
+                - SETUID
+                - SETGID
           env:
             - name: PUID
               value: "1000"
