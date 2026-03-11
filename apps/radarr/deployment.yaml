@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: radarr
-          image: ghcr.io/hotio/radarr:release-836d4c4
+          image: ghcr.io/hotio/radarr:testing-464d725
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
