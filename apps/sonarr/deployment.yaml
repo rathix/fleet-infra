@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: sonarr
-          image: ghcr.io/hotio/sonarr:v4-92a9b73
+          image: ghcr.io/hotio/sonarr:release-92bdb53
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

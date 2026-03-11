@@ -21,7 +21,7 @@ spec:
       enableServiceLinks: true
       containers:
         - name: sabnzbd
-          image: lscr.io/linuxserver/sabnzbd:4.5.5
+          image: ghcr.io/hotio/sabnzbd:release-48d37cb
           imagePullPolicy: IfNotPresent
           env:
             - name: PGID

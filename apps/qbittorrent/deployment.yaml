@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: qbittorrent
-          image: ghcr.io/hotio/qbittorrent:release-1974b63
+          image: ghcr.io/hotio/qbittorrent:release-b54ef0b
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

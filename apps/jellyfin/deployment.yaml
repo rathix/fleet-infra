@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: jellyfin
-          image: docker.io/jellyfin/jellyfin:10.11.6
+          image: ghcr.io/hotio/jellyfin:release-88e2b7c
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false

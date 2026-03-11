@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: lidarr
-          image: ghcr.io/hotio/lidarr:release-69f64fd
+          image: ghcr.io/hotio/lidarr:release-563b232
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

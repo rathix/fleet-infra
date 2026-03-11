@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: prowlarr
-          image: ghcr.io/hotio/prowlarr:release-faf934d
+          image: ghcr.io/hotio/prowlarr:release-fa01a1c
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
