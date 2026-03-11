@@ -18,6 +18,7 @@ spec:
       labels:
         app.kubernetes.io/name: trilium
     spec:
+      enableServiceLinks: false
       securityContext:
         fsGroup: 1000
         seccompProfile:
