@@ -85,6 +85,7 @@ data:
               type: jellyfin
               url: http://jellyfin.servarr.svc.cluster.local:8096
               key: {{HOMEPAGE_VAR_JELLYFIN}}
+              version: 2
               enableBlocks: true
               enableNowPlaying: true
               enableUser: true
