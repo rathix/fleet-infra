@@ -77,6 +77,6 @@ spec:
       crowdsecMode: stream
       updateIntervalSeconds: 15
       crowdsecAppsecEnabled: true
-      crowdsecAppsecHost: crowdsec-crowdsec-agent.crowdsec.svc.cluster.local:7422
+      crowdsecAppsecHost: crowdsec-crowdsec-appsec-svc.crowdsec.svc.cluster.local:7422
       crowdsecAppsecFailureBlock: true
       crowdsecAppsecUnreachableBlock: true

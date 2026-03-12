@@ -65,11 +65,6 @@ spec:
         - namespace: traefik-system
           podName: traefik-*
           program: traefik
-        - source: appsec
-          appsec_config: crowdsecurity/appsec-default
-          listen_addr: 0.0.0.0:7422
-          labels:
-            type: appsec
       resources:
         requests:
           cpu: 100m
@@ -78,4 +73,18 @@ spec:
           memory: 256Mi
       env:
         - name: COLLECTIONS
-          value: "crowdsecurity/traefik crowdsecurity/linux crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"
+          value: "crowdsecurity/traefik crowdsecurity/linux"
+    appsec:
+      enabled: true
+      acquisitions:
+        - appsec_config: crowdsecurity/appsec-default
+          listen_addr: 0.0.0.0:7422
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
+      env:
+        - name: COLLECTIONS
+          value: "crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"
