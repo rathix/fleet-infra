@@ -30,7 +30,9 @@
         {
             "customType": "regex",
             "description": "Traefik plugin versions",
-            "fileMatch": ["infrastructure/traefik/helmrelease\\.yaml$"],
+            "managerFilePatterns": [
+                "/infrastructure/traefik/helmrelease\\.yaml$/"
+            ],
             "matchStrings": [
                 "moduleName:\\s*\"github\\.com/(?<depName>[^\"]+)\"\\s*version:\\s*\"v(?<currentValue>[^\"]+)\""
             ],
@@ -58,12 +60,16 @@
         },
         {
             "description": "Group infrastructure controller updates",
-            "matchFileNames": ["infrastructure/**"],
+            "matchFileNames": [
+                "infrastructure/**"
+            ],
             "groupName": "infrastructure"
         },
         {
             "description": "Group application updates",
-            "matchFileNames": ["apps/**"],
+            "matchFileNames": [
+                "apps/**"
+            ],
             "groupName": "applications"
         }
     ]
