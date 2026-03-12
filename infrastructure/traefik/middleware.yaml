@@ -72,7 +72,7 @@ spec:
   plugin:
     crowdsec-bouncer-traefik-plugin:
       crowdsecLapiScheme: http
-      crowdsecLapiHost: crowdsec-lapi.crowdsec.svc.cluster.local:8080
+      crowdsecLapiHost: crowdsec-crowdsec-service.crowdsec.svc.cluster.local:8080
       crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
       crowdsecMode: stream
       updateIntervalSeconds: 15
