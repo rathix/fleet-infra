@@ -13,7 +13,10 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: traefik-system
-    # Allow agent connections from nodes
-    - ports:
+    # Allow agent connections from LAN only
+    - from:
+        - ipBlock:
+            cidr: 192.168.1.0/24
+      ports:
         - protocol: TCP
           port: 45876
