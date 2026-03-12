@@ -50,6 +50,10 @@ spec:
       websecure:
         http3:
           enabled: true
+        forwardedHeaders:
+          insecure: false
+          trustedIPs:
+            - 192.168.1.0/24
         middlewares:
           - traefik-system-crowdsec@kubernetescrd
           - traefik-system-security-headers@kubernetescrd
@@ -57,8 +61,9 @@ spec:
     logs:
       access:
         enabled: true
-        filters:
-          statuscodes: "400-599"
+        fields:
+          headers:
+            defaultMode: drop
     ingressRoute:
       dashboard:
         enabled: true
@@ -74,14 +79,16 @@ spec:
         externalTrafficPolicy: Local
       annotations:
         external-dns.alpha.kubernetes.io/hostname: traefik.kennyandries.com
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
     tlsOptions:
       default:
-        minVersion: VersionTLS12
-        cipherSuites:
-          - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-          - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-          - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
-          - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        minVersion: VersionTLS13
+        sniStrict: true
     tlsStore:
       default:
         defaultCertificate:

@@ -10,12 +10,13 @@ spec:
     stsSeconds: 31536000
     stsIncludeSubdomains: true
     stsPreload: true
-    frameDeny: true
+    customFrameOptionsValue: "SAMEORIGIN"
     contentTypeNosniff: true
-    browserXssFilter: true
     referrerPolicy: strict-origin-when-cross-origin
     customResponseHeaders:
       X-Robots-Tag: noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
+      X-XSS-Protection: "0"
+      Permissions-Policy: "camera=(), microphone=(), geolocation=(), payment=()"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
