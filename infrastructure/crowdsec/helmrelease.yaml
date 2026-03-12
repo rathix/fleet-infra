@@ -80,6 +80,9 @@ spec:
         - source: appsec
           appsec_config: crowdsecurity/appsec-default
           listen_addr: 0.0.0.0:7422
+          path: /
+          labels:
+            type: appsec
       resources:
         requests:
           cpu: 100m
