@@ -138,16 +138,16 @@ data:
               type: prowlarr
               url: http://prowlarr.servarr.svc.cluster.local:9696
               key: {{HOMEPAGE_VAR_PROWLARR}}
-        - Jellyseerr:
+        - Seerr:
             icon: jellyseerr.png
-            href: https://jellyseerr.kennyandries.com/
+            href: https://seerr.kennyandries.com/
             description: Request manager
             namespace: servarr
-            app: jellyseerr
-            siteMonitor: http://jellyseerr.servarr.svc.cluster.local:5055
+            app: seerr
+            siteMonitor: http://seerr.servarr.svc.cluster.local:5055
             widget:
               type: jellyseerr
-              url: http://jellyseerr.servarr.svc.cluster.local:5055
+              url: http://seerr.servarr.svc.cluster.local:5055
               key: {{HOMEPAGE_VAR_JELLYSEERR}}
         - qBittorrent:
             icon: qbittorrent.png

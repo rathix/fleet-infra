@@ -1,22 +1,22 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jellyseerr
+  name: seerr
   namespace: servarr
   labels:
-    app.kubernetes.io/name: jellyseerr
+    app.kubernetes.io/name: seerr
   annotations:
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
   ingressClassName: traefik-system-traefik
   rules:
-    - host: jellyseerr.kennyandries.com
+    - host: seerr.kennyandries.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: jellyseerr
+                name: seerr
                 port:
                   number: 5055

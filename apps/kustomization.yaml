@@ -6,7 +6,7 @@ resources:
   - configarr
   - homepage
   - jellyfin
-  - jellyseerr
+  - seerr
   - lidarr
   - pocket-id
   - prowlarr
