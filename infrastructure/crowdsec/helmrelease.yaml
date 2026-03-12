@@ -77,7 +77,8 @@ spec:
     appsec:
       enabled: true
       acquisitions:
-        - appsec_config: crowdsecurity/appsec-default
+        - source: appsec
+          appsec_config: crowdsecurity/appsec-default
           listen_addr: 0.0.0.0:7422
       resources:
         requests:
