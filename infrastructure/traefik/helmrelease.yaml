@@ -59,6 +59,8 @@ spec:
           - traefik-system-security-headers@kubernetescrd
           - traefik-system-rate-limit@kubernetescrd
     logs:
+      general:
+        noColor: true
       access:
         enabled: true
         fields:
