@@ -60,9 +60,10 @@ spec:
           - traefik-system-rate-limit@kubernetescrd
     logs:
       general:
-        noColor: true
+        format: json
       access:
         enabled: true
+        format: json
         fields:
           headers:
             defaultMode: drop
