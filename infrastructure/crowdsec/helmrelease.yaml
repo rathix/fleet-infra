@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: crowdsec
-      version: 0.17.0
+      version: 0.22.1
   interval: 30m
   timeout: 10m
   targetNamespace: crowdsec
