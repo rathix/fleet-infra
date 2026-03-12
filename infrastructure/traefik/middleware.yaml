@@ -74,3 +74,5 @@ spec:
       crowdsecLapiScheme: http
       crowdsecLapiHost: crowdsec-lapi.crowdsec.svc.cluster.local:8080
       crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
+      crowdsecMode: stream
+      updateIntervalSeconds: 15

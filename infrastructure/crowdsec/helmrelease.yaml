@@ -34,7 +34,7 @@ spec:
           db_config:
             flush:
               agents_autodelete:
-                login_password: 60m
+                login_password: 168h
       resources:
         requests:
           cpu: 100m
@@ -43,9 +43,14 @@ spec:
           memory: 256Mi
       env:
         - name: ENROLL_KEY
-          value: ""
+          valueFrom:
+            secretKeyRef:
+              name: crowdsec-enroll-key
+              key: enroll-key
         - name: ENROLL_INSTANCE_NAME
           value: "fleet-infra-k8s"
+        - name: ENROLL_TAGS
+          value: "env:production cluster:fleet-infra"
       persistentVolume:
         config:
           enabled: true
@@ -68,4 +73,4 @@ spec:
           memory: 256Mi
       env:
         - name: COLLECTIONS
-          value: "crowdsecurity/traefik"
+          value: "crowdsecurity/traefik crowdsecurity/linux"

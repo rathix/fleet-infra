@@ -1,0 +1,76 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crowdsec-lapi
+  namespace: crowdsec
+spec:
+  podSelector:
+    matchLabels:
+      type: lapi
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow agents within the namespace
+    - from:
+        - podSelector: {}
+    # Allow Traefik bouncer plugin
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow CrowdSec Central API (HTTPS)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crowdsec-agent
+  namespace: crowdsec
+spec:
+  podSelector:
+    matchLabels:
+      type: agent
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow agent to reach LAPI
+    - to:
+        - podSelector:
+            matchLabels:
+              type: lapi
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow reading Traefik logs
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
