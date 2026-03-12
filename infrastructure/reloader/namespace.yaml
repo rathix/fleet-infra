@@ -6,4 +6,4 @@ metadata:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     app.kubernetes.io/name: reloader
-    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/enforce: restricted
