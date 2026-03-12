@@ -26,6 +26,18 @@
             "/infrastructure/.+/values.yaml$/"
         ]
     },
+    "customManagers": [
+        {
+            "customType": "regex",
+            "description": "Traefik plugin versions",
+            "fileMatch": ["infrastructure/traefik/helmrelease\\.yaml$"],
+            "matchStrings": [
+                "moduleName:\\s*\"github\\.com/(?<depName>[^\"]+)\"\\s*version:\\s*\"v(?<currentValue>[^\"]+)\""
+            ],
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        }
+    ],
     "packageRules": [
         {
             "description": "Disable digest pinning for all container images and helm charts",
