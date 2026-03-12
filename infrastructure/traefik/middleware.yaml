@@ -76,3 +76,7 @@ spec:
       crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
       crowdsecMode: stream
       updateIntervalSeconds: 15
+      crowdsecAppsecEnabled: true
+      crowdsecAppsecHost: crowdsec-crowdsec-agent.crowdsec.svc.cluster.local:7422
+      crowdsecAppsecFailureBlock: true
+      crowdsecAppsecUnreachableBlock: true
