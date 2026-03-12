@@ -15,9 +15,22 @@ spec:
       labels:
         app: unifi-bouncer
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: cs-unifi-bouncer
           image: ghcr.io/teifun2/cs-unifi-bouncer:v1.2.2
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           env:
             - name: CROWDSEC_BOUNCER_API_KEY
               valueFrom:
