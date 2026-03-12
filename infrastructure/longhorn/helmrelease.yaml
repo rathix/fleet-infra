@@ -49,4 +49,14 @@ spec:
       nodeMonitorGracePeriod: 60
       replicaReplenishmentWaitInterval: 60
       defaultReplicaCount: 3
+      concurrentAutomaticEngineUpgradePerNodeLimit: 1
+      orphanAutoDeletion: true
+      fastReplicaRebuildEnabled: true
+      snapshotMaxCount: 10
+      backupCompressionMethod: lz4
+      allowRecurringJobWhileVolumeDetached: true
+      autoCleanupSnapshotWhenDeleteBackup: true
+      autoCleanupSystemGeneratedSnapshot: true
+      autoDeletePodWhenVolumeDetachedUnexpectedly: true
+      replicaFileSyncHttpClientTimeout: 120
     deleting-confirmation-flag: "false"
