@@ -113,3 +113,41 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crowdsec-unifi-bouncer
+  namespace: crowdsec
+spec:
+  podSelector:
+    matchLabels:
+      app: unifi-bouncer
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress: []
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow bouncer to reach CrowdSec LAPI
+    - to:
+        - podSelector:
+            matchLabels:
+              type: lapi
+      ports:
+        - protocol: TCP
+          port: 8080
+    # Allow bouncer to reach UniFi Express
+    - to:
+        - ipBlock:
+            cidr: 192.168.1.1/32
+      ports:
+        - protocol: TCP
+          port: 443

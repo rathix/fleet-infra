@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-unifi-bouncer
+  namespace: crowdsec
+  labels:
+    app: unifi-bouncer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi-bouncer
+  template:
+    metadata:
+      labels:
+        app: unifi-bouncer
+    spec:
+      containers:
+        - name: cs-unifi-bouncer
+          image: ghcr.io/teifun2/cs-unifi-bouncer:v1.2.2
+          env:
+            - name: CROWDSEC_BOUNCER_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-unifi-bouncer-secrets
+                  key: crowdsec-bouncer-api-key
+            - name: CROWDSEC_URL
+              value: "http://crowdsec-service.crowdsec.svc.cluster.local:8080/"
+            - name: UNIFI_HOST
+              value: "https://192.168.1.1"
+            - name: UNIFI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: crowdsec-unifi-bouncer-secrets
+                  key: unifi-api-key
+            - name: UNIFI_SKIP_TLS_VERIFY
+              value: "true"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi

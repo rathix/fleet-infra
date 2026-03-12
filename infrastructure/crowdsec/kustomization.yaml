@@ -5,3 +5,5 @@ resources:
   - helmrelease.yaml
   - networkpolicy.yaml
   - sealedsecret.yaml
+  - deployment-unifi-bouncer.yaml
+  - sealedsecret-unifi-bouncer.yaml
