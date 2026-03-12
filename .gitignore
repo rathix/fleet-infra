@@ -47,5 +47,8 @@ docs/post-mortem-*.md
 talos/clusterconfig/
 talos/talosconfig
 
+# Superpowers specs and plans
+docs/superpowers/
+
 # Git worktrees
 .worktrees/
