@@ -36,35 +36,3 @@ spec:
     podDisruptionBudget:
       enabled: true
       minAvailable: 1
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: cert-manager-webhook-hetzner
-  namespace: flux-system
-  annotations:
-    kustomize.toolkit.fluxcd.io/prune: disabled
-spec:
-  dependsOn:
-    - name: cert-manager
-  chart:
-    spec:
-      chart: cert-manager-webhook-hetzner
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: cert-manager-webhook-hetzner
-      version: 1.4.2
-  interval: 30m
-  timeout: 5m
-  releaseName: cert-manager-webhook-hetzner
-  targetNamespace: cert-manager
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
-  driftDetection:
-    mode: enabled
