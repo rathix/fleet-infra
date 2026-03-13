@@ -72,7 +72,7 @@ data:
         - Collect&Go:
             - abbr: CG
               href: https://collectandgo.be/colruyt/nl/home
-    - Homelab
+    - Homelab:
         - Cloudflare:
             - abbr: CF
               href: https://dash.cloudflare.com
