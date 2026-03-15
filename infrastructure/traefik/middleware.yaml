@@ -45,9 +45,9 @@ spec:
       Provider:
         Url: http://pocket-id.pocket-id.svc.cluster.local:1411
         ValidIssuer: https://auth.kennyandries.com
-        Scopes: ["openid", "profile", "email"]
         ClientId: urn:k8s:secret:oidc-secret:providerClientId
         ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
+      Scopes: ["openid", "profile", "email"]
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
