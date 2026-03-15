@@ -220,7 +220,7 @@ data:
             icon: truenas.png
             href: https://pkb-nas-tns-1/
             description: File server
-            siteMonitor: https://pkb-nas-tns-1
+            siteMonitor: https://192.168.1.21
         - plb-nas-tns-1:
             icon: truenas.png
             href: https://192.168.2.2/
