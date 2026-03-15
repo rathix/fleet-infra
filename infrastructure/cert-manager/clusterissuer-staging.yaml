@@ -12,10 +12,7 @@ spec:
       name: letsencrypt-staging
     solvers:
       - dns01:
-          webhook:
-            groupName: hetzner.cert-mananger-webhook.noshoes.xyz
-            solverName: hetzner
-            config:
-              secretName: hetzner-secret
-              zoneName: kennyandries.com
-              apiUrl: https://dns.hetzner.com/api/v1
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
