@@ -48,7 +48,7 @@ spec:
               mountPath: /config
       containers:
         - name: homepage
-          image: ghcr.io/gethomepage/homepage:v1.10
+          image: ghcr.io/gethomepage/homepage:v1.11
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
