@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/name: jellyfin
   annotations:
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-security-headers@kubernetescrd
 spec:
   ingressClassName: traefik-system-traefik
   rules:

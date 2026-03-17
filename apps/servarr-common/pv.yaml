@@ -12,6 +12,12 @@ spec:
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  mountOptions:
+    - nfsvers=4
+    - rsize=1048576
+    - wsize=1048576
+    - hard
+    - noatime
   nfs:
     server: 192.168.1.21
     path: /mnt/hpool/media
