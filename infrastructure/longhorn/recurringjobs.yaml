@@ -5,8 +5,8 @@ metadata:
   namespace: longhorn-system
 spec:
   task: snapshot
-  cron: "0 */4 * * *"
-  retain: 6
+  cron: "0 */8 * * *"
+  retain: 3
   concurrency: 1
   groups:
     - default
@@ -18,8 +18,8 @@ metadata:
   namespace: longhorn-system
 spec:
   task: snapshot-cleanup
-  cron: "30 */4 * * *"
-  retain: 6
+  cron: "30 */8 * * *"
+  retain: 3
   concurrency: 1
   groups:
     - default
