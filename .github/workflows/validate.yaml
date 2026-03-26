@@ -42,7 +42,7 @@ jobs:
 
       - name: Install yamllint
         run: |
-          python3 -m pip install --user yamllint==1.37.1
+          python3 -m pip install --user yamllint==1.38.0
 
       - name: Run yamllint
         run: |
