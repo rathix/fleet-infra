@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: copy-config
-          image: busybox:1.37
+          image: busybox:1.37.0
           command: ["sh", "-c", "cp /configmap/config.ini /home/node/trilium-data/config.ini"]
           securityContext:
             allowPrivilegeEscalation: false

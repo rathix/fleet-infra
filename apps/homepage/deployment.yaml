@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: copy-config
-          image: busybox:1.37
+          image: busybox:1.37.0
           command: ["sh", "-c", "cp /configmap/* /config/"]
           securityContext:
             allowPrivilegeEscalation: false
@@ -48,7 +48,7 @@ spec:
               mountPath: /config
       containers:
         - name: homepage
-          image: ghcr.io/gethomepage/homepage:v1.11
+          image: ghcr.io/gethomepage/homepage:v1.11.0
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false

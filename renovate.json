@@ -22,8 +22,8 @@
     },
     "helm-values": {
         "managerFilePatterns": [
-            "/apps/.+/values.yaml$/",
-            "/infrastructure/.+/values.yaml$/"
+            "/apps/.+\\.yaml$/",
+            "/infrastructure/.+\\.yaml$/"
         ]
     },
     "customManagers": [
@@ -36,6 +36,83 @@
             "matchStrings": [
                 "moduleName:\\s*\"github\\.com/(?<depName>[^\"]+)\"\\s*version:\\s*\"v(?<currentValue>[^\"]+)\""
             ],
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "Kustomize version in CI",
+            "managerFilePatterns": [
+                "/.github/workflows/.+\\.yaml$/"
+            ],
+            "matchStrings": [
+                "KUSTOMIZE_VERSION:\\s*\"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "kubernetes-sigs/kustomize",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^kustomize/v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "Kubeconform version in CI",
+            "managerFilePatterns": [
+                "/.github/workflows/.+\\.yaml$/"
+            ],
+            "matchStrings": [
+                "KUBECONFORM_VERSION:\\s*\"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "yannh/kubeconform",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "Flux CLI version in CI",
+            "managerFilePatterns": [
+                "/.github/workflows/.+\\.yaml$/"
+            ],
+            "matchStrings": [
+                "FLUX_VERSION:\\s*\"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "fluxcd/flux2",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "yamllint version in CI",
+            "managerFilePatterns": [
+                "/.github/workflows/.+\\.yaml$/"
+            ],
+            "matchStrings": [
+                "yamllint==(?<currentValue>[^\\s]+)"
+            ],
+            "depNameTemplate": "yamllint",
+            "datasourceTemplate": "pypi"
+        },
+        {
+            "customType": "regex",
+            "description": "Talos version in talconfig",
+            "managerFilePatterns": [
+                "/talos/talconfig\\.yaml$/"
+            ],
+            "matchStrings": [
+                "talosVersion:\\s*v(?<currentValue>[^\\s]+)"
+            ],
+            "depNameTemplate": "siderolabs/talos",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
+            "description": "Kubernetes version in talconfig",
+            "managerFilePatterns": [
+                "/talos/talconfig\\.yaml$/"
+            ],
+            "matchStrings": [
+                "kubernetesVersion:\\s*v(?<currentValue>[^\\s]+)"
+            ],
+            "depNameTemplate": "kubernetes/kubernetes",
             "datasourceTemplate": "github-releases",
             "extractVersionTemplate": "^v(?<version>.+)$"
         }
@@ -71,6 +148,14 @@
                 "apps/**"
             ],
             "groupName": "applications"
+        },
+        {
+            "description": "Talos and Kubernetes upgrades require manual steps - PR only, no auto-merge",
+            "matchFileNames": [
+                "talos/**"
+            ],
+            "automerge": false,
+            "groupName": "talos"
         }
     ]
 }
