@@ -35,5 +35,8 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
     persistence:
       enabled: true
