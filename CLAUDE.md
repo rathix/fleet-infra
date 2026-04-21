@@ -18,8 +18,8 @@ GitOps repository for managing a production Kubernetes cluster using Flux CD v2.
 kustomize build infrastructure
 kustomize build apps
 
-# Validate against Kubernetes schemas (v1.31.0)
-kustomize build apps | kubeconform -strict -ignore-missing-schemas -kubernetes-version 1.31.0 \
+# Validate against Kubernetes schemas (v1.35.0)
+kustomize build apps | kubeconform -strict -ignore-missing-schemas -kubernetes-version 1.35.0 \
   -schema-location default \
   -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
   -summary
@@ -86,7 +86,7 @@ Both infrastructure and apps use a flat structure:
 GitHub Actions runs on all PRs and pushes to main:
 1. YAML lint (relaxed rules, no line-length limit)
 2. Kustomize build for infrastructure, apps
-3. Kubeconform schema validation against Kubernetes 1.31.0 (with CRD schema support)
+3. Kubeconform schema validation against Kubernetes 1.35.0 (with CRD schema support)
 4. Flux resource validation
 5. Kustomize diff summary (PRs only)
 
