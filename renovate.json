@@ -67,6 +67,19 @@
         },
         {
             "customType": "regex",
+            "description": "Kubernetes schema version used by kubeconform in CI",
+            "managerFilePatterns": [
+                "/.github/workflows/.+\\.yaml$/"
+            ],
+            "matchStrings": [
+                "KUBERNETES_VERSION:\\s*\"(?<currentValue>[^\"]+)\""
+            ],
+            "depNameTemplate": "kubernetes/kubernetes",
+            "datasourceTemplate": "github-releases",
+            "extractVersionTemplate": "^v(?<version>.+)$"
+        },
+        {
+            "customType": "regex",
             "description": "Flux CLI version in CI",
             "managerFilePatterns": [
                 "/.github/workflows/.+\\.yaml$/"
