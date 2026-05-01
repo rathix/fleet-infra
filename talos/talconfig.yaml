@@ -1,7 +1,7 @@
 # -- Cluster identity --
 clusterName: production
-talosVersion: v1.12.6
-kubernetesVersion: v1.35.4
+talosVersion: v1.13.0
+kubernetesVersion: v1.36.0
 endpoint: https://kube.kennyandries.com:6443 # DNS record pointing to the VIP
 
 # All 3 nodes are control plane; no dedicated workers
