@@ -56,7 +56,7 @@ spec:
       type: Recreate
     image:
       repository: louislam/uptime-kuma
-      tag: 2.3.0
+      tag: 2.3.2
     extraVolumes:
       - name: tmp
         emptyDir:
