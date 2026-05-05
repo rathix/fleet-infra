@@ -42,11 +42,12 @@ spec:
         drop: [ALL]
     ports:
       web:
-        redirections:
-          entryPoint:
-            to: websecure
-            scheme: https
-            permanent: true
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
       websecure:
         http3:
           enabled: true
@@ -54,10 +55,11 @@ spec:
           insecure: false
           trustedIPs:
             - 192.168.1.0/24
-        middlewares:
-          - traefik-system-crowdsec@kubernetescrd
-          - traefik-system-security-headers@kubernetescrd
-          - traefik-system-rate-limit@kubernetescrd
+        http:
+          middlewares:
+            - traefik-system-crowdsec@kubernetescrd
+            - traefik-system-security-headers@kubernetescrd
+            - traefik-system-rate-limit@kubernetescrd
     logs:
       general:
         format: json
