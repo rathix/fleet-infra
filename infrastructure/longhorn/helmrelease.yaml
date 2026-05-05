@@ -14,7 +14,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: longhorn
-      version: 1.11.0
+      version: 1.11.2
   interval: 30m
   timeout: 15m
   targetNamespace: longhorn-system
