@@ -11,7 +11,8 @@
         "managerFilePatterns": [
             "/clusters/.+\\.yaml$/",
             "/infrastructure/.+\\.yaml$/",
-            "/apps/.+\\.yaml$/"
+            "/apps/.+\\.yaml$/",
+            "/repositories/.+\\.yaml$/"
         ]
     },
     "kubernetes": {
