@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: uptime-kuma
-      version: 2.25.0
+      version: 4.1.0
   interval: 30m
   timeout: 5m
   targetNamespace: uptime-kuma
