@@ -30,3 +30,11 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
+  values:
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      seccompProfile:
+        type: RuntimeDefault

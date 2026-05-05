@@ -26,3 +26,12 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
+  values:
+    reloader:
+      deployment:
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
