@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: sabnzbd
-          image: 11notes/sabnzbd:4.5.5
+          image: 11notes/sabnzbd:5.0.1
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
