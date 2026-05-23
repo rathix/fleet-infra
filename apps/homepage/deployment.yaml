@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: copy-config
-          image: busybox:1.37.0
+          image: busybox:1.38.0
           command: ["sh", "-c", "cp /configmap/* /config/"]
           securityContext:
             allowPrivilegeEscalation: false
