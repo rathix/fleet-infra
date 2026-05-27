@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: qbittorrent
-          image: 11notes/qbittorrent:5.2.0
+          image: 11notes/qbittorrent:5.2.1
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
