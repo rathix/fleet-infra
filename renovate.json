@@ -170,13 +170,6 @@
             ],
             "automerge": false,
             "groupName": "talos"
-        },
-        {
-            "description": "Pin 11notes/qbittorrent: v5.2.1 silently exits with code 0 in <2s under readOnlyRootFilesystem (no logs). Re-enable once upstream ships a fix.",
-            "matchPackageNames": [
-                "11notes/qbittorrent"
-            ],
-            "enabled": false
         }
     ]
 }
