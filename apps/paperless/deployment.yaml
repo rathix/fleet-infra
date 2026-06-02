@@ -61,6 +61,12 @@ spec:
               value: "true"
             - name: PAPERLESS_HTTP_REMOTE_USER_HEADER_NAME
               value: HTTP_REMOTE_USER
+            - name: PAPERLESS_TIKA_ENABLED
+              value: "1"
+            - name: PAPERLESS_TIKA_ENDPOINT
+              value: http://tika:9998
+            - name: PAPERLESS_TIKA_GOTENBERG_ENDPOINT
+              value: http://gotenberg:3000
             - name: PAPERLESS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
