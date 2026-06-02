@@ -1,0 +1,174 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: longhorn-backup-check
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/name: longhorn-backup-check
+data:
+  check.py: |
+    #!/usr/bin/env python3
+    # Verifies every Longhorn volume has a recent successful backup in the
+    # backupstore. Emails (SMTP) when any volume is stale or missing a backup,
+    # or when the Longhorn API itself can't be reached. Failure-only: a healthy
+    # run is silent (exit 0). Queries the in-cluster Longhorn manager REST API,
+    # so it needs no RBAC.
+    import os, sys, json, ssl, smtplib, urllib.request
+    from datetime import datetime, timezone
+    from email.message import EmailMessage
+
+    API = os.environ.get("LONGHORN_API", "http://longhorn-backend.longhorn-system:9500")
+    MAX_AGE_H = float(os.environ.get("MAX_AGE_HOURS", "26"))
+
+    def get(path):
+        with urllib.request.urlopen(f"{API}{path}", timeout=30) as r:
+            return json.load(r)
+
+    def parse_ts(s):
+        if not s or s in ("", "-"):
+            return None
+        try:
+            return datetime.fromisoformat(s.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+
+    def send_email(subject, body):
+        host = os.environ["SMTP_HOST"]
+        port = int(os.environ.get("SMTP_PORT", "587"))
+        sec = os.environ.get("SMTP_SECURITY", "starttls").lower()
+        user = os.environ.get("SMTP_USERNAME")
+        pw = os.environ.get("SMTP_PASSWORD")
+        msg = EmailMessage()
+        msg["From"] = os.environ["SMTP_FROM"]
+        msg["To"] = os.environ["SMTP_TO"]
+        msg["Subject"] = subject
+        msg.set_content(body)
+        ctx = ssl.create_default_context()
+        if sec == "ssl":
+            s = smtplib.SMTP_SSL(host, port, timeout=30, context=ctx)
+        else:
+            s = smtplib.SMTP(host, port, timeout=30)
+            if sec == "starttls":
+                s.starttls(context=ctx)
+        if user:
+            s.login(user, pw)
+        s.send_message(msg)
+        s.quit()
+
+    def main():
+        now = datetime.now(timezone.utc)
+        try:
+            vols = [v["name"] for v in get("/v1/volumes").get("data", [])]
+            bvs = {b["name"]: b for b in get("/v1/backupvolumes").get("data", [])}
+        except Exception as e:
+            send_email(
+                "⚠ Longhorn backup check FAILED to run",
+                f"Could not query the Longhorn API at {API}:\n\n  {e}\n\n"
+                "Backups are currently UNVERIFIED. Investigate the longhorn-manager "
+                "and the backup-check CronJob.",
+            )
+            print(f"API error: {e}")
+            sys.exit(1)
+
+        problems = []
+        for v in sorted(vols):
+            bv = bvs.get(v)
+            ts = parse_ts(bv.get("lastBackupAt")) if bv else None
+            if ts is None:
+                problems.append(f"{v}: no successful backup found in the backupstore")
+                continue
+            age = (now - ts).total_seconds() / 3600
+            if age > MAX_AGE_H:
+                problems.append(
+                    f"{v}: last backup {age:.1f}h ago ({ts.isoformat()}) "
+                    f"— exceeds {MAX_AGE_H:.0f}h threshold"
+                )
+
+        if problems:
+            body = (
+                "Longhorn reports stale or missing backups:\n\n"
+                + "\n".join(f"  • {p}" for p in problems)
+                + f"\n\nChecked {len(vols)} volume(s) at {now.isoformat()}.\n"
+                "Investigate in the Longhorn UI → Backup, and confirm the NFS "
+                "backup target is reachable.\n"
+            )
+            send_email(
+                f"⚠ Longhorn backup alert: {len(problems)} volume(s) stale/missing",
+                body,
+            )
+            print(body)
+            sys.exit(1)
+
+        print(f"OK: all {len(vols)} volume(s) have a backup within {MAX_AGE_H:.0f}h")
+
+    main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-backup-check
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/name: longhorn-backup-check
+spec:
+  # 06:00 — well after the 02:00 daily backup window.
+  schedule: "0 6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 300
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: longhorn-backup-check
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: check
+              image: python:3.12-alpine
+              imagePullPolicy: IfNotPresent
+              command: ["python3", "/app/check.py"]
+              env:
+                - name: HOME
+                  value: /tmp
+                - name: PYTHONDONTWRITEBYTECODE
+                  value: "1"
+              envFrom:
+                - secretRef:
+                    name: longhorn-backup-check-smtp
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  memory: 64Mi
+                  cpu: "0.05"
+                limits:
+                  memory: 128Mi
+                  cpu: "0.5"
+          volumes:
+            - name: script
+              configMap:
+                name: longhorn-backup-check
+            - name: tmp
+              emptyDir:
+                medium: Memory

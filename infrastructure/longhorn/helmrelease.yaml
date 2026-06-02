@@ -52,7 +52,7 @@ spec:
       concurrentAutomaticEngineUpgradePerNodeLimit: 1
       orphanAutoDeletion: true
       fastReplicaRebuildEnabled: true
-      snapshotMaxCount: 5
+      snapshotMaxCount: 16
       backupCompressionMethod: lz4
       allowRecurringJobWhileVolumeDetached: true
       autoCleanupSnapshotWhenDeleteBackup: true

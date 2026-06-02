@@ -1,3 +1,17 @@
+# Backup/snapshot retention scheme (GFS — grandfather-father-son)
+#
+# Snapshots live on the same disks as the live volume (fast "undo", but NOT
+# disaster-safe). Backups are copied off-volume to the NFS target and are the
+# real recovery tier. All jobs target the `default` group, which every Longhorn
+# volume joins automatically unless it carries an opt-out label.
+#
+#   Snapshots : every 8h, keep 6   -> 48h of on-volume restore points
+#   Daily     : 02:00,    keep 7   -> ~1 week
+#   Weekly    : Sun 03:00, keep 5  -> ~1 month
+#   Monthly   : 1st 04:00, keep 12 -> ~1 year
+#
+# NB: snapshot retain (6) + transient backup snapshots must stay under
+# defaultSettings.snapshotMaxCount in helmrelease.yaml (set to 16).
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
@@ -6,7 +20,7 @@ metadata:
 spec:
   task: snapshot
   cron: "0 */8 * * *"
-  retain: 3
+  retain: 6
   concurrency: 1
   groups:
     - default
@@ -19,7 +33,7 @@ metadata:
 spec:
   task: snapshot-cleanup
   cron: "30 */8 * * *"
-  retain: 3
+  retain: 6
   concurrency: 1
   groups:
     - default
@@ -27,12 +41,38 @@ spec:
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:
-  name: backup-recurring
+  name: backup-daily
   namespace: longhorn-system
 spec:
   task: backup
   cron: "0 2 * * *"
   retain: 7
+  concurrency: 1
+  groups:
+    - default
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-weekly
+  namespace: longhorn-system
+spec:
+  task: backup
+  cron: "0 3 * * 0"
+  retain: 5
+  concurrency: 1
+  groups:
+    - default
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-monthly
+  namespace: longhorn-system
+spec:
+  task: backup
+  cron: "0 4 1 * *"
+  retain: 12
   concurrency: 1
   groups:
     - default
