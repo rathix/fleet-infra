@@ -1,0 +1,231 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flux-health-check
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: flux-health-check
+---
+# Read-only access to the Flux resources we want to watch, cluster-wide
+# (Kustomizations/HelmReleases/sources can live in any namespace).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flux-health-check
+  labels:
+    app.kubernetes.io/name: flux-health-check
+rules:
+  - apiGroups: ["kustomize.toolkit.fluxcd.io"]
+    resources: ["kustomizations"]
+    verbs: ["get", "list"]
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list"]
+  - apiGroups: ["source.toolkit.fluxcd.io"]
+    resources: ["gitrepositories", "helmrepositories"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flux-health-check
+  labels:
+    app.kubernetes.io/name: flux-health-check
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flux-health-check
+subjects:
+  - kind: ServiceAccount
+    name: flux-health-check
+    namespace: flux-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flux-health-check
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: flux-health-check
+data:
+  check.py: |
+    #!/usr/bin/env python3
+    # Polls Flux resources via the Kubernetes API and emails (SMTP) when any
+    # have been not-Ready longer than GRACE_MINUTES. Failure-only: a healthy
+    # run is silent. The grace window suppresses the transient not-Ready flips
+    # that happen during normal reconciliations / Helm upgrades.
+    import os, sys, json, ssl, smtplib, urllib.request
+    from datetime import datetime, timezone
+    from email.message import EmailMessage
+
+    HOST = "https://kubernetes.default.svc"
+    SA = "/var/run/secrets/kubernetes.io/serviceaccount"
+    GRACE_MIN = float(os.environ.get("GRACE_MINUTES", "10"))
+
+    # (group/version, plural, human label)
+    KINDS = [
+        ("kustomize.toolkit.fluxcd.io/v1", "kustomizations", "Kustomization"),
+        ("helm.toolkit.fluxcd.io/v2", "helmreleases", "HelmRelease"),
+        ("source.toolkit.fluxcd.io/v1", "gitrepositories", "GitRepository"),
+        ("source.toolkit.fluxcd.io/v1", "helmrepositories", "HelmRepository"),
+    ]
+
+    with open(f"{SA}/token") as f:
+        TOKEN = f.read().strip()
+    CTX = ssl.create_default_context(cafile=f"{SA}/ca.crt")
+
+    def get(path):
+        req = urllib.request.Request(f"{HOST}{path}",
+                                     headers={"Authorization": f"Bearer {TOKEN}"})
+        with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
+            return json.load(r)
+
+    def parse_ts(s):
+        try:
+            return datetime.fromisoformat(s.replace("Z", "+00:00"))
+        except (ValueError, AttributeError):
+            return None
+
+    def ready_condition(obj):
+        for c in obj.get("status", {}).get("conditions", []):
+            if c.get("type") == "Ready":
+                return c
+        return None
+
+    def send_email(subject, body):
+        host = os.environ["SMTP_HOST"]
+        port = int(os.environ.get("SMTP_PORT", "587"))
+        sec = os.environ.get("SMTP_SECURITY", "starttls").lower()
+        user = os.environ.get("SMTP_USERNAME")
+        pw = os.environ.get("SMTP_PASSWORD")
+        msg = EmailMessage()
+        msg["From"] = os.environ["SMTP_FROM"]
+        msg["To"] = os.environ["SMTP_TO"]
+        msg["Subject"] = subject
+        msg.set_content(body)
+        ctx = ssl.create_default_context()
+        if sec == "ssl":
+            s = smtplib.SMTP_SSL(host, port, timeout=30, context=ctx)
+        else:
+            s = smtplib.SMTP(host, port, timeout=30)
+            if sec == "starttls":
+                s.starttls(context=ctx)
+        if user:
+            s.login(user, pw)
+        s.send_message(msg)
+        s.quit()
+
+    def main():
+        now = datetime.now(timezone.utc)
+        failing = []
+        try:
+            for gv, plural, label in KINDS:
+                data = get(f"/apis/{gv}/{plural}")
+                for obj in data.get("items", []):
+                    cond = ready_condition(obj)
+                    if cond is None or cond.get("status") == "True":
+                        continue
+                    ts = parse_ts(cond.get("lastTransitionTime", ""))
+                    mins = (now - ts).total_seconds() / 60 if ts else GRACE_MIN + 1
+                    if mins < GRACE_MIN:
+                        continue  # within grace — likely mid-reconcile
+                    md = obj.get("metadata", {})
+                    failing.append(
+                        f"{label}/{md.get('namespace','-')}/{md.get('name','?')} "
+                        f"— not Ready for {mins:.0f}m\n"
+                        f"      {cond.get('reason','')}: {cond.get('message','').strip()}"
+                    )
+        except Exception as e:
+            send_email(
+                "⚠ Flux health check FAILED to run",
+                f"Could not query the Kubernetes API for Flux resources:\n\n  {e}\n\n"
+                "Flux health is currently UNVERIFIED.",
+            )
+            print(f"API error: {e}")
+            sys.exit(1)
+
+        if failing:
+            body = (
+                "The following Flux resources have been failing "
+                f"for more than {GRACE_MIN:.0f} minutes:\n\n  • "
+                + "\n  • ".join(failing)
+                + f"\n\nChecked at {now.isoformat()}.\n"
+                "Investigate with: flux get all -A\n"
+            )
+            send_email(f"⚠ Flux: {len(failing)} resource(s) failing", body)
+            print(body)
+            sys.exit(1)
+
+        print("OK: all Flux resources Ready")
+
+    main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: flux-health-check
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: flux-health-check
+spec:
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 120
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: flux-health-check
+        spec:
+          restartPolicy: Never
+          serviceAccountName: flux-health-check
+          automountServiceAccountToken: true
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: check
+              image: python:3.12-alpine
+              imagePullPolicy: IfNotPresent
+              command: ["python3", "/app/check.py"]
+              env:
+                - name: HOME
+                  value: /tmp
+                - name: PYTHONDONTWRITEBYTECODE
+                  value: "1"
+              envFrom:
+                - secretRef:
+                    name: flux-health-check-smtp
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+              resources:
+                requests:
+                  memory: 64Mi
+                  cpu: "0.05"
+                limits:
+                  memory: 128Mi
+                  cpu: "0.5"
+          volumes:
+            - name: script
+              configMap:
+                name: flux-health-check
+            - name: tmp
+              emptyDir:
+                medium: Memory

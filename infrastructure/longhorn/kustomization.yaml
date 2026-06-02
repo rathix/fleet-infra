@@ -4,3 +4,5 @@ resources:
   - namespace.yaml
   - helmrelease.yaml
   - recurringjobs.yaml
+  - backup-check-sealedsecret.yaml
+  - backup-check.yaml

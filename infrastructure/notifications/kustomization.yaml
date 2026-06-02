@@ -4,3 +4,5 @@ resources:
   - sealedsecret.yaml
   - provider.yaml
   - alert.yaml
+  - flux-health-check-sealedsecret.yaml
+  - flux-health-check.yaml
