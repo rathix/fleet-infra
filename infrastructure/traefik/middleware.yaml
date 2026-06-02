@@ -48,6 +48,9 @@ spec:
         ClientId: urn:k8s:secret:oidc-secret:providerClientId
         ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
       Scopes: ["openid", "profile", "email"]
+      Headers:
+        - Name: "Remote-User"
+          Value: "{{ .claims.preferred_username }}"
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
