@@ -47,7 +47,7 @@ spec:
         ValidIssuer: https://auth.kennyandries.com
         ClientId: urn:k8s:secret:oidc-secret:providerClientId
         ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
-      Scopes: ["openid", "profile", "email"]
+      Scopes: ["openid", "profile", "email", "offline_access"]
       Headers:
         - Name: "Remote-User"
           Value: "{{ .claims.preferred_username }}"
