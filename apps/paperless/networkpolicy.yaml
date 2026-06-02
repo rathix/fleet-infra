@@ -32,3 +32,43 @@ spec:
       ports:
         - protocol: TCP
           port: 6379
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-paperless-to-tika
+  namespace: paperless
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: tika
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: paperless
+      ports:
+        - protocol: TCP
+          port: 9998
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-paperless-to-gotenberg
+  namespace: paperless
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gotenberg
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: paperless
+      ports:
+        - protocol: TCP
+          port: 3000

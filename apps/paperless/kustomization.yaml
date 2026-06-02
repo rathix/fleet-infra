@@ -5,6 +5,8 @@ resources:
   - pvc.yaml
   - sealedsecret.yaml
   - redis.yaml
+  - tika.yaml
+  - gotenberg.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
