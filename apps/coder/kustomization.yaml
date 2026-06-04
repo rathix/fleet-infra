@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - sealedsecret.yaml
+  - sealedsecret-oidc.yaml
   - postgres.yaml
   - helmrelease.yaml
   - ingress.yaml
