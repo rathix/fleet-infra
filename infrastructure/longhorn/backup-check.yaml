@@ -1,4 +1,41 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-backup-check
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/name: longhorn-backup-check
+---
+# Read-only access to Longhorn volumes + their backup records.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: longhorn-backup-check
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/name: longhorn-backup-check
+rules:
+  - apiGroups: ["longhorn.io"]
+    resources: ["volumes", "backupvolumes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: longhorn-backup-check
+  namespace: longhorn-system
+  labels:
+    app.kubernetes.io/name: longhorn-backup-check
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: longhorn-backup-check
+subjects:
+  - kind: ServiceAccount
+    name: longhorn-backup-check
+    namespace: longhorn-system
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: longhorn-backup-check
@@ -8,28 +45,54 @@ metadata:
 data:
   check.py: |
     #!/usr/bin/env python3
-    # Verifies every Longhorn volume has a recent successful backup in the
-    # backupstore. Emails (SMTP) when any volume is stale or missing a backup,
-    # or when the Longhorn API itself can't be reached. Failure-only: a healthy
-    # run is silent (exit 0). Queries the in-cluster Longhorn manager REST API,
-    # so it needs no RBAC.
-    import os, sys, json, ssl, smtplib, urllib.request
+    # Verifies every Longhorn volume has a recent successful backup. Emails
+    # (SMTP) when any volume is stale/missing, or when the Kubernetes API can't
+    # be reached after retries. Failure-only: a healthy run is silent (exit 0).
+    #
+    # Reads the BackupVolume CRDs (longhorn.io/v1beta2) via the Kubernetes API
+    # rather than the Longhorn REST API: the CRD's spec.volumeName /
+    # status.lastBackupAt are stable across versions, whereas the REST API's
+    # backupVolume `name` became a hashed "<volume>-<hash>" in Longhorn 1.6+.
+    import os, sys, json, ssl, time, smtplib, urllib.request, urllib.error
     from datetime import datetime, timezone
     from email.message import EmailMessage
 
-    API = os.environ.get("LONGHORN_API", "http://longhorn-backend.longhorn-system:9500")
-    MAX_AGE_H = float(os.environ.get("MAX_AGE_HOURS", "26"))
+    HOST = "https://kubernetes.default.svc"
+    SA = "/var/run/secrets/kubernetes.io/serviceaccount"
+    NS = os.environ.get("LONGHORN_NAMESPACE", "longhorn-system")
+    BASE = f"/apis/longhorn.io/v1beta2/namespaces/{NS}"
+    # Daily backups run at 02:00; 50h tolerates one delayed/missed daily cycle
+    # (backups serialize at concurrency 1) and pages only on a real stall.
+    MAX_AGE_H = float(os.environ.get("MAX_AGE_HOURS", "50"))
 
-    def get(path):
-        with urllib.request.urlopen(f"{API}{path}", timeout=30) as r:
-            return json.load(r)
+    with open(f"{SA}/token") as f:
+        TOKEN = f.read().strip()
+    CTX = ssl.create_default_context(cafile=f"{SA}/ca.crt")
+
+    def api_get(path):
+        url = f"{HOST}{path}"
+        for attempt in range(4):
+            try:
+                req = urllib.request.Request(
+                    url, headers={"Authorization": f"Bearer {TOKEN}"})
+                with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
+                    return json.load(r)
+            except urllib.error.HTTPError as e:
+                if e.code in (429, 500, 503) and attempt < 3:
+                    ra = e.headers.get("Retry-After", "")
+                    time.sleep(float(ra) if ra.isdigit() else (2, 5, 10)[attempt])
+                    continue
+                raise
+            except urllib.error.URLError:
+                if attempt < 3:
+                    time.sleep((2, 5, 10)[attempt])
+                    continue
+                raise
 
     def parse_ts(s):
-        if not s or s in ("", "-"):
-            return None
         try:
             return datetime.fromisoformat(s.replace("Z", "+00:00"))
-        except ValueError:
+        except (ValueError, AttributeError):
             return None
 
     def send_email(subject, body):
@@ -58,22 +121,25 @@ data:
     def main():
         now = datetime.now(timezone.utc)
         try:
-            vols = [v["name"] for v in get("/v1/volumes").get("data", [])]
-            bvs = {b["name"]: b for b in get("/v1/backupvolumes").get("data", [])}
+            vols = [v["metadata"]["name"]
+                    for v in api_get(f"{BASE}/volumes").get("items", [])]
+            last = {}
+            for bv in api_get(f"{BASE}/backupvolumes").get("items", []):
+                name = bv.get("spec", {}).get("volumeName") \
+                    or bv.get("metadata", {}).get("name")
+                last[name] = bv.get("status", {}).get("lastBackupAt", "")
         except Exception as e:
             send_email(
                 "⚠ Longhorn backup check FAILED to run",
-                f"Could not query the Longhorn API at {API}:\n\n  {e}\n\n"
-                "Backups are currently UNVERIFIED. Investigate the longhorn-manager "
-                "and the backup-check CronJob.",
+                f"Could not query the Kubernetes API for Longhorn backups:\n\n"
+                f"  {e}\n\nBackups are currently UNVERIFIED.",
             )
             print(f"API error: {e}")
             sys.exit(1)
 
         problems = []
         for v in sorted(vols):
-            bv = bvs.get(v)
-            ts = parse_ts(bv.get("lastBackupAt")) if bv else None
+            ts = parse_ts(last.get(v, ""))
             if ts is None:
                 problems.append(f"{v}: no successful backup found in the backupstore")
                 continue
@@ -126,7 +192,8 @@ spec:
             app.kubernetes.io/name: longhorn-backup-check
         spec:
           restartPolicy: Never
-          automountServiceAccountToken: false
+          serviceAccountName: longhorn-backup-check
+          automountServiceAccountToken: true
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
