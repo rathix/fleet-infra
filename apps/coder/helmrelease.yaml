@@ -46,3 +46,10 @@ spec:
           value: Sign in with Pocket ID
         - name: CODER_OIDC_SCOPES
           value: openid,profile,email
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 4096Mi
+      requests:
+        cpu: 500m
+        memory: 1024Mi
