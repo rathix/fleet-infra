@@ -180,6 +180,13 @@ data:
               type: sabnzbd
               url: http://servarr-sabnzbd.servarr.svc.cluster.local:8080
               key: {{HOMEPAGE_VAR_SABNZBD}}
+        - Immich:
+            icon: immich.png
+            href: https://immich.kennyandries.com/
+            description: Photo manager
+            namespace: immich
+            app: immich-server
+            siteMonitor: http://immich-server.immich.svc.cluster.local:2283
     - Services:
         - Actual Budget:
             icon: actual-budget.png
@@ -209,6 +216,20 @@ data:
             namespace: pocket-id
             app: pocket-id
             siteMonitor: https://auth.kennyandries.com/
+        - code-server:
+            icon: code-server.png
+            href: https://code.kennyandries.com/
+            description: Cloud IDE
+            namespace: code-server
+            app: code-server
+            siteMonitor: http://code-server.code-server.svc.cluster.local:8080
+        - Vaultwarden:
+            icon: vaultwarden.png
+            href: https://vaultwarden.kennyandries.com/
+            description: Password manager
+            namespace: vaultwarden
+            app: vaultwarden
+            siteMonitor: http://vaultwarden.vaultwarden.svc.cluster.local:8080
         - Home Assistant:
             icon: home-assistant.png
             href: http://homeassistant.local:8123/
