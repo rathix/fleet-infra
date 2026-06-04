@@ -54,6 +54,9 @@ spec:
             capabilities:
               drop:
                 - ALL
+          envFrom:
+            - secretRef:
+                name: trilium-oidc-secret
           ports:
             - name: http
               containerPort: 8080

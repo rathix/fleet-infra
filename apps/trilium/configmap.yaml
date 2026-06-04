@@ -19,3 +19,11 @@ data:
     certPath=
     keyPath=
     trustedReverseProxy=true
+
+    [MultiFactorAuthentication]
+    oauthBaseUrl=https://trilium.kennyandries.com
+    oauthClientId=!secret clientId
+    oauthClientSecret=!secret clientSecret
+    oauthIssuerBaseUrl=https://auth.kennyandries.com
+    oauthIssuerName=Pocket ID
+    oauthIssuerIcon=https://auth.kennyandries.com/api/application-images/logo
