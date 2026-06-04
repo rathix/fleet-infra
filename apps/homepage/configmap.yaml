@@ -187,7 +187,21 @@ data:
             description: Budget manager
             namespace: actualbudget
             app: actualbudget
-            siteMonitor: http://actualbudget-actualbudget.actualbudget.svc.cluster.local:5006
+            siteMonitor: http://actualbudget.actualbudget.svc.cluster.local:5006
+        - Paperless:
+            icon: paperless-ngx.png
+            href: https://paperless.kennyandries.com/
+            description: Document manager
+            namespace: paperless
+            app: paperless
+            siteMonitor: http://paperless.paperless.svc.cluster.local:8000
+        - Trilium:
+            icon: trilium.png
+            href: https://trilium.kennyandries.com/
+            description: Notes
+            namespace: trilium
+            app: trilium
+            siteMonitor: http://trilium.trilium.svc.cluster.local:8080
         - Pocket ID:
             icon: pocket-id.png
             href: https://auth.kennyandries.com/
