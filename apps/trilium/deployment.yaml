@@ -26,7 +26,12 @@ spec:
       initContainers:
         - name: copy-config
           image: busybox:1.38.0
-          command: ["sh", "-c", "cp /configmap/config.ini /home/node/trilium-data/config.ini"]
+          command:
+            [
+              "sh",
+              "-c",
+              "cp /configmap/config.ini /home/node/trilium-data/config.ini",
+            ]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -43,7 +48,7 @@ spec:
               mountPath: /home/node/trilium-data
       containers:
         - name: trilium
-          image: triliumnext/notes:v0.95.0
+          image: triliumnext/trilium:v0.103.0
           command: ["node", "/usr/src/app/main.cjs"]
           securityContext:
             allowPrivilegeEscalation: false
