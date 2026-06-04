@@ -3,8 +3,10 @@ kind: Kustomization
 resources:
   - actualbudget
   - beszel
+  - coder
   - configarr
   - homepage
+  - immich
   - jellyfin
   - seerr
   - lidarr
@@ -18,3 +20,4 @@ resources:
   - sonarr
   - trilium
   - uptime-kuma
+  - vaultwarden
