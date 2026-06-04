@@ -31,8 +31,17 @@ spec:
     # `config.yaml.local` is deep-merged into the LAPI's main config.yaml, so we
     # only specify deltas — but the chart's DEFAULT value for this key is the
     # auto_registration block, which an override replaces wholesale. We therefore
-    # re-include auto_registration (token is chart-managed) alongside the
-    # agents_autodelete flush rule that prunes stale agent registrations >168h.
+    # re-include auto_registration (token is chart-managed) alongside the flush
+    # rules below.
+    #
+    # Pod names are used as machine/bouncer identities, so every reschedule or
+    # rollout mints a NEW registration and the old one lingers as a stale
+    # "engine"/bouncer with no activity in the console. These autodelete rules
+    # prune registrations whose last heartbeat/pull exceeds the threshold:
+    #   - agents_autodelete.login_password: agents (LAPI password auth)
+    #   - bouncers_autodelete.api_key: traefik/unifi bouncers (API-key auth)
+    # 48h gives a 2-day window to notice a genuinely-down-but-recent component
+    # before it's reaped, while keeping the console clean.
     config:
       config.yaml.local: |
         api:
@@ -48,7 +57,9 @@ spec:
         db_config:
           flush:
             agents_autodelete:
-              login_password: 168h
+              login_password: 48h
+            bouncers_autodelete:
+              api_key: 48h
     lapi:
       replicas: 1
       resources:
