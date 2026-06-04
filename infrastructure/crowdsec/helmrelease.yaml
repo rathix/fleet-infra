@@ -27,20 +27,36 @@ spec:
     mode: enabled
   values:
     container_runtime: containerd
+    # Chart mounts files from this top-level `config` map (keyed by filename).
+    # `config.yaml.local` is deep-merged into the LAPI's main config.yaml, so we
+    # only specify deltas — but the chart's DEFAULT value for this key is the
+    # auto_registration block, which an override replaces wholesale. We therefore
+    # re-include auto_registration (token is chart-managed) alongside the
+    # agents_autodelete flush rule that prunes stale agent registrations >168h.
+    config:
+      config.yaml.local: |
+        api:
+          server:
+            auto_registration:
+              enabled: true
+              token: "${REGISTRATION_TOKEN}"
+              allowed_ranges:
+                - "127.0.0.1/32"
+                - "192.168.0.0/16"
+                - "10.0.0.0/8"
+                - "172.16.0.0/12"
+        db_config:
+          flush:
+            agents_autodelete:
+              login_password: 168h
     lapi:
       replicas: 1
-      extraConfig:
-        config.yaml.local: |
-          db_config:
-            flush:
-              agents_autodelete:
-                login_password: 168h
       resources:
         requests:
           cpu: 100m
           memory: 128Mi
         limits:
-          memory: 256Mi
+          memory: 512Mi
       env:
         - name: ENROLL_KEY
           valueFrom:
