@@ -54,7 +54,7 @@ data:
     # have been not-Ready longer than GRACE_MINUTES. Failure-only: a healthy
     # run is silent. The grace window suppresses the transient not-Ready flips
     # that happen during normal reconciliations / Helm upgrades.
-    import os, sys, json, ssl, smtplib, urllib.request
+    import os, sys, json, ssl, time, smtplib, urllib.request, urllib.error
     from datetime import datetime, timezone
     from email.message import EmailMessage
 
@@ -75,10 +75,26 @@ data:
     CTX = ssl.create_default_context(cafile=f"{SA}/ca.crt")
 
     def get(path):
-        req = urllib.request.Request(f"{HOST}{path}",
-                                     headers={"Authorization": f"Bearer {TOKEN}"})
-        with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
-            return json.load(r)
+        # Retry transient apiserver errors (429/5xx) so a momentary blip
+        # doesn't page; honour Retry-After when present.
+        url = f"{HOST}{path}"
+        for attempt in range(4):
+            try:
+                req = urllib.request.Request(
+                    url, headers={"Authorization": f"Bearer {TOKEN}"})
+                with urllib.request.urlopen(req, timeout=30, context=CTX) as r:
+                    return json.load(r)
+            except urllib.error.HTTPError as e:
+                if e.code in (429, 500, 503) and attempt < 3:
+                    ra = e.headers.get("Retry-After", "")
+                    time.sleep(float(ra) if ra.isdigit() else (2, 5, 10)[attempt])
+                    continue
+                raise
+            except urllib.error.URLError:
+                if attempt < 3:
+                    time.sleep((2, 5, 10)[attempt])
+                    continue
+                raise
 
     def parse_ts(s):
         try:
