@@ -1,22 +1,23 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: coder
-  namespace: coder
+  name: code-server
+  namespace: code-server
   labels:
-    app.kubernetes.io/name: coder
+    app.kubernetes.io/name: code-server
   annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
     external-dns.alpha.kubernetes.io/target: traefik.kennyandries.com
 spec:
   ingressClassName: traefik-system-traefik
   rules:
-    - host: coder.kennyandries.com
+    - host: code.kennyandries.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: coder
+                name: code-server
                 port:
-                  number: 80
+                  number: 8080

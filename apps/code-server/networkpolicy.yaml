@@ -2,17 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-traefik-ingress
-  namespace: coder
+  namespace: code-server
 spec:
   podSelector: {}
   policyTypes:
     - Ingress
   ingress:
-    # External entry via Traefik
+    # Allow traffic from Traefik
     - from:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: traefik-system
-    # Intra-namespace (coderd <-> postgres, coderd <-> workspace pods)
-    - from:
-        - podSelector: {}

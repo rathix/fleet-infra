@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - actualbudget
   - beszel
-  - coder
+  - code-server
   - configarr
   - homepage
   - immich
