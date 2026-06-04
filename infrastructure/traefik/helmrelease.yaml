@@ -51,6 +51,12 @@ spec:
       websecure:
         http3:
           enabled: true
+        # Traefik v3 defaults readTimeout to 60s (was unlimited in v2), which
+        # severs long-running uploads such as Immich video uploads mid-request.
+        # Raise it so large request bodies have time to stream through.
+        transport:
+          respondingTimeouts:
+            readTimeout: "600s"
         forwardedHeaders:
           insecure: false
           trustedIPs:
