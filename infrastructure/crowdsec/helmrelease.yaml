@@ -92,6 +92,14 @@ spec:
         - namespace: traefik-system
           podName: traefik-*
           program: traefik
+          # The chart renders this acquisition as a file source on
+          # /var/log/containers/*.log with force_inotify=true. inotify alone is
+          # keyed to the file's inode, so when the kubelet rotates a container
+          # log (rename + recreate) the tailer loses it and gets stuck
+          # "Waiting for ... to appear", silently halting detection while the
+          # pod stays healthy. poll_without_inotify makes CrowdSec stat the path
+          # on an interval and reliably re-open the rotated file.
+          poll_without_inotify: true
       resources:
         requests:
           cpu: 100m
