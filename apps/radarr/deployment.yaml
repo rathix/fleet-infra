@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: radarr
-          image: 11notes/radarr:6.1.1
+          image: 11notes/radarr:6.2.1
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
