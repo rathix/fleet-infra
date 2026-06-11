@@ -5,8 +5,6 @@ metadata:
   namespace: pocket-id
   labels:
     app.kubernetes.io/name: pocket-id
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-login-rate-limit@kubernetescrd
 spec:
   ingressClassName: traefik-system-traefik
   rules:
