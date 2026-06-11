@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: lidarr
-          image: 11notes/lidarr:2.14.5
+          image: 11notes/lidarr:2.14.5@sha256:3dea7bda17ae7306576fedec9b4267556e376b663e56b8403d30e7e0a7c5266c
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
