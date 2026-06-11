@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: actualbudget
-          image: actualbudget/actual-server:26.6.0
+          image: actualbudget/actual-server:26.6.0@sha256:74385f8067f401e61f0be9e343c471705c42dfaa195295c40c5b2f15f4dcc9d4
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false

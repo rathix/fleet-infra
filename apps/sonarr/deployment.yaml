@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: sonarr
-          image: 11notes/sonarr:4.0.17
+          image: 11notes/sonarr:4.0.17@sha256:633e1ed7c43c39e2424d2a34f4627b8c2c2cd6fcac3efdac750bc8443b9f85c3
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
