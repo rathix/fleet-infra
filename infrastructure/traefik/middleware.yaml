@@ -76,6 +76,13 @@ metadata:
 spec:
   plugin:
     crowdsec-bouncer-traefik-plugin:
+      # REQUIRED: the plugin defaults Enabled=false. Without this, ServeHTTP
+      # short-circuits (`if !bouncer.enabled { next; return }`) and bypasses
+      # BOTH IP-reputation bouncing AND the AppSec WAF for every request —
+      # while the decision-stream ticker still runs in the background, so the
+      # bouncer falsely appears healthy. This single missing field silently
+      # disabled the entire WAF.
+      enabled: true
       crowdsecLapiScheme: http
       crowdsecLapiHost: crowdsec-crowdsec-service.crowdsec.svc.cluster.local:8080
       crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
