@@ -64,11 +64,17 @@ spec:
       replicas: 1
       resources:
         requests:
-          cpu: 100m
-          memory: 128Mi
+          cpu: 250m
+          memory: 256Mi
+        # LAPI serves ~140k active decisions (large list-based blocklists:
+        # firehol_voipbl, CVE lists) on every bouncer startup stream. A 500m
+        # CPU cap throttled serialization past the Traefik plugin's 10s read
+        # timeout, so streams never went healthy after a rollout (all pods
+        # pull startup=true at once) — a failure spiral. Give it headroom to
+        # serve the full stream well under the timeout.
         limits:
-          cpu: 500m
-          memory: 512Mi
+          cpu: "2"
+          memory: 1Gi
       env:
         - name: ENROLL_KEY
           valueFrom:
