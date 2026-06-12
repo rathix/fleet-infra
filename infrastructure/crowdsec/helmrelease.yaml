@@ -79,6 +79,19 @@ spec:
           value: "fleet-infra-k8s"
         - name: ENROLL_TAGS
           value: "env:production cluster:fleet-infra"
+        # Statically register the Traefik bouncer on LAPI startup. The image
+        # entrypoint runs `cscli bouncers add <name> -k <key>` (idempotent) for
+        # every BOUNCER_KEY_<name> var, where <name> is the suffix after the
+        # second underscore (here: "traefik"). REQUIRED for the AppSec WAF: the
+        # AppSec engine only accepts keys of already-registered bouncers and
+        # does NOT honour LAPI auto_registration. Key must match
+        # traefik-system/crowdsec-bouncer-key:api-key (what the Traefik
+        # crowdsec-bouncer plugin presents).
+        - name: BOUNCER_KEY_traefik
+          valueFrom:
+            secretKeyRef:
+              name: crowdsec-bouncer-key
+              key: api-key
       persistentVolume:
         config:
           enabled: true
