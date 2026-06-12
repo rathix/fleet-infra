@@ -5,8 +5,9 @@ metadata:
   namespace: actualbudget
   labels:
     app.kubernetes.io/name: actualbudget
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
+  # No Traefik forward-auth middleware: ActualBudget authenticates via its own
+  # built-in OpenID Connect (against pocket-id). A forward-auth proxy here would
+  # intercept the sync/API calls and break the local-first PWA ("Server offline").
 spec:
   ingressClassName: traefik-system-traefik
   rules:
