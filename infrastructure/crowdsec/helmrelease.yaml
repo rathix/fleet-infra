@@ -144,23 +144,36 @@ spec:
       # Custom AppSec config (chart mounts each key into /etc/crowdsec/appsec-configs/).
       configs:
         appsec-crs-detection.yaml: |
-          # Keeps the existing virtual-patching (CVE) + generic rules INBAND
-          # (they actively block — 403), and adds the OWASP Core Rule Set
-          # OUT-OF-BAND: CRS matches generate console alerts/decisions but do
-          # NOT block the live request. This lets us observe CRS false positives
-          # against the internet-exposed apps (immich, paperless, etc.) before
-          # enforcing. To turn CRS into active blocking once tuned, move
-          # `crowdsecurity/crs` from outofband_rules into inband_rules.
+          # Virtual-patching (CVE), generic rules, and the OWASP Core Rule Set
+          # all run INBAND — they actively block (403). `custom/allowed-methods`
+          # MUST be listed first: it runs before CRS in phase 1 and sets
+          # tx.allowed_methods, so CRS rule 901160 skips its restrictive default
+          # (GET HEAD POST OPTIONS) and rule 911100 (method enforcement) stops
+          # 403ing the PUT/PATCH/DELETE verbs that REST apps (Trilium, Immich,
+          # Paperless…) rely on. See appsec.rules below.
           name: crowdsecurity/appsec-crs-detection
           default_remediation: ban
           inband_rules:
+            - custom/allowed-methods
             - crowdsecurity/base-config
             - crowdsecurity/vpatch-*
             - crowdsecurity/generic-*
-          outofband_rules:
             - crowdsecurity/crs
+          outofband_rules:
             - crowdsecurity/experimental-*
             - crowdsecurity/appsec-generic-test
+      # Custom AppSec rules (chart mounts each key into /etc/crowdsec/appsec-rules/).
+      rules:
+        allowed-methods.yaml: |
+          # Widen the CRS HTTP method allow-list so REST APIs work behind the WAF.
+          # CRS rule 901160 only applies the GET/HEAD/POST/OPTIONS default when
+          # tx.allowed_methods is unset, so setting it first (phase 1) wins and
+          # rule 911100 no longer blocks PUT/PATCH/DELETE. Must appear before
+          # crowdsecurity/crs in the inband_rules list above (load order = eval
+          # order within phase 1).
+          name: custom/allowed-methods
+          seclang_rules:
+            - SecAction "id:80001,phase:1,nolog,pass,t:none,setvar:'tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE'"
       resources:
         requests:
           cpu: 100m
