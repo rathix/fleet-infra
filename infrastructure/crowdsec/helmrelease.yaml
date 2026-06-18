@@ -157,8 +157,8 @@ spec:
             - crowdsecurity/base-config
             - crowdsecurity/vpatch-*
             - crowdsecurity/generic-*
-            - crowdsecurity/crs
           outofband_rules:
+            - crowdsecurity/crs
             - crowdsecurity/experimental-*
             - crowdsecurity/appsec-generic-test
       resources:
