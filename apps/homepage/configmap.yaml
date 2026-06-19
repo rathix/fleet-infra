@@ -250,6 +250,16 @@ data:
             namespace: longhorn-system
             app: longhorn
             siteMonitor: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
+        - CrowdSec:
+            icon: crowdsec.png
+            href: https://app.crowdsec.net
+            description: WAF / IPS
+            siteMonitor: http://crowdsec-crowdsec-service.crowdsec.svc.cluster.local:8080/health
+            widget:
+              type: crowdsec
+              url: http://crowdsec-crowdsec-service.crowdsec.svc.cluster.local:8080
+              username: {{HOMEPAGE_VAR_CROWDSEC_USER}}
+              password: {{HOMEPAGE_VAR_CROWDSEC_PASS}}
     - TrueNAS:
         - pkb-nas-tns-1:
             icon: truenas.png
