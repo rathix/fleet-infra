@@ -12,27 +12,52 @@ data:
     providers:
       longhorn:
         url: http://longhorn-frontend.longhorn-system.svc.cluster.local:80
+    theme: dark
+    color: slate
+    headerStyle: boxed
     useEqualHeights: true
     statusStyle: dot
+    # Groups are organised into tabs. A group with no tab shows on every tab,
+    # so all groups (including bookmarks) are assigned to keep tabs clean.
     layout:
       Media:
+        tab: Media
         style: row
         columns: 4
+      Upcoming:
+        tab: Media
       Services:
+        tab: Apps
         style: row
         columns: 4
       Cluster Management:
+        tab: Infrastructure
         style: row
         columns: 4
       TrueNAS:
+        tab: Infrastructure
         style: row
         columns: 4
       Networking:
+        tab: Infrastructure
         style: row
         columns: 4
       Monitoring:
+        tab: Monitoring
         style: row
         columns: 4
+      Development:
+        tab: Links
+      Hetzner:
+        tab: Links
+      Personal:
+        tab: Links
+      Work:
+        tab: Links
+      Shopping:
+        tab: Links
+      Homelab:
+        tab: Links
   bookmarks.yaml: |
     - Development:
         - Github:
@@ -187,6 +212,29 @@ data:
             namespace: immich
             app: immich-server
             siteMonitor: http://immich-server.immich.svc.cluster.local:2283
+    - Upcoming:
+        - Calendar:
+            widget:
+              type: calendar
+              view: agenda
+              maxEvents: 12
+              showTime: true
+              firstDayInWeek: monday
+              timezone: Europe/Brussels
+              # Integrations reuse the existing widget creds of these services
+              integrations:
+                - type: sonarr
+                  service_group: Media
+                  service_name: Sonarr
+                  color: teal
+                - type: radarr
+                  service_group: Media
+                  service_name: Radarr
+                  color: red
+                - type: lidarr
+                  service_group: Media
+                  service_name: Lidarr
+                  color: purple
     - Services:
         - Actual Budget:
             icon: actual-budget.png
@@ -299,6 +347,23 @@ data:
               password: {{HOMEPAGE_VAR_BESZEL_PASS}}
               version: 2
   widgets.yaml: |
+    - greeting:
+        text_size: xl
+        text: Welcome back, Kenny
+    - datetime:
+        text_size: xl
+        format:
+          dateStyle: long
+          timeStyle: short
+          hourCycle: h23
+    # No API key required. Coordinates default to Brussels — adjust to taste.
+    - openmeteo:
+        label: Weather
+        latitude: 50.8503
+        longitude: 4.3517
+        timezone: Europe/Brussels
+        units: metric
+        cache: 5
     - kubernetes:
         cluster:
           show: true
