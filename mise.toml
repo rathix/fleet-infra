@@ -1,0 +1,4 @@
+[tools]
+kubectl = "latest"
+talhelper = "latest"
+talosctl = "latest"
