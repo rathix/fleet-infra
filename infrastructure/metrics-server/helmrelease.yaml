@@ -11,7 +11,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: metrics-server
-      version: v3.13.0
+      version: 3.13.1
   interval: 30m
   timeout: 5m
   targetNamespace: metrics-server
