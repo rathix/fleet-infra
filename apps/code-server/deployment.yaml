@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: code-server
-          image: codercom/code-server:4.123.0@sha256:6d46b83ea0687ab1826ec029b6d0e6342bbd55cc5c29b98258463e7faee16d1e
+          image: codercom/code-server:4.125.0@sha256:9a7848dd2627158e3873f88bd8743807a4168e4d580f26ec0cbc132a9d9ee78e
           # Override the image entrypoint (which wraps code-server in fixuid) so it
           # runs cleanly under a non-root/restricted securityContext. Auth is handled
           # at the edge by the Traefik oidc middleware, so code-server uses --auth none.
