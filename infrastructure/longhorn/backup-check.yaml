@@ -64,6 +64,12 @@ data:
     # Daily backups run at 02:00; 50h tolerates one delayed/missed daily cycle
     # (backups serialize at concurrency 1) and pages only on a real stall.
     MAX_AGE_H = float(os.environ.get("MAX_AGE_HOURS", "50"))
+    # A volume's per-volume snapshotMaxCount can silently shadow the global
+    # default (helmrelease.yaml). If it drops to/below the recurring snapshot
+    # retain (6), the engine refuses new snapshots — and because a backup
+    # snapshots first, backups stall too. Flag low caps BEFORE backups go stale.
+    # 0 means "use global default" and is always safe. Floor = retain + headroom.
+    MIN_SNAP_MAX = int(os.environ.get("MIN_SNAPSHOT_MAX_COUNT", "10"))
 
     with open(f"{SA}/token") as f:
         TOKEN = f.read().strip()
@@ -121,8 +127,8 @@ data:
     def main():
         now = datetime.now(timezone.utc)
         try:
-            vols = [v["metadata"]["name"]
-                    for v in api_get(f"{BASE}/volumes").get("items", [])]
+            vol_items = api_get(f"{BASE}/volumes").get("items", [])
+            vols = [v["metadata"]["name"] for v in vol_items]
             last = {}
             for bv in api_get(f"{BASE}/backupvolumes").get("items", []):
                 name = bv.get("spec", {}).get("volumeName") \
@@ -150,16 +156,44 @@ data:
                     f"— exceeds {MAX_AGE_H:.0f}h threshold"
                 )
 
-        if problems:
+        # Proactive: catch volumes whose cap will stall snapshots/backups soon,
+        # before they actually go stale above.
+        warnings = []
+        for v in sorted(vol_items, key=lambda x: x["metadata"]["name"]):
+            cap = v.get("spec", {}).get("snapshotMaxCount") or 0
+            if 0 < cap < MIN_SNAP_MAX:
+                name = v["metadata"]["name"]
+                pvc = (v.get("status", {}).get("kubernetesStatus", {})
+                       .get("pvcName") or "?")
+                warnings.append(
+                    f"{name} ({pvc}): snapshotMaxCount={cap} is below the safe "
+                    f"floor of {MIN_SNAP_MAX} — snapshots/backups will stall once "
+                    f"the chain fills. Raise it: kubectl patch volumes.longhorn.io "
+                    f"-n {NS} {name} --type merge "
+                    f"-p '{{\"spec\":{{\"snapshotMaxCount\":20}}}}'"
+                )
+
+        if problems or warnings:
+            sections = []
+            if problems:
+                sections.append(
+                    "Longhorn reports stale or missing backups:\n\n"
+                    + "\n".join(f"  • {p}" for p in problems)
+                )
+            if warnings:
+                sections.append(
+                    "Volumes at risk of backup failure (low snapshotMaxCount):\n\n"
+                    + "\n".join(f"  • {w}" for w in warnings)
+                )
             body = (
-                "Longhorn reports stale or missing backups:\n\n"
-                + "\n".join(f"  • {p}" for p in problems)
+                "\n\n".join(sections)
                 + f"\n\nChecked {len(vols)} volume(s) at {now.isoformat()}.\n"
                 "Investigate in the Longhorn UI → Backup, and confirm the NFS "
                 "backup target is reachable.\n"
             )
+            n = len(problems) + len(warnings)
             send_email(
-                f"⚠ Longhorn backup alert: {len(problems)} volume(s) stale/missing",
+                f"⚠ Longhorn backup alert: {n} volume(s) stale/missing/at-risk",
                 body,
             )
             print(body)

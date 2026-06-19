@@ -4,7 +4,7 @@
         "config:recommended",
         ":dependencyDashboard"
     ],
-    "pinDigests": false,
+    "pinDigests": true,
     "prHourlyLimit": 0,
     "prConcurrentLimit": 0,
     "flux": {
@@ -133,21 +133,23 @@
     ],
     "packageRules": [
         {
-            "description": "Disable digest pinning for all container images and helm charts",
-            "matchDatasources": [
-                "docker",
-                "helm"
+            "description": "Auto-merge digest pins and lockfile/pin maintenance only - no unattended version bumps",
+            "matchUpdateTypes": [
+                "pin",
+                "digest",
+                "pinDigest",
+                "lockFileMaintenance"
             ],
-            "pinDigests": false
+            "automerge": true,
+            "platformAutomerge": true
         },
         {
-            "description": "Auto-merge all minor and patch updates",
+            "description": "Require manual review/merge for minor and patch version bumps of charts and images",
             "matchUpdateTypes": [
                 "minor",
                 "patch"
             ],
-            "automerge": true,
-            "platformAutomerge": true
+            "automerge": false
         },
         {
             "description": "Group infrastructure controller updates",

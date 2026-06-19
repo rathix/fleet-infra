@@ -64,10 +64,17 @@ spec:
       replicas: 1
       resources:
         requests:
-          cpu: 100m
-          memory: 128Mi
+          cpu: 250m
+          memory: 256Mi
+        # LAPI serves ~140k active decisions (large list-based blocklists:
+        # firehol_voipbl, CVE lists) on every bouncer startup stream. A 500m
+        # CPU cap throttled serialization past the Traefik plugin's 10s read
+        # timeout, so streams never went healthy after a rollout (all pods
+        # pull startup=true at once) — a failure spiral. Give it headroom to
+        # serve the full stream well under the timeout.
         limits:
-          memory: 512Mi
+          cpu: "2"
+          memory: 1Gi
       env:
         - name: ENROLL_KEY
           valueFrom:
@@ -78,6 +85,19 @@ spec:
           value: "fleet-infra-k8s"
         - name: ENROLL_TAGS
           value: "env:production cluster:fleet-infra"
+        # Statically register the Traefik bouncer on LAPI startup. The image
+        # entrypoint runs `cscli bouncers add <name> -k <key>` (idempotent) for
+        # every BOUNCER_KEY_<name> var, where <name> is the suffix after the
+        # second underscore (here: "traefik"). REQUIRED for the AppSec WAF: the
+        # AppSec engine only accepts keys of already-registered bouncers and
+        # does NOT honour LAPI auto_registration. Key must match
+        # traefik-system/crowdsec-bouncer-key:api-key (what the Traefik
+        # crowdsec-bouncer plugin presents).
+        - name: BOUNCER_KEY_traefik
+          valueFrom:
+            secretKeyRef:
+              name: crowdsec-bouncer-key
+              key: api-key
       persistentVolume:
         config:
           enabled: true
@@ -92,11 +112,20 @@ spec:
         - namespace: traefik-system
           podName: traefik-*
           program: traefik
+          # The chart renders this acquisition as a file source on
+          # /var/log/containers/*.log with force_inotify=true. inotify alone is
+          # keyed to the file's inode, so when the kubelet rotates a container
+          # log (rename + recreate) the tailer loses it and gets stuck
+          # "Waiting for ... to appear", silently halting detection while the
+          # pod stays healthy. poll_without_inotify makes CrowdSec stat the path
+          # on an interval and reliably re-open the rotated file.
+          poll_without_inotify: true
       resources:
         requests:
           cpu: 100m
           memory: 128Mi
         limits:
+          cpu: 500m
           memory: 256Mi
       env:
         - name: COLLECTIONS
@@ -105,17 +134,56 @@ spec:
       enabled: true
       acquisitions:
         - source: appsec
-          appsec_config: crowdsecurity/appsec-default
+          # Custom config (defined under appsec.configs below) so we can run the
+          # OWASP CRS out-of-band alongside the inband CVE/generic rules.
+          appsec_config: crowdsecurity/appsec-crs-detection
           listen_addr: 0.0.0.0:7422
           path: /
           labels:
             type: appsec
+      # Custom AppSec config (chart mounts each key into /etc/crowdsec/appsec-configs/).
+      configs:
+        appsec-crs-detection.yaml: |
+          # Virtual-patching (CVE), generic rules, and the OWASP Core Rule Set
+          # all run INBAND — they actively block (403). `custom/allowed-methods`
+          # MUST be listed first: it runs before CRS in phase 1 and sets
+          # tx.allowed_methods, so CRS rule 901160 skips its restrictive default
+          # (GET HEAD POST OPTIONS) and rule 911100 (method enforcement) stops
+          # 403ing the PUT/PATCH/DELETE verbs that REST apps (Trilium, Immich,
+          # Paperless…) rely on. See appsec.rules below.
+          name: crowdsecurity/appsec-crs-detection
+          default_remediation: ban
+          inband_rules:
+            - custom/allowed-methods
+            - crowdsecurity/base-config
+            - crowdsecurity/vpatch-*
+            - crowdsecurity/generic-*
+            - crowdsecurity/crs
+          outofband_rules:
+            - crowdsecurity/experimental-*
+            - crowdsecurity/appsec-generic-test
+      # Custom AppSec rules (chart mounts each key into /etc/crowdsec/appsec-rules/).
+      rules:
+        allowed-methods.yaml: |
+          # Widen the CRS HTTP method allow-list so REST APIs work behind the WAF.
+          # CRS rule 901160 only applies the GET/HEAD/POST/OPTIONS default when
+          # tx.allowed_methods is unset, so setting it first (phase 1) wins and
+          # rule 911100 no longer blocks PUT/PATCH/DELETE. Must appear before
+          # crowdsecurity/crs in the inband_rules list above (load order = eval
+          # order within phase 1).
+          name: custom/allowed-methods
+          seclang_rules:
+            - SecAction "id:80001,phase:1,nolog,pass,t:none,setvar:'tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE'"
       resources:
         requests:
           cpu: 100m
           memory: 128Mi
         limits:
+          cpu: 500m
           memory: 256Mi
       env:
+        # appsec-crs bundles the OWASP Core Rule Set (the crowdsecurity/crs
+        # appsec-rule referenced out-of-band above) for broad SQLi/XSS/RCE
+        # coverage beyond the CVE-specific virtual-patching rules.
         - name: COLLECTIONS
-          value: "crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules"
+          value: "crowdsecurity/appsec-virtual-patching crowdsecurity/appsec-generic-rules crowdsecurity/appsec-crs"

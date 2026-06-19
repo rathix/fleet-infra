@@ -10,8 +10,14 @@
 #   Weekly    : Sun 03:00, keep 5  -> ~1 month
 #   Monthly   : 1st 04:00, keep 12 -> ~1 year
 #
-# NB: snapshot retain (6) + transient backup snapshots must stay under
-# defaultSettings.snapshotMaxCount in helmrelease.yaml (set to 16).
+# NB: snapshot retain (6) + transient backup snapshots must stay under each
+# volume's snapshotMaxCount. defaultSettings.snapshotMaxCount in helmrelease.yaml
+# (16) only seeds NEW volumes — existing volumes keep the per-volume
+# spec.snapshotMaxCount they were created with, which can be lower and silently
+# shadow the global default. When a volume's cap drops to/below the retain, the
+# engine refuses new snapshots ("snapshot count usage N >= snapshotMaxCount N")
+# and, because a backup snapshots first, backups stall too. backup-check.yaml
+# flags low per-volume caps proactively (MIN_SNAPSHOT_MAX_COUNT).
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
 metadata:

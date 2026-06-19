@@ -13,7 +13,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: traefik
-      version: 40.2.0
+      version: 40.3.0
   interval: 30m
   timeout: 10m
   targetNamespace: traefik-system
@@ -51,6 +51,12 @@ spec:
       websecure:
         http3:
           enabled: true
+        # Traefik v3 defaults readTimeout to 60s (was unlimited in v2), which
+        # severs long-running uploads such as Immich video uploads mid-request.
+        # Raise it so large request bodies have time to stream through.
+        transport:
+          respondingTimeouts:
+            readTimeout: "600s"
         forwardedHeaders:
           insecure: false
           trustedIPs:
@@ -82,13 +88,12 @@ spec:
       spec:
         externalIPs: ["192.168.1.3"]
         externalTrafficPolicy: Local
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: traefik.kennyandries.com
     resources:
       requests:
         cpu: 100m
         memory: 128Mi
       limits:
+        cpu: "1"
         memory: 256Mi
     tlsOptions:
       default:

@@ -17,6 +17,8 @@ spec:
       X-Robots-Tag: noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex
       X-XSS-Protection: "0"
       Permissions-Policy: "camera=(), microphone=(), geolocation=(), payment=()"
+      Server: ""
+      X-Powered-By: ""
 ---
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -74,6 +76,13 @@ metadata:
 spec:
   plugin:
     crowdsec-bouncer-traefik-plugin:
+      # REQUIRED: the plugin defaults Enabled=false. Without this, ServeHTTP
+      # short-circuits (`if !bouncer.enabled { next; return }`) and bypasses
+      # BOTH IP-reputation bouncing AND the AppSec WAF for every request —
+      # while the decision-stream ticker still runs in the background, so the
+      # bouncer falsely appears healthy. This single missing field silently
+      # disabled the entire WAF.
+      enabled: true
       crowdsecLapiScheme: http
       crowdsecLapiHost: crowdsec-crowdsec-service.crowdsec.svc.cluster.local:8080
       crowdsecLapiKey: urn:k8s:secret:crowdsec-bouncer-key:api-key
@@ -83,3 +92,16 @@ spec:
       crowdsecAppsecHost: crowdsec-crowdsec-appsec-service.crowdsec.svc.cluster.local:7422
       crowdsecAppsecFailureBlock: true
       crowdsecAppsecUnreachableBlock: true
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: login-rate-limit
+  namespace: traefik-system
+  labels:
+    app.kubernetes.io/name: traefik
+spec:
+  rateLimit:
+    average: 20
+    burst: 40
+    period: 1m
