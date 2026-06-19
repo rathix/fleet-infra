@@ -55,6 +55,13 @@ spec:
                 - "10.0.0.0/8"
                 - "172.16.0.0/12"
         db_config:
+          # SQLite WAL mode: writers append to a -wal file instead of taking an
+          # exclusive lock on the main DB, so readers (decision streams, AppSec
+          # allowlist fetches, cscli, heartbeats) are never blocked by an
+          # in-progress write. Without this, the ~140k-decision blocklist
+          # refreshes hold a rollback-journal lock long enough that the Traefik
+          # bouncer fails closed and returns 403 (blank page) across all apps.
+          use_wal: true
           flush:
             agents_autodelete:
               login_password: 48h
