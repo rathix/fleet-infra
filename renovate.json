@@ -152,26 +152,11 @@
             "automerge": false
         },
         {
-            "description": "Group infrastructure controller updates",
-            "matchFileNames": [
-                "infrastructure/**"
-            ],
-            "groupName": "infrastructure"
-        },
-        {
-            "description": "Group application updates",
-            "matchFileNames": [
-                "apps/**"
-            ],
-            "groupName": "applications"
-        },
-        {
             "description": "Talos and Kubernetes upgrades require manual steps - PR only, no auto-merge",
             "matchFileNames": [
                 "talos/**"
             ],
-            "automerge": false,
-            "groupName": "talos"
+            "automerge": false
         }
     ]
 }
