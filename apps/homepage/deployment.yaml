@@ -106,6 +106,16 @@ spec:
                 secretKeyRef:
                   name: homepage-secret
                   key: crowdsecPass
+            - name: HOMEPAGE_VAR_BESZEL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: beszelUser
+            - name: HOMEPAGE_VAR_BESZEL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: homepage-secret
+                  key: beszelPass
           ports:
             - name: http
               containerPort: 3000

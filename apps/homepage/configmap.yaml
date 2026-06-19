@@ -292,6 +292,12 @@ data:
             namespace: beszel
             app: beszel
             siteMonitor: https://beszel.kennyandries.com/
+            widget:
+              type: beszel
+              url: http://beszel.beszel.svc.cluster.local:8090
+              username: {{HOMEPAGE_VAR_BESZEL_USER}}
+              password: {{HOMEPAGE_VAR_BESZEL_PASS}}
+              version: 2
   widgets.yaml: |
     - kubernetes:
         cluster:
