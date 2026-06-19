@@ -52,3 +52,6 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: beszel
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: crowdsec
