@@ -133,6 +133,19 @@ data:
               enableMediaControl: false
               showEpisodeNumber: true
               expandOneStreamToTwoRows: false
+        - Audiobookshelf:
+            icon: audiobookshelf.png
+            href: https://audiobookshelf.kennyandries.com/
+            description: Audiobook & podcast server
+            namespace: servarr
+            app: audiobookshelf
+            siteMonitor: http://audiobookshelf.servarr.svc.cluster.local:13378
+            # Widget needs an API token (Settings > Users > token). Add once
+            # the app is running and HOMEPAGE_VAR_AUDIOBOOKSHELF is sealed:
+            # widget:
+            #   type: audiobookshelf
+            #   url: http://audiobookshelf.servarr.svc.cluster.local:13378
+            #   key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF}}
         - Radarr:
             icon: radarr.png
             href: https://radarr.kennyandries.com/
