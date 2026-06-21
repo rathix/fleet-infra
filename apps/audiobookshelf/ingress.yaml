@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: audiobookshelf
+  namespace: servarr
+  labels:
+    app.kubernetes.io/name: audiobookshelf
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-security-headers@kubernetescrd
+spec:
+  ingressClassName: traefik-system-traefik
+  rules:
+    - host: audiobookshelf.kennyandries.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: audiobookshelf
+                port:
+                  number: 13378
