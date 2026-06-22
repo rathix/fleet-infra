@@ -4,3 +4,4 @@ resources:
   - namespace.yaml
   - mosquitto.yaml
   - zigbee2mqtt.yaml
+  - homeassistant.yaml
