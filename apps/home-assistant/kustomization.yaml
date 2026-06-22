@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - mosquitto.yaml
+  - zigbee2mqtt.yaml
