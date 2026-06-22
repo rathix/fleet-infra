@@ -6,6 +6,7 @@ resources:
   - beszel
   - code-server
   - configarr
+  - home-assistant
   - homepage
   - immich
   - jellyfin
