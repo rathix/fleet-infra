@@ -26,6 +26,9 @@ metadata:
   namespace: home-assistant
   labels:
     app.kubernetes.io/name: zigbee2mqtt
+  annotations:
+    # z2m frontend has no built-in auth — gate it behind OIDC like other admin UIs
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
 spec:
   ingressClassName: traefik-system-traefik
   rules:
