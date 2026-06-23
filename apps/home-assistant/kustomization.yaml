@@ -7,4 +7,5 @@ resources:
   - zigbee2mqtt.yaml
   - homeassistant.yaml
   - ingress.yaml
+  - mqtt-ingressroute.yaml
   - networkpolicy.yaml
