@@ -42,14 +42,23 @@ spec:
       containers:
         - name: piper
           image: docker.io/rhasspy/wyoming-piper:2.2.2@sha256:c874e4a04657ae3381332ee5d0c8c70a310dae6722892840f530ac0890b44eb3
+          securityContext:
+            # Pure Python TTS on a high port: needs no Linux capabilities and no
+            # privilege escalation. Stays root (the rhasspy image writes model
+            # downloads + /tmp at runtime and isn't built for non-root).
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           # The image entrypoint (docker_run.sh) already supplies
           # --uri tcp://0.0.0.0:10200 --data-dir /data and forwards "$@".
           # Piper is a pure TTS service (no HA callback), so no shell wrapper or
-          # token is needed: --voice/--streaming are just appended as args.
+          # token is needed: --voice is just appended as an arg. Streaming is the
+          # default in this image (only --no-streaming exists; there is no
+          # --streaming flag).
           args:
             - --voice
             - en_GB-alba-medium
-            - --streaming
           ports:
             - name: wyoming
               containerPort: 10200
