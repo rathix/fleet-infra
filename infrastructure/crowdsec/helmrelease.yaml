@@ -151,13 +151,21 @@ spec:
       # Custom AppSec config (chart mounts each key into /etc/crowdsec/appsec-configs/).
       configs:
         appsec-crs-detection.yaml: |
-          # Virtual-patching (CVE), generic rules, and the OWASP Core Rule Set
-          # all run INBAND — they actively block (403). `custom/allowed-methods`
-          # MUST be listed first: it runs before CRS in phase 1 and sets
-          # tx.allowed_methods, so CRS rule 901160 skips its restrictive default
-          # (GET HEAD POST OPTIONS) and rule 911100 (method enforcement) stops
-          # 403ing the PUT/PATCH/DELETE verbs that REST apps (Trilium, Immich,
-          # Paperless…) rely on. See appsec.rules below.
+          # Virtual-patching (CVE) and generic rules run INBAND — they actively
+          # block (403) on high-confidence exploit signatures. The broad OWASP
+          # Core Rule Set runs OUT-OF-BAND (detect + alert + IP-ban, but never
+          # block the in-flight request): its anomaly-scoring false-positives on
+          # legitimate app payloads (e.g. Home Assistant's onboarding POST hit
+          # the inbound threshold of 5 from a single PL1 rule → 403 → "Create
+          # Account does nothing") outweigh the benefit of inline blocking for
+          # apps that already enforce their own auth. CRS still catches real
+          # attacks asynchronously and bans the source IP.
+          #
+          # `custom/allowed-methods` MUST be listed first among inband rules: it
+          # runs before any CRS-derived method checks in phase 1 and sets
+          # tx.allowed_methods, so PUT/PATCH/DELETE verbs that REST apps
+          # (Trilium, Immich, Paperless…) rely on are not blocked. See
+          # appsec.rules below.
           name: crowdsecurity/appsec-crs-detection
           default_remediation: ban
           inband_rules:
@@ -165,8 +173,8 @@ spec:
             - crowdsecurity/base-config
             - crowdsecurity/vpatch-*
             - crowdsecurity/generic-*
-            - crowdsecurity/crs
           outofband_rules:
+            - crowdsecurity/crs
             - crowdsecurity/experimental-*
             - crowdsecurity/appsec-generic-test
       # Custom AppSec rules (chart mounts each key into /etc/crowdsec/appsec-rules/).
