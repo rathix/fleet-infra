@@ -80,17 +80,27 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          # TCP probes, not httpGet: z2m 2.x serves an interactive onboarding
+          # page on :8080 with `Connection: close`, which makes httpGet probes
+          # flap (EOF/timeout) and kill the pod before onboarding can be
+          # completed. A TCP check passes as soon as the frontend listens
+          # (onboarding or normal), so the pod stays Ready and reachable.
+          startupProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
           livenessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
-            initialDelaySeconds: 30
-            periodSeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           readinessProbe:
-            httpGet:
-              path: /
+            tcpSocket:
               port: http
-            initialDelaySeconds: 15
+            initialDelaySeconds: 10
             periodSeconds: 10
           volumeMounts:
             - name: data
