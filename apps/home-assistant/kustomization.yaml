@@ -5,6 +5,8 @@ resources:
   - sealedsecret.yaml
   - mosquitto.yaml
   - zigbee2mqtt.yaml
+  - sealedsecret-speech-to-phrase.yaml
+  - speech-to-phrase.yaml
   - homeassistant.yaml
   - ingress.yaml
   - mqtt-ingressroute.yaml
