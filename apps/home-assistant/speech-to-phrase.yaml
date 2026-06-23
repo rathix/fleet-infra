@@ -42,6 +42,14 @@ spec:
       containers:
         - name: speech-to-phrase
           image: docker.io/rhasspy/wyoming-speech-to-phrase:1.4.3@sha256:e532f0dbc6b21285c4c784212003865b9167041927328a767cb0beb1a0beaa20
+          securityContext:
+            # STT/intent service on a high port: needs no Linux capabilities and
+            # no privilege escalation. Stays root (the rhasspy image writes model
+            # downloads + Kaldi training output at runtime, not built for non-root).
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           # The image entrypoint (/run.sh) already supplies
           # --uri tcp://0.0.0.0:10300 --models-dir /models --train-dir /train
           # --tools-dir ./tools and forwards "$@". We wrap it in a shell only so
