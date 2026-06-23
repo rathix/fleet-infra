@@ -95,6 +95,11 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: traefik-system
+        # speech-to-phrase connects to the HA websocket API to learn the
+        # entities exposed to Assist (it trains a fixed-phrase model from them).
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: speech-to-phrase
       ports:
         - protocol: TCP
           port: 8123
@@ -122,3 +127,52 @@ spec:
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: speech-to-phrase
+  namespace: home-assistant
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: speech-to-phrase
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # HA streams audio to the Wyoming STT service.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: homeassistant
+      ports:
+        - protocol: TCP
+          port: 10300
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # HA websocket API (entity discovery for training)
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: homeassistant
+      ports:
+        - protocol: TCP
+          port: 8123
+    # Model + tool downloads from HuggingFace / GitHub on first run
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443

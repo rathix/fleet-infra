@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: speech-to-phrase-data
+  namespace: home-assistant
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    app.kubernetes.io/name: speech-to-phrase
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speech-to-phrase
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: speech-to-phrase
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: speech-to-phrase
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: speech-to-phrase
+    spec:
+      enableServiceLinks: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: speech-to-phrase
+          image: docker.io/rhasspy/wyoming-speech-to-phrase:1.4.3@sha256:e532f0dbc6b21285c4c784212003865b9167041927328a767cb0beb1a0beaa20
+          # The image entrypoint (/run.sh) already supplies
+          # --uri tcp://0.0.0.0:10300 --models-dir /models --train-dir /train
+          # --tools-dir ./tools and forwards "$@". We wrap it in a shell only so
+          # the long-lived HA token can be injected from a Secret via env instead
+          # of being hardcoded as a plaintext arg in this manifest.
+          command:
+            - /bin/bash
+            - -c
+            - >
+              exec bash /run.sh
+              --hass-websocket-uri ws://homeassistant:8123/api/websocket
+              --hass-token "$HASS_TOKEN"
+              --retrain-on-start
+          env:
+            - name: HASS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: speech-to-phrase-hass
+                  key: token
+          ports:
+            - name: wyoming
+              containerPort: 10300
+          # Wyoming is a raw TCP protocol (not HTTP), so probes are tcpSocket.
+          # The startup probe is generous: the first boot downloads the English
+          # model from HuggingFace and trains a Kaldi model, which can take
+          # several minutes (60 x 10s = up to 10 min) before :10300 listens.
+          startupProbe:
+            tcpSocket:
+              port: wyoming
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            tcpSocket:
+              port: wyoming
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: wyoming
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /models
+              subPath: models
+            - name: data
+              mountPath: /train
+              subPath: train
+          resources:
+            limits:
+              memory: 1Gi
+              cpu: "2"
+            requests:
+              memory: 256Mi
+              cpu: "100m"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: speech-to-phrase-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: speech-to-phrase
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: speech-to-phrase
+spec:
+  selector:
+    app.kubernetes.io/name: speech-to-phrase
+  ports:
+    - name: wyoming
+      port: 10300
+      targetPort: wyoming
