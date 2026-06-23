@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: piper-data
+  namespace: home-assistant
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    app.kubernetes.io/name: piper
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: piper
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: piper
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: piper
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: piper
+    spec:
+      enableServiceLinks: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: piper
+          image: docker.io/rhasspy/wyoming-piper:2.2.2@sha256:c874e4a04657ae3381332ee5d0c8c70a310dae6722892840f530ac0890b44eb3
+          # The image entrypoint (docker_run.sh) already supplies
+          # --uri tcp://0.0.0.0:10200 --data-dir /data and forwards "$@".
+          # Piper is a pure TTS service (no HA callback), so no shell wrapper or
+          # token is needed: --voice/--streaming are just appended as args.
+          args:
+            - --voice
+            - en_GB-alba-medium
+            - --streaming
+          ports:
+            - name: wyoming
+              containerPort: 10200
+          # Wyoming is a raw TCP protocol (not HTTP), so probes are tcpSocket.
+          # The startup probe allows time for the voice model to download from
+          # HuggingFace on first boot before :10200 listens.
+          startupProbe:
+            tcpSocket:
+              port: wyoming
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+          livenessProbe:
+            tcpSocket:
+              port: wyoming
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: wyoming
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 128Mi
+              cpu: "50m"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: piper-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: piper
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: piper
+spec:
+  selector:
+    app.kubernetes.io/name: piper
+  ports:
+    - name: wyoming
+      port: 10200
+      targetPort: wyoming
