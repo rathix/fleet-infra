@@ -48,6 +48,17 @@ spec:
               to: websecure
               scheme: https
               permanent: true
+      # Raw-TCP entrypoint for MQTT so LAN smart-home devices can reach the
+      # Mosquitto broker on the VIP (192.168.1.3:1883). Plaintext, LAN-only —
+      # do NOT port-forward this from the internet. No HTTP middlewares apply
+      # to a TCP entrypoint, so the WAF/rate-limit chain is bypassed (correct
+      # for MQTT). Routed by an IngressRouteTCP in the home-assistant namespace.
+      mqtt:
+        port: 1883
+        exposedPort: 1883
+        protocol: TCP
+        expose:
+          default: true
       websecure:
         http3:
           enabled: true

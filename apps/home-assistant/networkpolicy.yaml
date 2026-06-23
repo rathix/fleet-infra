@@ -18,6 +18,12 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: zigbee2mqtt
+        # LAN MQTT devices (Tasmota/Shelly/ESPHome) reach the broker via the
+        # Traefik TCP entrypoint on the VIP; the proxied connection originates
+        # from the Traefik pod.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik-system
       ports:
         - protocol: TCP
           port: 1883
