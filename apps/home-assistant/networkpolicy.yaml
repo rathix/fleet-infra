@@ -176,3 +176,85 @@ spec:
       ports:
         - protocol: TCP
           port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: piper
+  namespace: home-assistant
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: piper
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # HA sends text to the Wyoming TTS service.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: homeassistant
+      ports:
+        - protocol: TCP
+          port: 10200
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Voice model download from HuggingFace / GitHub on first run
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: whisper
+  namespace: home-assistant
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: whisper
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # HA streams audio to the Wyoming STT service.
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: homeassistant
+      ports:
+        - protocol: TCP
+          port: 10300
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Model download from HuggingFace on first run
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
