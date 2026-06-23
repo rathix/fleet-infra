@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homeassistant
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: homeassistant
+spec:
+  ingressClassName: traefik-system-traefik
+  rules:
+    - host: homeassistant.kennyandries.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: homeassistant
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zigbee2mqtt
+  namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: zigbee2mqtt
+  annotations:
+    # z2m frontend has no built-in auth — gate it behind OIDC like other admin UIs
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
+spec:
+  ingressClassName: traefik-system-traefik
+  rules:
+    - host: z2m.kennyandries.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: zigbee2mqtt
+                port:
+                  name: http
