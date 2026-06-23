@@ -102,6 +102,7 @@ controlPlane:
             - name: iscsi_tcp  # iSCSI initiator for Longhorn
             - name: i915       # Intel GPU
             - name: configfs   # Required by iSCSI target mode
+            - name: cp210x     # Silicon Labs CP210x USB-UART (Sonoff ZBDongle-P on pkb-k3s-tal-1)
 
         # Route CoreDNS upstream queries through host DNS resolver
         features:
