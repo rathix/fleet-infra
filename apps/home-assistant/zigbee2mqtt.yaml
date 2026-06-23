@@ -40,7 +40,7 @@ spec:
       nodeName: pkb-k3s-tal-1
       containers:
         - name: zigbee2mqtt
-          image: docker.io/koenkk/zigbee2mqtt:2.6.2
+          image: docker.io/koenkk/zigbee2mqtt:2.12.0@sha256:1debff565ab6841417bd9f7ce8ad44f8c5f25a8b02a24ce3fd79e4779a4763a5
           securityContext:
             # Raw serial device access requires privileged on Talos.
             privileged: true
