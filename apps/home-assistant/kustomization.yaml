@@ -7,6 +7,7 @@ resources:
   - zigbee2mqtt.yaml
   - sealedsecret-speech-to-phrase.yaml
   - speech-to-phrase.yaml
+  - piper.yaml
   - whisper.yaml
   - homeassistant.yaml
   - ingress.yaml
