@@ -6,8 +6,9 @@ metadata:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     app.kubernetes.io/name: intel-device-plugin
-    # baseline (not restricted): the plugin mounts hostPath volumes
-    # (/dev/dri, /sys/class/drm, the kubelet device-plugin socket), which
-    # the restricted profile forbids. It is otherwise locked down (no
-    # privileged, drops ALL caps, RuntimeDefault seccomp).
-    pod-security.kubernetes.io/enforce: baseline
+    # privileged: the plugin mounts hostPath volumes (/dev/dri, /sys/class/drm,
+    # the kubelet device-plugin socket). hostPath is forbidden by BOTH the
+    # restricted and baseline profiles, so privileged is required. The pod
+    # itself is still locked down: no privileged container, drops ALL caps,
+    # RuntimeDefault seccomp, read-only root fs.
+    pod-security.kubernetes.io/enforce: privileged

@@ -44,8 +44,10 @@ spec:
         image: docker.io/intel/intel-gpu-plugin:0.36.0@sha256:2db679be62b52ac985169084ca711cab6e6c59fe543ab2ddee58163d6f8d29e0
         imagePullPolicy: IfNotPresent
         securityContext:
-          seLinuxOptions:
-            type: "container_device_plugin_t"
+          # Upstream sets seLinuxOptions.type: container_device_plugin_t for
+          # SELinux clusters using container-selinux. Talos doesn't ship that
+          # policy type, and PodSecurity rejects a custom type below privileged,
+          # so it's omitted here.
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
