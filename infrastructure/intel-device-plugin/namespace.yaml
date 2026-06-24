@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: intel-device-plugin
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    app.kubernetes.io/name: intel-device-plugin
+    # baseline (not restricted): the plugin mounts hostPath volumes
+    # (/dev/dri, /sys/class/drm, the kubelet device-plugin socket), which
+    # the restricted profile forbids. It is otherwise locked down (no
+    # privileged, drops ALL caps, RuntimeDefault seccomp).
+    pod-security.kubernetes.io/enforce: baseline
