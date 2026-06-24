@@ -61,9 +61,16 @@ spec:
             limits:
               memory: 8Gi
               cpu: "4"
+              # Intel iGPU for QSV/VA-API hardware transcoding. The device
+              # plugin injects /dev/dri into the container; renderD128 is
+              # world-writable (0666) on Talos, so the hardened securityContext
+              # above (runAsNonRoot, drop ALL caps) still has access — no
+              # render group / supplementalGroups needed.
+              gpu.intel.com/i915: "1"
             requests:
               memory: 512Mi
               cpu: "0.5"
+              gpu.intel.com/i915: "1"
       volumes:
         - name: config
           persistentVolumeClaim:

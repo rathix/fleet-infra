@@ -10,3 +10,4 @@ resources:
   - metrics-server
   - notifications
   - crowdsec
+  - intel-device-plugin

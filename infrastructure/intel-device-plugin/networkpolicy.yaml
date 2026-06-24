@@ -1,0 +1,10 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: intel-device-plugin
+spec:
+  # The device plugin registers with the local kubelet over a unix socket and
+  # makes no network calls, so deny all ingress and egress.
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
