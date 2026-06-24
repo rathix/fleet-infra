@@ -5,8 +5,10 @@ metadata:
   namespace: servarr
   labels:
     app.kubernetes.io/name: jellyfin
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-system-security-headers@kubernetescrd
+  # security-headers, rate-limit and crowdsec are applied globally on the
+  # websecure entrypoint (see infrastructure/traefik/helmrelease.yaml), so no
+  # per-ingress middleware annotation is needed. Jellyfin is intentionally not
+  # OIDC-gated (native clients use built-in accounts).
 spec:
   ingressClassName: traefik-system-traefik
   rules:

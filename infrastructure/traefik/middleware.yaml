@@ -92,16 +92,3 @@ spec:
       crowdsecAppsecHost: crowdsec-crowdsec-appsec-service.crowdsec.svc.cluster.local:7422
       crowdsecAppsecFailureBlock: true
       crowdsecAppsecUnreachableBlock: true
----
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: login-rate-limit
-  namespace: traefik-system
-  labels:
-    app.kubernetes.io/name: traefik
-spec:
-  rateLimit:
-    average: 20
-    burst: 40
-    period: 1m
