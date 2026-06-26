@@ -144,12 +144,13 @@
             "platformAutomerge": true
         },
         {
-            "description": "Require manual review/merge for minor and patch version bumps of charts and images",
+            "description": "Auto-merge minor and patch version bumps of charts and images once CI passes",
             "matchUpdateTypes": [
                 "minor",
                 "patch"
             ],
-            "automerge": false
+            "automerge": true,
+            "platformAutomerge": true
         },
         {
             "description": "Talos and Kubernetes upgrades require manual steps - PR only, no auto-merge",
