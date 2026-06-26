@@ -80,15 +80,14 @@ spec:
             - traefik-system-crowdsec@kubernetescrd
             - traefik-system-security-headers@kubernetescrd
             - traefik-system-rate-limit@kubernetescrd
-    logs:
-      general:
-        format: json
-      access:
-        enabled: true
-        format: json
-        fields:
-          headers:
-            defaultMode: drop
+    log:
+      format: json
+    accessLog:
+      enabled: true
+      format: json
+      fields:
+        headers:
+          defaultMode: drop
     ingressRoute:
       dashboard:
         enabled: true
