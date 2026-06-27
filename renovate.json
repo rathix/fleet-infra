@@ -158,6 +158,17 @@
                 "talos/**"
             ],
             "automerge": false
+        },
+        {
+            "description": "pocket-id: the v2.9.0 tag has ambiguous digests - one build (a2a38a9) is an app downgrade that crash-loops against the migrated DB, the other (9faea0c) owns the current schema. Pin the digest manually; do not let Renovate flap it. Version bumps (e.g. v2.10.0) are still allowed.",
+            "matchPackageNames": [
+                "ghcr.io/pocket-id/pocket-id"
+            ],
+            "matchUpdateTypes": [
+                "digest",
+                "pinDigest"
+            ],
+            "enabled": false
         }
     ]
 }
