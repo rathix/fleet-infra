@@ -14,9 +14,7 @@ spec:
     name: flux-system
   path: ./infrastructure
   prune: true
-  # TODO: revert to wait: true + restore kube-vip-ds healthCheck once
-  # pkb-k3s-tal-2 is back online (power supply replacement pending).
-  wait: false
+  wait: true
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
@@ -42,3 +40,7 @@ spec:
       kind: HelmRelease
       name: metrics-server
       namespace: flux-system
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: kube-vip-ds
+      namespace: kube-system
