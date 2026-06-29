@@ -48,8 +48,8 @@ spec:
           server:
             auto_registration:
               enabled: true
-              # $$ escapes Flux postBuild substitution so crowdsec receives a
-              # literal ${...} and expands the token from its env at runtime.
+              # $$ is the Flux postBuild escape: outputs a literal '$' so the
+              # resulting ${REGISTRATION_TOKEN} is expanded by CrowdSec at runtime.
               token: "$${REGISTRATION_TOKEN}"
               allowed_ranges:
                 - "127.0.0.1/32"
