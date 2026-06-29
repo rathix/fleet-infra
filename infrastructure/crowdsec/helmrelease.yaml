@@ -48,7 +48,9 @@ spec:
           server:
             auto_registration:
               enabled: true
-              token: "${REGISTRATION_TOKEN}"
+              # $$ escapes Flux postBuild substitution so crowdsec receives a
+              # literal ${...} and expands the token from its env at runtime.
+              token: "$${REGISTRATION_TOKEN}"
               allowed_ranges:
                 - "127.0.0.1/32"
                 - "192.168.0.0/16"
@@ -109,11 +111,11 @@ spec:
         config:
           enabled: true
           size: 1Gi
-          storageClassName: longhorn
+          storageClassName: ${storage_class}
         data:
           enabled: true
           size: 2Gi
-          storageClassName: longhorn
+          storageClassName: ${storage_class}
     agent:
       acquisition:
         - namespace: traefik-system

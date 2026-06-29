@@ -60,7 +60,7 @@ spec:
                 - ALL
           env:
             - name: HOMEPAGE_ALLOWED_HOSTS
-              value: homepage.kennyandries.com
+              value: homepage.${domain}
             - name: HOMEPAGE_VAR_SONARR
               valueFrom:
                 secretKeyRef:

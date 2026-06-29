@@ -6,6 +6,7 @@ metadata:
 data:
   cluster_name: production
   domain: kennyandries.com
-  ingress_class: traefik
+  # Traefik IngressClass name (helm release "traefik" in namespace "traefik-system")
+  ingress_class: traefik-system-traefik
   storage_class: longhorn
   external_dns_target: traefik.kennyandries.com

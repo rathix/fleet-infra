@@ -21,7 +21,7 @@ data:
     trustedReverseProxy=true
 
     [MultiFactorAuthentication]
-    oauthBaseUrl=https://trilium.kennyandries.com
-    oauthIssuerBaseUrl=https://auth.kennyandries.com
+    oauthBaseUrl=https://trilium.${domain}
+    oauthIssuerBaseUrl=https://auth.${domain}
     oauthIssuerName=Pocket ID
-    oauthIssuerIcon=https://auth.kennyandries.com/api/application-images/logo
+    oauthIssuerIcon=https://auth.${domain}/api/application-images/logo

@@ -10,9 +10,9 @@ metadata:
   # per-ingress middleware annotation is needed. Audiobookshelf is intentionally
   # not OIDC-gated (native clients use built-in accounts).
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: audiobookshelf.kennyandries.com
+    - host: audiobookshelf.${domain}
       http:
         paths:
           - path: /

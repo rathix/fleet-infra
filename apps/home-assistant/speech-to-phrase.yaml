@@ -10,7 +10,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: ${storage_class}
   resources:
     requests:
       storage: 5Gi
@@ -61,7 +61,7 @@ spec:
             - >
               exec bash /run.sh
               --hass-websocket-uri ws://homeassistant:8123/api/websocket
-              --hass-token "$HASS_TOKEN"
+              --hass-token "$$HASS_TOKEN"
               --retrain-on-start
           env:
             - name: HASS_TOKEN

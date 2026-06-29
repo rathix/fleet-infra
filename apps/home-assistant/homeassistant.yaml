@@ -10,7 +10,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: ${storage_class}
   resources:
     requests:
       storage: 5Gi
@@ -39,39 +39,11 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-      initContainers:
-        # HA owns /config/configuration.yaml; ensure it trusts the Traefik
-        # proxy or HA returns "400: Bad Request" behind the ingress.
-        - name: ensure-trusted-proxies
-          image: docker.io/library/busybox:1.38.0@sha256:fd8d9aa63ba2f0982b5304e1ee8d3b90a210bc1ffb5314d980eb6962f1a9715d
-          command:
-            - sh
-            - -c
-            - |
-              set -e
-              CONFIG=/config/configuration.yaml
-              if [ ! -f "$CONFIG" ]; then
-                echo "default_config:" > "$CONFIG"
-              fi
-              if ! grep -q "^http:" "$CONFIG"; then
-                cat >> "$CONFIG" <<'EOF'
-
-              http:
-                use_x_forwarded_for: true
-                trusted_proxies:
-                  - 10.0.0.0/8
-                  - 172.16.0.0/12
-                  - 192.168.0.0/16
-              EOF
-              fi
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-          volumeMounts:
-            - name: config
-              mountPath: /config
+      # NOTE: HA needs an http.trusted_proxies block in
+      # /config/configuration.yaml or it returns "400: Bad Request" behind
+      # Traefik. The config PVC is persistent, so this is set once. If the PVC
+      # is ever rebuilt, add the trusted_proxies (10.0.0.0/8, 172.16.0.0/12,
+      # 192.168.0.0/16) to configuration.yaml manually before exposing it.
       containers:
         - name: homeassistant
           image: ghcr.io/home-assistant/home-assistant:2026.6@sha256:adb3341e31e03e0048e60d8c1cf952e118a381ae258bb921d3da12a3b27bf0c2

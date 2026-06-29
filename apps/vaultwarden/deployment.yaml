@@ -39,7 +39,7 @@ spec:
                 - ALL
           env:
             - name: DOMAIN
-              value: https://vaultwarden.kennyandries.com
+              value: https://vaultwarden.${domain}
             - name: ROCKET_PORT
               value: "8080"
             - name: SIGNUPS_ALLOWED

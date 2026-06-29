@@ -6,9 +6,9 @@ metadata:
   labels:
     app.kubernetes.io/name: pocket-id
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: auth.kennyandries.com
+    - host: auth.${domain}
       http:
         paths:
           - path: /

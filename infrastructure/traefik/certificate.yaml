@@ -6,10 +6,10 @@ metadata:
   labels:
     app.kubernetes.io/name: traefik
 spec:
-  commonName: "*.kennyandries.com"
+  commonName: "*.${domain}"
   dnsNames:
-    - kennyandries.com
-    - "*.kennyandries.com"
+    - ${domain}
+    - "*.${domain}"
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer

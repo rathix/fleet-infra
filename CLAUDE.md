@@ -76,10 +76,20 @@ Both infrastructure and apps use a flat structure:
 ### Key Configuration
 
 - HelmReleases deployed to `flux-system` namespace with `targetNamespace` pointing to app namespace
-- TLS uses a wildcard certificate (`*.kennyandries.com`) managed by cert-manager at `infrastructure/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
-- Ingress uses `ingressClassName: traefik-system-traefik`
-- Storage uses `storageClassName: longhorn`
+- TLS uses a wildcard certificate (`*.${domain}`) managed by cert-manager at `infrastructure/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
 - metrics-server is in `infrastructure/metrics-server/`
+
+### Cluster-wide variables (Flux postBuild substitution)
+
+Both the `apps` and `infrastructure` Flux Kustomizations apply `postBuild.substituteFrom` the `cluster-config` ConfigMap (`clusters/production/cluster-config.yaml`). Use these tokens in manifests instead of hardcoding:
+
+- `${domain}` → `kennyandries.com` (e.g. `host: sonarr.${domain}`)
+- `${storage_class}` → `longhorn` (e.g. `storageClassName: ${storage_class}`)
+- `${ingress_class}` → `traefik-system-traefik` (e.g. `ingressClassName: ${ingress_class}`)
+
+These are substituted by Flux at apply time, NOT by `kustomize build` — local builds and CI show the literal `${...}` strings, which is expected.
+
+**Escaping:** because substitution scans the entire rendered output, any literal `$` (shell scripts, env-var expansion in app configs, regex) must be doubled as `$$` or Flux blanks it. Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer avoiding shell variables entirely (inline values) where practical.
 
 ## CI Validation
 

@@ -31,7 +31,7 @@ spec:
       annotations:
         traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
       hosts:
-        - host: uptime-kuma.kennyandries.com
+        - host: uptime-kuma.${domain}
           paths:
             - path: /
               pathType: ImplementationSpecific
