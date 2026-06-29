@@ -1,4 +1,5 @@
 [tools]
+gh = "latest"
 kubectl = "latest"
 talhelper = "latest"
 talosctl = "latest"

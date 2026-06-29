@@ -8,9 +8,9 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: traefik-system-oidc@kubernetescrd
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: prowlarr.kennyandries.com
+    - host: prowlarr.${domain}
       http:
         paths:
           - path: /

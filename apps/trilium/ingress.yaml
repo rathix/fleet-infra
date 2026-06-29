@@ -6,9 +6,9 @@ metadata:
   labels:
     app.kubernetes.io/name: trilium
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: trilium.kennyandries.com
+    - host: trilium.${domain}
       http:
         paths:
           - path: /

@@ -43,7 +43,7 @@ spec:
             - name: TRUST_PROXY
               value: "true"
             - name: APP_URL
-              value: https://auth.kennyandries.com
+              value: https://auth.${domain}
             - name: ENCRYPTION_KEY
               valueFrom:
                 secretKeyRef:

@@ -46,7 +46,7 @@ spec:
       Secret: urn:k8s:secret:oidc-secret:pluginSecret
       Provider:
         Url: http://pocket-id.pocket-id.svc.cluster.local:1411
-        ValidIssuer: https://auth.kennyandries.com
+        ValidIssuer: https://auth.${domain}
         ClientId: urn:k8s:secret:oidc-secret:providerClientId
         ClientSecret: urn:k8s:secret:oidc-secret:providerClientSecret
       # pocket-id only advertises openid/profile/email/groups in

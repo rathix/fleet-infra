@@ -52,7 +52,7 @@ spec:
                   name: beszel-secret
                   key: apiKey
             - name: HUB_URL
-              value: https://beszel.kennyandries.com
+              value: https://beszel.${domain}
           ports:
             - containerPort: 45876
               hostPort: 45876

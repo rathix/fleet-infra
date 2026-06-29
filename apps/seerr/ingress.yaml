@@ -6,9 +6,9 @@ metadata:
   labels:
     app.kubernetes.io/name: seerr
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: seerr.kennyandries.com
+    - host: seerr.${domain}
       http:
         paths:
           - path: /

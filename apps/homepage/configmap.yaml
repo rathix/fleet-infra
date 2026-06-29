@@ -88,7 +88,7 @@ data:
     - Personal:
         - Personal Website:
             - abbr: KA
-              href: https://kennyandries.com/
+              href: https://${domain}/
         - ProtonMail:
             - abbr: PM
               href: https://mail.proton.me/u/4/inbox
@@ -117,7 +117,7 @@ data:
     - Media:
         - Jellyfin:
             icon: jellyfin.png
-            href: https://jellyfin.kennyandries.com/
+            href: https://jellyfin.${domain}/
             description: Media server
             namespace: servarr
             app: jellyfin
@@ -135,7 +135,7 @@ data:
               expandOneStreamToTwoRows: false
         - Audiobookshelf:
             icon: audiobookshelf.png
-            href: https://audiobookshelf.kennyandries.com/
+            href: https://audiobookshelf.${domain}/
             description: Audiobook & podcast server
             namespace: servarr
             app: audiobookshelf
@@ -148,7 +148,7 @@ data:
             #   key: {{HOMEPAGE_VAR_AUDIOBOOKSHELF}}
         - Radarr:
             icon: radarr.png
-            href: https://radarr.kennyandries.com/
+            href: https://radarr.${domain}/
             description: Movie manager
             namespace: servarr
             app: radarr
@@ -160,7 +160,7 @@ data:
               enableQueue: true
         - Sonarr:
             icon: sonarr.png
-            href: https://sonarr.kennyandries.com/
+            href: https://sonarr.${domain}/
             description: Series manager
             namespace: servarr
             app: sonarr
@@ -172,7 +172,7 @@ data:
               enableQueue: true
         - Lidarr:
             icon: lidarr.png
-            href: https://lidarr.kennyandries.com/
+            href: https://lidarr.${domain}/
             description: Music manager
             namespace: servarr
             app: lidarr
@@ -184,7 +184,7 @@ data:
               enableQueue: true
         - Prowlarr:
             icon: prowlarr.png
-            href: https://prowlarr.kennyandries.com/
+            href: https://prowlarr.${domain}/
             description: Indexer manager
             namespace: servarr
             app: prowlarr
@@ -195,7 +195,7 @@ data:
               key: {{HOMEPAGE_VAR_PROWLARR}}
         - Seerr:
             icon: jellyseerr.png
-            href: https://seerr.kennyandries.com/
+            href: https://seerr.${domain}/
             description: Request manager
             namespace: servarr
             app: seerr
@@ -206,7 +206,7 @@ data:
               key: {{HOMEPAGE_VAR_JELLYSEERR}}
         - qBittorrent:
             icon: qbittorrent.png
-            href: https://qbittorrent.kennyandries.com/
+            href: https://qbittorrent.${domain}/
             description: Download client
             namespace: servarr
             app: qbittorrent
@@ -218,7 +218,7 @@ data:
               enableLeechSize: true
         - SABnzbd:
             icon: sabnzbd.png
-            href: https://sabnzbd.kennyandries.com/
+            href: https://sabnzbd.${domain}/
             description: Download client
             namespace: servarr
             app: sabnzbd
@@ -229,7 +229,7 @@ data:
               key: {{HOMEPAGE_VAR_SABNZBD}}
         - Immich:
             icon: immich.png
-            href: https://immich.kennyandries.com/
+            href: https://immich.${domain}/
             description: Photo manager
             namespace: immich
             app: immich-server
@@ -260,42 +260,42 @@ data:
     - Services:
         - Actual Budget:
             icon: actual-budget.png
-            href: https://actualbudget.kennyandries.com/
+            href: https://actualbudget.${domain}/
             description: Budget manager
             namespace: actualbudget
             app: actualbudget
             siteMonitor: http://actualbudget.actualbudget.svc.cluster.local:5006
         - Paperless:
             icon: paperless-ngx.png
-            href: https://paperless.kennyandries.com/
+            href: https://paperless.${domain}/
             description: Document manager
             namespace: paperless
             app: paperless
             siteMonitor: http://paperless.paperless.svc.cluster.local:8000
         - Trilium:
             icon: trilium.png
-            href: https://trilium.kennyandries.com/
+            href: https://trilium.${domain}/
             description: Notes
             namespace: trilium
             app: trilium
             siteMonitor: http://trilium.trilium.svc.cluster.local:8080
         - Pocket ID:
             icon: pocket-id.png
-            href: https://auth.kennyandries.com/
+            href: https://auth.${domain}/
             description: Identity provider
             namespace: pocket-id
             app: pocket-id
-            siteMonitor: https://auth.kennyandries.com/
+            siteMonitor: https://auth.${domain}/
         - code-server:
             icon: code-server.png
-            href: https://code.kennyandries.com/
+            href: https://code.${domain}/
             description: Cloud IDE
             namespace: code-server
             app: code-server
             siteMonitor: http://code-server.code-server.svc.cluster.local:8080
         - Vaultwarden:
             icon: vaultwarden.png
-            href: https://vaultwarden.kennyandries.com/
+            href: https://vaultwarden.${domain}/
             description: Password manager
             namespace: vaultwarden
             app: vaultwarden
@@ -308,14 +308,14 @@ data:
     - Cluster Management:
         - Traefik:
             icon: traefik.png
-            href: https://traefik.kennyandries.com/
+            href: https://traefik.${domain}/
             description: Reverse proxy
             namespace: traefik-system
             app: traefik
-            siteMonitor: https://traefik.kennyandries.com
+            siteMonitor: https://traefik.${domain}
         - Longhorn:
             icon: longhorn.png
-            href: https://longhorn.kennyandries.com/
+            href: https://longhorn.${domain}/
             description: Block storage
             namespace: longhorn-system
             app: longhorn
@@ -350,18 +350,18 @@ data:
     - Monitoring:
         - Uptime Kuma:
             icon: uptime-kuma.png
-            href: https://uptime-kuma.kennyandries.com/
+            href: https://uptime-kuma.${domain}/
             description: Uptime monitor
             namespace: uptime-kuma
             app: uptime-kuma
-            siteMonitor: https://uptime-kuma.kennyandries.com/
+            siteMonitor: https://uptime-kuma.${domain}/
         - Beszel:
             icon: beszel.png
-            href: https://beszel.kennyandries.com/
+            href: https://beszel.${domain}/
             description: System monitor
             namespace: beszel
             app: beszel
-            siteMonitor: https://beszel.kennyandries.com/
+            siteMonitor: https://beszel.${domain}/
             widget:
               type: beszel
               url: http://beszel.beszel.svc.cluster.local:8090

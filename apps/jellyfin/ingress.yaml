@@ -10,9 +10,9 @@ metadata:
   # per-ingress middleware annotation is needed. Jellyfin is intentionally not
   # OIDC-gated (native clients use built-in accounts).
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: jellyfin.kennyandries.com
+    - host: jellyfin.${domain}
       http:
         paths:
           - path: /

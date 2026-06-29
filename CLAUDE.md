@@ -76,10 +76,40 @@ Both infrastructure and apps use a flat structure:
 ### Key Configuration
 
 - HelmReleases deployed to `flux-system` namespace with `targetNamespace` pointing to app namespace
-- TLS uses a wildcard certificate (`*.kennyandries.com`) managed by cert-manager at `infrastructure/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
-- Ingress uses `ingressClassName: traefik-system-traefik`
-- Storage uses `storageClassName: longhorn`
+- TLS uses a wildcard certificate (`*.${domain}`) managed by cert-manager at `infrastructure/traefik/certificate.yaml`; individual ingresses do not need `cert-manager.io/cluster-issuer` annotations
 - metrics-server is in `infrastructure/metrics-server/`
+
+### Cluster-wide variables (Flux postBuild substitution)
+
+Both the `apps` and `infrastructure` Flux Kustomizations apply `postBuild.substituteFrom` the `cluster-config` ConfigMap (`clusters/production/cluster-config.yaml`). Use these tokens in manifests instead of hardcoding:
+
+- `${domain}` → `kennyandries.com` (e.g. `host: sonarr.${domain}`)
+- `${storage_class}` → `longhorn` (e.g. `storageClassName: ${storage_class}`)
+- `${ingress_class}` → `traefik-system-traefik` (e.g. `ingressClassName: ${ingress_class}`)
+
+These are substituted by Flux at apply time, NOT by `kustomize build` — local builds and CI show the literal `${...}` strings, which is expected.
+
+**Escaping:** because substitution scans the entire rendered output, any literal `$` (shell scripts, env-var expansion in app configs, regex) must be doubled as `$$` or Flux blanks it. Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer avoiding shell variables entirely (inline values) where practical.
+
+### Naming conventions
+
+Principle: **identity at the boundary, role on the inside.** Outer names carry the app identity; inner names describe the role (so you never get `vaultwarden-vaultwarden`).
+
+| Element | Convention | Example |
+|-|-|-|
+| Namespace | one per app, = app name, kebab-case | `vaultwarden`, `home-assistant` |
+| HelmRelease / release | = app name, in `flux-system` | `name: vaultwarden` |
+| Controller (app-template) | `main` for the primary workload; role-named for extras | `main`, `worker` |
+| Container | `app` for the primary; role for sidecars/init | `app`, `exporter`, `init-db` |
+| Service | `app` for primary; role otherwise | `app` |
+| Service port | protocol/role, not a number | `http`, `metrics` |
+| Persistence (volume) | by purpose, **never** the app name | `config`, `data`, `media`, `cache`, `tmp` |
+| Resulting PVC | auto-named `<release>-<purpose>` by app-template | `vaultwarden-data`, `sonarr-config` |
+| Labels | let app-template set `app.kubernetes.io/{name,instance}` | (automatic) |
+
+- **Namespaces:** default to one per app (it's the boundary for NetworkPolicy, PSS, RBAC). `servarr` is a deliberate exception — those apps share the media PVC and talk to each other.
+- **Apps with a good upstream chart** (e.g. uptime-kuma) use that chart, not app-template; the standard is "every app is a `HelmRelease`", not "every app is app-template".
+- See `apps/vaultwarden/` for the reference app-template layout.
 
 ## CI Validation
 

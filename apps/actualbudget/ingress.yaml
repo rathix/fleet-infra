@@ -9,9 +9,9 @@ metadata:
   # built-in OpenID Connect (against pocket-id). A forward-auth proxy here would
   # intercept the sync/API calls and break the local-first PWA ("Server offline").
 spec:
-  ingressClassName: traefik-system-traefik
+  ingressClassName: ${ingress_class}
   rules:
-    - host: actualbudget.kennyandries.com
+    - host: actualbudget.${domain}
       http:
         paths:
           - path: /
