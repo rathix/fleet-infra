@@ -58,6 +58,10 @@ spec:
               port: http
             initialDelaySeconds: 30
             periodSeconds: 10
+            timeoutSeconds: 5
+            # Tolerate a stalled event loop during CPU-heavy builds (e.g. Gradle)
+            # so the kubelet doesn't restart a pod that's merely busy compiling.
+            failureThreshold: 12
           readinessProbe:
             httpGet:
               path: /healthz
@@ -69,10 +73,15 @@ spec:
               mountPath: /home/coder
           resources:
             requests:
-              memory: 256Mi
+              memory: 512Mi
               cpu: "250m"
             limits:
-              memory: 2Gi
+              # Android/Gradle builds (Gradle daemon + kotlinc/javac + d8/r8 dexing)
+              # routinely exceed 2Gi and get OOMKilled. 6Gi fits a 16Gi node with
+              # headroom for the OS/kubelet. Cap Gradle's own heap to stay inside
+              # this limit, e.g. in ~/.gradle/gradle.properties:
+              #   org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=1g
+              memory: 6Gi
               cpu: "2"
       volumes:
         - name: data
