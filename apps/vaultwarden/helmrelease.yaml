@@ -38,7 +38,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
     controllers:
-      vaultwarden:
+      main:
         type: deployment
         replicas: 1
         strategy: Recreate
@@ -87,7 +87,7 @@ spec:
                 memory: 512Mi
     service:
       app:
-        controller: vaultwarden
+        controller: main
         ports:
           http:
             port: 8080
