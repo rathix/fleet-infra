@@ -1,0 +1,113 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vaultwarden
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: app-template
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+      version: 5.0.1
+  interval: 30m
+  timeout: 5m
+  targetNamespace: vaultwarden
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    # Pod-level defaults applied to every controller/container below.
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    controllers:
+      vaultwarden:
+        type: deployment
+        replicas: 1
+        strategy: Recreate
+        revisionHistoryLimit: 3
+        containers:
+          app:
+            image:
+              repository: vaultwarden/server
+              tag: 1.36.0-alpine@sha256:d3531610b486905943706b235e97159331801c6856e1367a93a5905e2b40f204
+            env:
+              DOMAIN: https://vaultwarden.${domain}
+              ROCKET_PORT: "8080"
+              SIGNUPS_ALLOWED: "false"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /alive
+                    port: 8080
+                  initialDelaySeconds: 20
+                  periodSeconds: 10
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /alive
+                    port: 8080
+                  initialDelaySeconds: 5
+                  periodSeconds: 5
+            securityContext:
+              allowPrivilegeEscalation: false
+              # vaultwarden writes to its root fs (icon cache, rocket temp)
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 50m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+    service:
+      app:
+        controller: vaultwarden
+        ports:
+          http:
+            port: 8080
+            targetPort: 8080
+    # No OIDC middleware: vaultwarden provides its own authentication.
+    ingress:
+      app:
+        className: ${ingress_class}
+        hosts:
+          - host: vaultwarden.${domain}
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+    persistence:
+      # Reuse the existing prune-protected PVC (keeps current data); the
+      # standalone pvc.yaml still owns the PVC object.
+      data:
+        existingClaim: vaultwarden-data
+        globalMounts:
+          - path: /data
