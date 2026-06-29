@@ -104,10 +104,16 @@ spec:
     resources:
       requests:
         cpu: 100m
-        memory: 128Mi
+        memory: 256Mi
+      # The yaegi-interpreted plugins (oidc, crowdsec) are memory-heavy and the
+      # OIDC forward-auth plugin buffers request bodies. A 256Mi limit OOMKilled
+      # (exit 137) the replica mid-upload on large/batched scans (e.g. paperless,
+      # Immich): the upload connection reset ("HTTP error 0", no access-log line)
+      # and every other app on that replica (jellyfin) dropped with it. 1Gi gives
+      # headroom for concurrent buffered upload bodies.
       limits:
         cpu: "1"
-        memory: 256Mi
+        memory: 1Gi
     tlsOptions:
       default:
         minVersion: VersionTLS13
