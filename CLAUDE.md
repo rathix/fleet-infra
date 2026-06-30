@@ -111,6 +111,12 @@ Principle: **identity at the boundary, role on the inside.** Outer names carry t
 - **Apps with a good upstream chart** (e.g. uptime-kuma) use that chart, not app-template; the standard is "every app is a `HelmRelease`", not "every app is app-template".
 - See `apps/vaultwarden/` for the reference app-template layout.
 
+### Shared app-template defaults
+
+Universal pod security/options live once in `apps/_shared/app-template-defaults.yaml` (a ConfigMap in `flux-system`). app-template HelmReleases pull it in with `spec.valuesFrom` and add only their specifics inline (inline `values` deep-merge over the ConfigMap and win on conflicts). Apps supply identity (`runAsUser`/`runAsGroup`/`fsGroup`) and any overrides (e.g. `runAsNonRoot: false` for root workloads).
+
+Don't re-specify app-template/k8s defaults: controller `type: deployment`, `replicas: 1`, and service `targetPort` (= `port`) are implicit. Do keep `probes.*.enabled: true` (probes are disabled by default), `revisionHistoryLimit` (k8s default is 10), and ingress `pathType`.
+
 ## CI Validation
 
 GitHub Actions runs on all PRs and pushes to main:
