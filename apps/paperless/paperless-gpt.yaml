@@ -14,6 +14,11 @@ spec:
       version: 5.0.1
   interval: 30m
   timeout: 5m
+  # Without releaseName, Flux names the release <targetNamespace>-<name>
+  # (paperless-paperless-gpt) and app-template labels every resource that way.
+  # Pin it so names/labels are just "paperless-gpt" (matches the NetworkPolicy
+  # selector and avoids the double-name).
+  releaseName: paperless-gpt
   targetNamespace: paperless
   install:
     remediation:
