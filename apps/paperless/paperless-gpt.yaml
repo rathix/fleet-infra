@@ -60,7 +60,7 @@ spec:
                     key: PAPERLESS_API_TOKEN
               # Text tasks (title/tags/correspondents) via Ollama on the Windows box
               LLM_PROVIDER: ollama
-              LLM_MODEL: qwen2.5:7b
+              LLM_MODEL: qwen3:8b
               OLLAMA_HOST: http://192.168.1.254:11434
               LLM_LANGUAGE: English
               # LLM-based OCR via a vision model. paperless-ngx can't update a
