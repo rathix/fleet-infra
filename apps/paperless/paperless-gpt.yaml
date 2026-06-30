@@ -119,3 +119,12 @@ spec:
                 service:
                   identifier: app
                   port: http
+    persistence:
+      # paperless-gpt writes config/settings.json under its workdir (/app), which
+      # is root-owned in the image. A writable volume (chowned to fsGroup 1000)
+      # lets it run as non-root. emptyDir = settings regenerate from defaults on
+      # restart; switch to a PVC if UI-tuned prompts need to persist.
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /app/config
