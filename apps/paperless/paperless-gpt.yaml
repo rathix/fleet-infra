@@ -61,7 +61,7 @@ spec:
               # Text tasks (title/tags/correspondents) via Ollama on the Windows box
               # LLM_PROVIDER: ollama
               # LLM_MODEL: qwen3:8b
-              # OLLAMA_HOST: http://192.168.1.254:11434
+              OLLAMA_HOST: http://192.168.1.254:11434
               LLM_PROVIDER: "anthropic"
               LLM_MODEL: "claude-sonnet-4-6"
               ANTHROPIC_API_KEY:
