@@ -128,19 +128,26 @@ GitHub Actions runs on all PRs and pushes to main:
 
 ## Adding New Applications
 
-### Helm-based
-1. Add Helm repository to `repositories/repositories.yaml` if needed
-2. Create `apps/<app>/` with kustomization.yaml, namespace.yaml, helmrelease.yaml (with values inline), ingress.yaml
-3. Add network policy if needed (`networkpolicy.yaml`)
-4. Add sealed secrets if needed
-5. Add to `apps/kustomization.yaml`
-6. Test with `kustomize build apps/<app>`
+Standard: **every app is a `HelmRelease`.** Prefer the app-template pattern below for self-built/simple apps; use a dedicated upstream chart when one exists (e.g. uptime-kuma). Follow the naming conventions and `${...}` substitution variables above. `apps/vaultwarden/` is the reference layout.
 
-### Manifest-based
-1. Create `apps/<app>/` with kustomization.yaml, namespace.yaml, deployment.yaml, service.yaml, ingress.yaml
-2. Add network policy and sealed secrets if needed
-3. Add to `apps/kustomization.yaml`
-4. Test with `kustomize build apps/<app>`
+### app-template-based (preferred default)
+1. Create `apps/<app>/` with:
+   - `namespace.yaml` (one namespace per app, with the appropriate `pod-security.kubernetes.io/*` labels)
+   - `helmrelease.yaml` (chart `app-template` from the `bjw-s` repo; `spec.valuesFrom` the `app-template-defaults` ConfigMap; app-specific `values` inline)
+   - `networkpolicy.yaml`
+   - `pvc.yaml` only if reusing an existing PVC via `existingClaim`; otherwise declare storage under `persistence` and let app-template create it
+   - `sealedsecret.yaml` if needed
+   - `kustomization.yaml`
+2. Add to `apps/kustomization.yaml`
+3. Test with `kustomize build apps/<app>`
+
+### Upstream-chart-based
+1. Add the Helm repository to `repositories/repositories.yaml` if needed
+2. Create `apps/<app>/` with `namespace.yaml`, `helmrelease.yaml` (values inline), `networkpolicy.yaml`, sealed secrets if needed, `kustomization.yaml`
+3. Add to `apps/kustomization.yaml`; test with `kustomize build apps/<app>`
+
+### Manifest-based (legacy)
+Existing apps may still use raw `deployment.yaml`/`service.yaml`/`ingress.yaml`. New apps should use a HelmRelease instead.
 
 See [docs/adding-apps.md](docs/adding-apps.md) for detailed examples.
 
