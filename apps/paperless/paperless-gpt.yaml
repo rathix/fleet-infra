@@ -74,6 +74,7 @@ spec:
               PDF_UPLOAD: "true"
               PDF_REPLACE: "true"
               PDF_OCR_TAGGING: "true"
+              PDF_OCR_COMPLETE_TAG: "paperless-gpt-ocr-complete"
               # Auto-generation features (apply only to tagged documents)
               AUTO_GENERATE_TITLE: "true"
               AUTO_GENERATE_TAGS: "true"
