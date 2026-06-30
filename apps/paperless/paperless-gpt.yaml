@@ -121,8 +121,8 @@ spec:
                 # (up to 600 DPI / 40M px), which spikes hard — 512Mi OOMKilled
                 # within 2s of starting OCR. Heavy compute is on the GPU
                 # (off-cluster Ollama), so cpu stays modest; memory needs room.
-                cpu: "2"
-                memory: 2Gi
+                cpu: "4"
+                memory: 6Gi
     service:
       app:
         controller: main
