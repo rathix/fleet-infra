@@ -62,7 +62,6 @@ spec:
               LLM_PROVIDER: ollama
               LLM_MODEL: qwen3:8b
               OLLAMA_HOST: http://192.168.1.254:11434
-              LLM_LANGUAGE: English
               # LLM-based OCR via a vision model. paperless-ngx can't update a
               # document's text in place, so OCR output is uploaded as a NEW
               # document; PDF_REPLACE deletes the original once the copy lands
@@ -74,6 +73,7 @@ spec:
               OCR_LIMIT_PAGES: "0"
               PDF_UPLOAD: "true"
               PDF_REPLACE: "true"
+              PDF_OCR_TAGGING: "true"
               # Auto-generation features (apply only to tagged documents)
               AUTO_GENERATE_TITLE: "true"
               AUTO_GENERATE_TAGS: "true"
