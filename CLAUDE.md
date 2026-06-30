@@ -89,7 +89,11 @@ Both the `apps` and `infrastructure` Flux Kustomizations apply `postBuild.substi
 
 These are substituted by Flux at apply time, NOT by `kustomize build` — local builds and CI show the literal `${...}` strings, which is expected.
 
-**Escaping:** because substitution scans the entire rendered output, any literal `$` (shell scripts, env-var expansion in app configs, regex) must be doubled as `$$` or Flux blanks it. Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer avoiding shell variables entirely (inline values) where practical.
+**Escaping:** substitution scans the **entire rendered output, including YAML comments and Helm-values block scalars**, so any literal `$` (shell scripts, env-var expansion in app configs, regex, comments) must be doubled as `$$`. Two failure modes:
+- A valid-looking `${VAR}` that isn't in `cluster-config` is replaced with an empty string (silent breakage).
+- An **invalid** variable name — e.g. `${...}` (dots aren't legal name chars) — makes envsubst fail with `unable to parse variable name` and **blocks the whole Kustomization** until fixed. This actually happened: a `${...}` left in a *comment* stalled the entire `infrastructure` Kustomization (fixed in `95bf7d5`).
+
+Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer inlining values over shell variables, and don't write `${...}` placeholders in comments.
 
 ### Naming conventions
 
