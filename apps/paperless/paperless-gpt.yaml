@@ -106,11 +106,15 @@ spec:
                   - ALL
             resources:
               requests:
-                cpu: 50m
-                memory: 128Mi
+                cpu: 100m
+                memory: 256Mi
               limits:
-                cpu: "1"
-                memory: 512Mi
+                # LLM OCR renders PDF pages to high-res images in memory
+                # (up to 600 DPI / 40M px), which spikes hard — 512Mi OOMKilled
+                # within 2s of starting OCR. Heavy compute is on the GPU
+                # (off-cluster Ollama), so cpu stays modest; memory needs room.
+                cpu: "2"
+                memory: 2Gi
     service:
       app:
         controller: main
