@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-template-defaults
+  namespace: flux-system
+data:
+  # Universal pod-level defaults for app-template HelmReleases, merged in via
+  # spec.valuesFrom. Apps add identity (runAsUser/runAsGroup/fsGroup) and any
+  # overrides (e.g. runAsNonRoot: false for root workloads) in their inline
+  # spec.values, which take precedence over this ConfigMap.
+  values.yaml: |
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroupChangePolicy: OnRootMismatch

@@ -89,7 +89,11 @@ Both the `apps` and `infrastructure` Flux Kustomizations apply `postBuild.substi
 
 These are substituted by Flux at apply time, NOT by `kustomize build` — local builds and CI show the literal `${...}` strings, which is expected.
 
-**Escaping:** because substitution scans the entire rendered output, any literal `$` (shell scripts, env-var expansion in app configs, regex) must be doubled as `$$` or Flux blanks it. Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer avoiding shell variables entirely (inline values) where practical.
+**Escaping:** substitution scans the **entire rendered output, including YAML comments and Helm-values block scalars**, so any literal `$` (shell scripts, env-var expansion in app configs, regex, comments) must be doubled as `$$`. Two failure modes:
+- A valid-looking `${VAR}` that isn't in `cluster-config` is replaced with an empty string (silent breakage).
+- An **invalid** variable name — e.g. `${...}` (dots aren't legal name chars) — makes envsubst fail with `unable to parse variable name` and **blocks the whole Kustomization** until fixed. This actually happened: a `${...}` left in a *comment* stalled the entire `infrastructure` Kustomization (fixed in `95bf7d5`).
+
+Examples in-repo: `infrastructure/crowdsec/helmrelease.yaml` (`$${REGISTRATION_TOKEN}`), `apps/home-assistant/speech-to-phrase.yaml` (`$$HASS_TOKEN`). Prefer inlining values over shell variables, and don't write `${...}` placeholders in comments.
 
 ### Naming conventions
 
@@ -111,6 +115,12 @@ Principle: **identity at the boundary, role on the inside.** Outer names carry t
 - **Apps with a good upstream chart** (e.g. uptime-kuma) use that chart, not app-template; the standard is "every app is a `HelmRelease`", not "every app is app-template".
 - See `apps/vaultwarden/` for the reference app-template layout.
 
+### Shared app-template defaults
+
+Universal pod security/options live once in `apps/_shared/app-template-defaults.yaml` (a ConfigMap in `flux-system`). app-template HelmReleases pull it in with `spec.valuesFrom` and add only their specifics inline (inline `values` deep-merge over the ConfigMap and win on conflicts). Apps supply identity (`runAsUser`/`runAsGroup`/`fsGroup`) and any overrides (e.g. `runAsNonRoot: false` for root workloads).
+
+Don't re-specify app-template/k8s defaults: controller `type: deployment`, `replicas: 1`, and service `targetPort` (= `port`) are implicit. Do keep `probes.*.enabled: true` (probes are disabled by default), `revisionHistoryLimit` (k8s default is 10), and ingress `pathType`.
+
 ## CI Validation
 
 GitHub Actions runs on all PRs and pushes to main:
@@ -122,19 +132,26 @@ GitHub Actions runs on all PRs and pushes to main:
 
 ## Adding New Applications
 
-### Helm-based
-1. Add Helm repository to `repositories/repositories.yaml` if needed
-2. Create `apps/<app>/` with kustomization.yaml, namespace.yaml, helmrelease.yaml (with values inline), ingress.yaml
-3. Add network policy if needed (`networkpolicy.yaml`)
-4. Add sealed secrets if needed
-5. Add to `apps/kustomization.yaml`
-6. Test with `kustomize build apps/<app>`
+Standard: **every app is a `HelmRelease`.** Prefer the app-template pattern below for self-built/simple apps; use a dedicated upstream chart when one exists (e.g. uptime-kuma). Follow the naming conventions and `${...}` substitution variables above. `apps/vaultwarden/` is the reference layout.
 
-### Manifest-based
-1. Create `apps/<app>/` with kustomization.yaml, namespace.yaml, deployment.yaml, service.yaml, ingress.yaml
-2. Add network policy and sealed secrets if needed
-3. Add to `apps/kustomization.yaml`
-4. Test with `kustomize build apps/<app>`
+### app-template-based (preferred default)
+1. Create `apps/<app>/` with:
+   - `namespace.yaml` (one namespace per app, with the appropriate `pod-security.kubernetes.io/*` labels)
+   - `helmrelease.yaml` (chart `app-template` from the `bjw-s` repo; `spec.valuesFrom` the `app-template-defaults` ConfigMap; app-specific `values` inline)
+   - `networkpolicy.yaml`
+   - `pvc.yaml` only if reusing an existing PVC via `existingClaim`; otherwise declare storage under `persistence` and let app-template create it
+   - `sealedsecret.yaml` if needed
+   - `kustomization.yaml`
+2. Add to `apps/kustomization.yaml`
+3. Test with `kustomize build apps/<app>`
+
+### Upstream-chart-based
+1. Add the Helm repository to `repositories/repositories.yaml` if needed
+2. Create `apps/<app>/` with `namespace.yaml`, `helmrelease.yaml` (values inline), `networkpolicy.yaml`, sealed secrets if needed, `kustomization.yaml`
+3. Add to `apps/kustomization.yaml`; test with `kustomize build apps/<app>`
+
+### Manifest-based (legacy)
+Existing apps may still use raw `deployment.yaml`/`service.yaml`/`ingress.yaml`. New apps should use a HelmRelease instead.
 
 See [docs/adding-apps.md](docs/adding-apps.md) for detailed examples.
 

@@ -24,23 +24,19 @@ spec:
       retries: 3
   driftDetection:
     mode: enabled
+  # Universal pod security/options come from this shared ConfigMap; inline
+  # values below override/extend it (see apps/_shared/app-template-defaults.yaml).
+  valuesFrom:
+    - kind: ConfigMap
+      name: app-template-defaults
   values:
-    # Pod-level defaults applied to every controller/container below.
     defaultPodOptions:
-      automountServiceAccountToken: false
-      enableServiceLinks: false
       securityContext:
-        runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-        fsGroupChangePolicy: OnRootMismatch
-        seccompProfile:
-          type: RuntimeDefault
     controllers:
       main:
-        type: deployment
-        replicas: 1
         strategy: Recreate
         revisionHistoryLimit: 3
         containers:
@@ -91,7 +87,6 @@ spec:
         ports:
           http:
             port: 8080
-            targetPort: 8080
     # No OIDC middleware: vaultwarden provides its own authentication.
     ingress:
       app:
