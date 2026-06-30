@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-paperless-gpt-to-ollama
+  namespace: paperless
+spec:
+  # Additive policy: the namespace-wide allow-traefik-ingress policy already
+  # grants DNS, same-namespace (paperless API) and public-internet egress, but
+  # it EXCLUDES 192.168.0.0/16. Ollama runs off-cluster on the Windows LAN host,
+  # so paperless-gpt needs this extra egress rule to reach it.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: paperless-gpt
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 192.168.1.254/32
+      ports:
+        - protocol: TCP
+          port: 11434

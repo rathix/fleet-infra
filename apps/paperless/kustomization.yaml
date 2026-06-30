@@ -11,3 +11,6 @@ resources:
   - service.yaml
   - ingress.yaml
   - networkpolicy.yaml
+  - paperless-gpt-sealedsecret.yaml
+  - paperless-gpt.yaml
+  - paperless-gpt-networkpolicy.yaml
