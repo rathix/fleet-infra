@@ -14,7 +14,12 @@ spec:
     name: flux-system
   path: ./apps
   prune: true
-  wait: true
+  # wait: false so a single failing/crashlooping HelmRelease can't stall the
+  # whole apps reconcile (and block other apps' updates) for the 15m timeout.
+  # apps is the terminal stage — nothing dependsOn it — so health-gating the
+  # entire tree has no ordering benefit, only the cross-app blocking downside.
+  # The uptime-kuma healthCheck below stays as a lightweight canary gate.
+  wait: false
   postBuild:
     substituteFrom:
       - kind: ConfigMap
