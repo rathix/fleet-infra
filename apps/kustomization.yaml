@@ -13,6 +13,7 @@ resources:
   - jellyfin
   - seerr
   - lidarr
+  - open-webui
   - paperless
   - pocket-id
   - prowlarr

@@ -1,0 +1,153 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: open-webui
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: app-template
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+      version: 5.0.1
+  interval: 30m
+  timeout: 10m
+  targetNamespace: open-webui
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  # Universal pod security/options come from this shared ConfigMap; inline
+  # values below override/extend it (see apps/_shared/app-template-defaults.yaml).
+  valuesFrom:
+    - kind: ConfigMap
+      name: app-template-defaults
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+    controllers:
+      main:
+        strategy: Recreate
+        revisionHistoryLimit: 3
+        containers:
+          app:
+            image:
+              repository: ghcr.io/open-webui/open-webui
+              tag: v0.10.1@sha256:080a25a7cfc995ad64013a3827a54e681d4a4d70e5a5f79c1209206aefe13265
+            env:
+              # Public URL (used for OIDC redirect + share links)
+              WEBUI_URL: https://openwebui.${domain}
+              # --- LLM backend: off-cluster Ollama on the Windows box ---
+              ENABLE_OLLAMA_API: "true"
+              OLLAMA_BASE_URL: http://192.168.1.254:11434
+              ENABLE_OPENAI_API: "false"
+              # --- Auth: OIDC-only against pocket-id, no local password form ---
+              ENABLE_LOGIN_FORM: "false"
+              ENABLE_SIGNUP: "false"
+              ENABLE_OAUTH_SIGNUP: "true"
+              OAUTH_PROVIDER_NAME: pocket-id
+              OPENID_PROVIDER_URL: https://auth.${domain}/.well-known/openid-configuration
+              OAUTH_SCOPES: openid email profile
+              OAUTH_CLIENT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: open-webui-secrets
+                    key: OAUTH_CLIENT_ID
+              OAUTH_CLIENT_SECRET:
+                valueFrom:
+                  secretKeyRef:
+                    name: open-webui-secrets
+                    key: OAUTH_CLIENT_SECRET
+              # Session signing key
+              WEBUI_SECRET_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: open-webui-secrets
+                    key: WEBUI_SECRET_KEY
+              # --- Keep all caches on the data PVC (non-root: root fs is not writable) ---
+              DATA_DIR: /app/backend/data
+              HOME: /app/backend/data
+              HF_HOME: /app/backend/data/cache/huggingface
+              SENTENCE_TRANSFORMERS_HOME: /app/backend/data/cache/embedding
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  initialDelaySeconds: 30
+                  periodSeconds: 15
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: 8080
+                  # First boot downloads the embedding model; allow up to ~5m
+                  initialDelaySeconds: 15
+                  periodSeconds: 10
+                  failureThreshold: 30
+            securityContext:
+              allowPrivilegeEscalation: false
+              # open-webui writes temp/runtime files outside the data dir
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                cpu: "2"
+                memory: 2Gi
+    service:
+      app:
+        controller: main
+        ports:
+          http:
+            port: 8080
+    # OIDC handled in-app (pocket-id) — no Traefik oidc middleware.
+    ingress:
+      app:
+        className: ${ingress_class}
+        hosts:
+          - host: openwebui.${domain}
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
+    persistence:
+      data:
+        enabled: true
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: ${storage_class}
+        retain: true
+        globalMounts:
+          - path: /app/backend/data
