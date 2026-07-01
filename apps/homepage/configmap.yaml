@@ -272,6 +272,13 @@ data:
             namespace: paperless
             app: paperless
             siteMonitor: http://paperless.paperless.svc.cluster.local:8000
+        - Paperless GPT:
+            icon: paperless-ngx.png
+            href: https://paperless-gpt.${domain}/
+            description: AI document tagging
+            namespace: paperless
+            app: paperless-gpt
+            siteMonitor: http://paperless-gpt.paperless.svc.cluster.local:8080
         - Trilium:
             icon: trilium.png
             href: https://trilium.${domain}/
@@ -299,12 +306,26 @@ data:
             description: Password manager
             namespace: vaultwarden
             app: vaultwarden
-            siteMonitor: http://vaultwarden.vaultwarden.svc.cluster.local:8080
+            siteMonitor: http://vaultwarden-app.vaultwarden.svc.cluster.local:8080
+        - Open WebUI:
+            icon: open-webui.png
+            href: https://openwebui.${domain}/
+            description: LLM chat interface
+            namespace: open-webui
+            app: open-webui
+            siteMonitor: http://open-webui.open-webui.svc.cluster.local:8080
         - Home Assistant:
             icon: home-assistant.png
             href: http://homeassistant.local:8123/
             description: Smart home controller
             siteMonitor: http://192.168.1.151:8123/
+        - Zigbee2MQTT:
+            icon: zigbee2mqtt.png
+            href: https://z2m.${domain}/
+            description: Zigbee bridge
+            namespace: home-assistant
+            app: zigbee2mqtt
+            siteMonitor: http://zigbee2mqtt.home-assistant.svc.cluster.local:8080
     - Cluster Management:
         - Traefik:
             icon: traefik.png
