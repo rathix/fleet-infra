@@ -305,14 +305,14 @@ data:
             href: https://vaultwarden.${domain}/
             description: Password manager
             namespace: vaultwarden
-            app: vaultwarden
+            app: vaultwarden-vaultwarden
             siteMonitor: http://vaultwarden-vaultwarden.vaultwarden.svc.cluster.local:8080
         - Open WebUI:
             icon: open-webui.png
             href: https://openwebui.${domain}/
             description: LLM chat interface
             namespace: open-webui
-            app: open-webui
+            app: open-webui-open-webui
             siteMonitor: http://open-webui-open-webui.open-webui.svc.cluster.local:8080
         - Home Assistant:
             icon: home-assistant.png
