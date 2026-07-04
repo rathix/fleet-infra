@@ -46,7 +46,7 @@ spec:
       # 192.168.0.0/16) to configuration.yaml manually before exposing it.
       containers:
         - name: homeassistant
-          image: ghcr.io/home-assistant/home-assistant:2026.7@sha256:cb76c9922b530f6a5063a15463eb3ad6de287d297c826713abda16795bb98980
+          image: ghcr.io/home-assistant/home-assistant:2026.7@sha256:f73512ba4fe06bb4d57636fe3578d0820cdec46f81e8f837ab59e451662ff3cb
           ports:
             - name: http
               containerPort: 8123
