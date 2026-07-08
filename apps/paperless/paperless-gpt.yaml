@@ -48,7 +48,12 @@ spec:
           app:
             image:
               repository: icereed/paperless-gpt
-              tag: v0.26.0@sha256:1210dcf072d9b3de0eb8aff3d7716c28c5d658f2c5b04f0461f16fd6d9551069
+              # Pinned to v0.25.1: v0.26.0 switched to a start-as-root-then-drop
+              # (su-exec) entrypoint that runs addgroup/chown at boot, which fails
+              # under this non-root securityContext ("addgroup: permission denied").
+              # Moving to v0.26.0+ requires runAsUser:0 + PUID/PGID env + re-adding
+              # CHOWN/SETUID/SETGID/DAC_OVERRIDE/FOWNER caps. Do that deliberately.
+              tag: v0.25.1@sha256:c0ce6186028911101a2cfe68353f14a9dbb2653596f3f1cff94de4b6db3114ff
             env:
               # paperless-ngx connection (in-cluster service + public URL for UI links)
               PAPERLESS_BASE_URL: http://paperless:8000
