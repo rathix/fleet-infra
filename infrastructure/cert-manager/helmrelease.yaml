@@ -14,7 +14,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: cert-manager
-      version: v1.20.3
+      version: v1.21.0
   interval: 30m
   timeout: 10m
   releaseName: cert-manager
