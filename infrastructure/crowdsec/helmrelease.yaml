@@ -69,6 +69,29 @@ spec:
               login_password: 48h
             bouncers_autodelete:
               api_key: 48h
+      # Postoverflow whitelist: drop bans from CrowdSec's BEHAVIORAL scenarios
+      # (crawl/probe detection). Those scenarios are built to police anonymous
+      # PUBLIC sites, where "one client fetching many URLs / hitting 403s" means
+      # a scanner. On this single-user PRIVATE cluster that pattern is just us
+      # using our own apps, so they false-positive and ban the source IP for 4h
+      # across EVERY app. Confirmed FPs (alerts 11703-11706):
+      #   - http-crawl-non_statics + http-sensitive-files (200): Actual Budget
+      #     fetching dozens of /data/migrations/*.sql on load (.sql = "sensitive")
+      #   - http-probing (403): Homepage dashboard polling /api/widgets/* and
+      #     Trilium /sync/sync
+      # Keyed on the SCENARIO, not the source IP, so it holds from any network
+      # (4G / home / work). IP-reputation blocklists (~140k decisions) and inband
+      # AppSec CVE virtual-patching stay active, so known-bad IPs and real
+      # exploit payloads are still blocked — we only stop behavior-based bans.
+      postoverflows:
+        s01-whitelist:
+          private-apps-behavioral.yaml: |
+            name: kennyandries/private-apps-behavioral-whitelist
+            description: "Suppress behavioral crawl/probe bans on legitimate self-hosted app traffic"
+            whitelist:
+              reason: "single-user private homelab; behavioral scenarios FP on normal app use. IP reputation + inband AppSec CVE virtual-patching stay active."
+              expression:
+                - evt.Overflow.Alert.Scenario in ["crowdsecurity/http-crawl-non_statics", "crowdsecurity/http-probing", "crowdsecurity/http-sensitive-files", "crowdsecurity/http-admin-interface-probing"]
     lapi:
       replicas: 1
       resources:
@@ -160,8 +183,10 @@ spec:
           # legitimate app payloads (e.g. Home Assistant's onboarding POST hit
           # the inbound threshold of 5 from a single PL1 rule → 403 → "Create
           # Account does nothing") outweigh the benefit of inline blocking for
-          # apps that already enforce their own auth. CRS still catches real
-          # attacks asynchronously and bans the source IP.
+          # apps that already enforce their own auth. CRS still records alerts
+          # asynchronously for visibility, but no longer bans (see on_match
+          # below) — its anomaly scoring banned roaming clients across all apps
+          # (e.g. Actual's /data/migrations/*.sql tripped CRS 901340).
           #
           # `custom/allowed-methods` MUST be listed first among inband rules: it
           # runs before any CRS-derived method checks in phase 1 and sets
@@ -179,6 +204,15 @@ spec:
             - crowdsecurity/crs
             - crowdsecurity/experimental-*
             - crowdsecurity/appsec-generic-test
+          # Make every out-of-band match DETECT-ONLY: drop its remediation to
+          # "allow" so CRS/experimental rules still raise an alert (visible in
+          # the console) but never create an IP ban. Their broad anomaly scoring
+          # false-positives on legit app payloads; inband vpatch/generic rules
+          # still block (403) real exploit signatures in-flight.
+          on_match:
+            - filter: IsInBand == false
+              apply:
+                - SetRemediation("allow")
       # Custom AppSec rules (chart mounts each key into /etc/crowdsec/appsec-rules/).
       rules:
         allowed-methods.yaml: |
