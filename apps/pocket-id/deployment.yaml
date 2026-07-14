@@ -30,7 +30,7 @@ spec:
           # Pinned to the v2.9.0 build that owns the on-disk DB schema (migration 20260607120000).
           # The other v2.9.0 digest (a2a38a96) is an older app build and crash-loops with
           # "downgrades are not allowed". Do not let Renovate flap this digest (see renovate.json).
-          image: ghcr.io/pocket-id/pocket-id:v2.10.0@sha256:183f1ae8426f3af0b65878fae9ddbe9a0515f6548c04d8ebb640ad1abd9c8fce
+          image: ghcr.io/pocket-id/pocket-id:v2.11.0@sha256:b7c37ab3044e53fd29b5f7295eebff5fdc0367dc043f36b41bcbe1815fcd965d
           imagePullPolicy: IfNotPresent
           securityContext:
             runAsNonRoot: true
