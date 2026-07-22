@@ -53,7 +53,7 @@ spec:
               # under this non-root securityContext ("addgroup: permission denied").
               # Moving to v0.26.0+ requires runAsUser:0 + PUID/PGID env + re-adding
               # CHOWN/SETUID/SETGID/DAC_OVERRIDE/FOWNER caps. Do that deliberately.
-              tag: v0.25.1@sha256:c0ce6186028911101a2cfe68353f14a9dbb2653596f3f1cff94de4b6db3114ff
+              tag: v0.27.0@sha256:855d9df5bacb2bed60bd520f1ffe0d118695aef9f77d37466ae85823001f547d
             env:
               # paperless-ngx connection (in-cluster service + public URL for UI links)
               PAPERLESS_BASE_URL: http://paperless:8000
