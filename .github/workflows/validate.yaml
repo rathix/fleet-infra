@@ -27,7 +27,7 @@ env:
   KUBERNETES_VERSION: "1.36.2"
   KUSTOMIZE_VERSION: "5.8.1"
   KUBECONFORM_VERSION: "0.8.0"
-  FLUX_VERSION: "2.9.2"
+  FLUX_VERSION: "2.9.3"
 
 jobs:
   # ---------------------------------------------------------------------------
