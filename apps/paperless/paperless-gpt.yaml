@@ -37,8 +37,13 @@ spec:
   values:
     defaultPodOptions:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
+        # v0.26.0+ ships a start-as-root entrypoint (entrypoint.sh) that runs
+        # addgroup/adduser/chown then su-exec's down to PUID:PGID. It must start
+        # as uid 0, so override the shared default runAsNonRoot: true. fsGroup
+        # stays 1000 so the emptyDir volumes are group-owned by the final user.
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
         fsGroup: 1000
     controllers:
       main:
@@ -48,13 +53,16 @@ spec:
           app:
             image:
               repository: icereed/paperless-gpt
-              # Pinned to v0.25.1: v0.26.0 switched to a start-as-root-then-drop
-              # (su-exec) entrypoint that runs addgroup/chown at boot, which fails
-              # under this non-root securityContext ("addgroup: permission denied").
-              # Moving to v0.26.0+ requires runAsUser:0 + PUID/PGID env + re-adding
-              # CHOWN/SETUID/SETGID/DAC_OVERRIDE/FOWNER caps. Do that deliberately.
+              # v0.26.0+ runs a start-as-root entrypoint (su-exec) that does
+              # addgroup/adduser/chown then drops to PUID:PGID. That needs the
+              # root pod securityContext + PUID/PGID env + CHOWN/SETUID/SETGID/
+              # DAC_OVERRIDE/FOWNER caps configured below — keep them in sync
+              # with this tag.
               tag: v0.27.0@sha256:855d9df5bacb2bed60bd520f1ffe0d118695aef9f77d37466ae85823001f547d
             env:
+              # Entrypoint (root) creates this user/group and su-exec's down to it.
+              PUID: "1000"
+              PGID: "1000"
               # paperless-ngx connection (in-cluster service + public URL for UI links)
               PAPERLESS_BASE_URL: http://paperless:8000
               PAPERLESS_PUBLIC_URL: https://paperless.${domain}
@@ -117,6 +125,15 @@ spec:
               capabilities:
                 drop:
                   - ALL
+                # Root at boot needs these back (drop:ALL neuters uid 0):
+                # CHOWN+FOWNER+DAC_OVERRIDE for chown -R /app, SETUID+SETGID for
+                # adduser/addgroup and the su-exec drop to PUID:PGID.
+                add:
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - FOWNER
+                  - SETGID
+                  - SETUID
             resources:
               requests:
                 cpu: 100m
